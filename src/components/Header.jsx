@@ -4,7 +4,7 @@ export default function Header({ onLogout }) {
   return (
     <header className="h-16 bg-white shadow flex items-center justify-between px-6">
       <div className="text-lg font-semibold text-blue-700">
-        Vehicle Requisition System — RTO
+        Vehicle Requisition System —
       </div>
       <button
         onClick={onLogout}

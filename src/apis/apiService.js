@@ -1,0 +1,88 @@
+import axios from "axios";
+import { API_ENDPOINTS } from "./endpoint.js";
+
+const api = axios.create({
+  baseURL:  "http://localhost:8091/Requisition",
+  withCredentials: true,
+});
+
+// Authentication
+export const authAPI = {
+  login: credentials => api.post(API_ENDPOINTS.auth.login(), credentials),
+  loginWithOtp: data => api.post(API_ENDPOINTS.auth.loginOtp(), data),
+  sendOtp: data => api.post(API_ENDPOINTS.auth.sendOtp(), data),
+  logout: () => api.post(API_ENDPOINTS.auth.logout()),
+};
+
+// User Management
+export const userAPI = {
+  registerRto: data => api.post(API_ENDPOINTS.users.registerRto(), data),
+  registerCollector: data => api.post(API_ENDPOINTS.users.registerCollector(), data),
+  registerCommissioner: data => api.post(API_ENDPOINTS.users.registerCommissioner(), data),  // Add this
+  registerDepartment: data => api.post(API_ENDPOINTS.users.registerDepartment(), data),
+  registerOfficer: data => api.post(API_ENDPOINTS.users.registerOfficer(), data),
+  getUsersByRole: role => api.get(API_ENDPOINTS.users.byRole(role)),
+  signup: data => api.post(API_ENDPOINTS.users.signup(), data),
+  requisitionSignin: data => api.post(API_ENDPOINTS.users.requisitionSignin(), data),
+  requisitionCreate: data => api.post(API_ENDPOINTS.users.requisitionCreate(), data),
+};
+
+// Vehicle Management
+export const vehicleAPI = {
+  create: data => api.post(API_ENDPOINTS.vehicles.create(), data),
+  list: () => api.get(API_ENDPOINTS.vehicles.list()),
+  details: id => api.get(API_ENDPOINTS.vehicles.details(id)),
+};
+
+// Request Events (PDF letters)
+export const requestEventAPI = {
+  create: formData => api.post(API_ENDPOINTS.requestEvents.create(), formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  }),
+  list: () => api.get(API_ENDPOINTS.requestEvents.list()),
+  details: id => api.get(API_ENDPOINTS.requestEvents.details(id)),
+  viewPdf: id => api.get(API_ENDPOINTS.requestEvents.viewPdf(id), { responseType: "blob" }),
+  downloadPdf: id => api.get(API_ENDPOINTS.requestEvents.downloadPdf(id), { responseType: "blob" }),
+  approve: (id, data) => api.patch(API_ENDPOINTS.requestEvents.approve(id), data),
+};
+
+
+// Events Management with multipart form data
+export const eventAPI = {
+  create: formData => api.post(API_ENDPOINTS.events.create(), formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  }),
+  list: () => api.get(API_ENDPOINTS.events.list()),
+  details: id => api.get(API_ENDPOINTS.events.details(id)),
+  
+   update: (id, data) => api.patch(API_ENDPOINTS.events.update(id), data, {
+    headers: { "Content-Type": "application/json" },
+  }),
+
+  viewPdf: id => api.get(`${API_ENDPOINTS.events.viewPdf(id)}`, { responseType: "blob" }),
+  downloadPdf: (id) => api.get(API_ENDPOINTS.events.downloadPdf(id), { responseType: "blob" }),
+};
+
+
+export const utilizationAPI = {
+  create: data => api.post(API_ENDPOINTS.utilizations.create(), data),
+  list: () => api.get(API_ENDPOINTS.utilizations.list()),
+  details: id => api.get(API_ENDPOINTS.utilizations.details(id)),
+  update: (id, data) => api.put(API_ENDPOINTS.utilizations.update(id), data),
+  delete: id => api.delete(API_ENDPOINTS.utilizations.delete(id)),
+  getByEvent: eventId => api.get(API_ENDPOINTS.utilizations.byEvent(eventId)),
+  getByStatus: status => api.get(API_ENDPOINTS.utilizations.byStatus(status)),
+  approve: (id, approvedBy) => api.put(API_ENDPOINTS.utilizations.approve(id), null, {
+    params: { approvedBy }
+  }),
+  reject: (id, remarks) => api.put(API_ENDPOINTS.utilizations.reject(id), null, {
+    params: { remarks }
+  }),
+    commissionerApprove: (id, commissionerId, remarks) => api.patch(`/api/utilizations/${id}/commissioner-approve`, null, {
+    params: { commissionerApprovedBy: commissionerId, remarks }
+  }),
+  commissionerReject: (id, remarks) => api.patch(`/api/utilizations/${id}/commissioner-reject`, null, {
+    params: { remarks }
+  }),
+
+};

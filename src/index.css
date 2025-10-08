@@ -21,6 +21,7 @@ a {
 a:hover {
   color: #535bf2;
 }
+  .cust
 
 body {
   margin: 0;
@@ -66,4 +67,8 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 } */
+
+.custom{
+  color: brown
+}
 @import "tailwindcss";

@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import Sidebar from "../components/Sidebar";
-import Header from "../components/Header";
+import Sidebar from "../../components/Sidebar";
+import Header from "../../components/Header";
 
 import CreateUser from "./modules/CreateUser";
 import CreateEvent from "./modules/CreateEvent";
-import DisposeEvent from "./modules/DisposeEvent";
+import EventUtilization from "./modules/EventUtilization";
 import ShowAllEvents from "./modules/ShowAllEvents";
 import ShowPaymentBill from "./modules/ShowPaymentBill";
 import UploadLetterToCollector from "./modules/UploadLetterToCollector";
@@ -19,7 +19,7 @@ export default function RTODashboard({ onLogout }) {
       case "DashBoard": return <RTOMainDashboard/>;
       case "CreateUser": return <CreateUser />;
       case "CreateEvent": return <CreateEvent />;
-      case "DisposeEvent": return <DisposeEvent />;
+      case "EventUtilization": return <EventUtilization/>;
       case "ShowAllEvents": return <ShowAllEvents />;
       case "ShowPaymentBill": return <ShowPaymentBill />;
       case "UploadLetterToCollector": return <UploadLetterToCollector />;

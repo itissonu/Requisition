@@ -38,7 +38,7 @@ export default function RTOMainDashboard() {
             {/* Stat Cards */}
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <div className="bg-white p-4 shadow rounded">
-                    <h4 className="text-sm text-gray-500">Total Users</h4>
+                    <h4 className="text-sm text-gray-500 custom">Total Users</h4>
                     <p className="text-2xl font-bold">120</p>
                 </div>
                 <div className="bg-white p-4 shadow rounded">
@@ -97,17 +97,7 @@ export default function RTOMainDashboard() {
                 </div>
             </div>
 
-            {/* Recent Activity */}
-            <div className="bg-white p-4 shadow rounded">
-                <h3 className="font-semibold mb-4">Recent Activity</h3>
-                <ul className="space-y-2 text-sm text-gray-600">
-                    <li>✅ Event #EVT-001 created by User A</li>
-                    <li>📤 Letter uploaded to Collector</li>
-                    <li>🧾 Payment Bill generated for EVT-002</li>
-                    <li>❌ Event EVT-003 disposed</li>
-                    <li>👤 New User registered</li>
-                </ul>
-            </div>
+        
         </div>
     );
 }

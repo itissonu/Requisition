@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { IoMdClose } from "react-icons/io";
 
 export default function RTOLogin({ onLogin }) {
   const [username, setUsername] = useState("");
@@ -8,39 +9,105 @@ export default function RTOLogin({ onLogin }) {
   const [otpSent, setOtpSent] = useState(false);
   const [showLoginOptions, setShowLoginOptions] = useState(false);
   const [selectedRole, setSelectedRole] = useState(null);
-  const dropdownRef = useRef(null); // for outside click
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const dropdownRef = useRef(null);
+  const modalRef = useRef(null);
 
-  // Submit for Username/Password roles
-  const handlePasswordLogin = (e) => {
+  // Role configuration
+  const roles = [
+    {
+      id: "RTO",
+      name: "RTO Login",
+      authType: "password",
+      icon: "🏛️"
+    },
+    {
+      id: "Collector",
+      name: "Collector Login",
+      authType: "password",
+      icon: "👨‍💼"
+    },
+    {
+      id: "Commissioner",  
+      name: "Commissioner Login",
+      authType: "password",
+      icon: "👮‍♂️"
+    }
+
+
+  ];
+
+
+  useEffect(() => {
+    setError("");
+  }, [username, password, mobile, otp]);
+
+ 
+  const handlePasswordLogin = async (e) => {
     e.preventDefault();
-    if (username && password) {
-      onLogin({ role: selectedRole, username, password });
-    } else {
-      alert("Enter Username and Password");
+    setError("");
+
+    if (!username.trim()) {
+      setError("Please enter username");
+      return;
+    }
+    if (!password.trim()) {
+      setError("Please enter password");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // Simulate authentication
+      const userData = {
+        role: selectedRole.id,
+        username,
+        token: `token_${Date.now()}`,
+        name: `${selectedRole.name.split(' ')[0]} User`,
+        loginTime: new Date().toISOString()
+      };
+
+      onLogin(userData);
+    } catch (err) {
+      setError("Login failed. Please check your credentials.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // OTP send simulation
-  const handleSendOtp = () => {
-    if (mobile.length === 10) {
-      setOtpSent(true);
-      alert("OTP sent to " + mobile);
-    } else {
-      alert("Enter a valid 10-digit mobile number");
-    }
+ 
+
+ 
+
+  // Reset form when role changes
+  const handleRoleSelect = (role) => {
+    setSelectedRole(role);
+    setShowLoginOptions(false);
+    setUsername("");
+    setPassword("");
+    setMobile("");
+    setOtp("");
+    setOtpSent(false);
+    setError("");
   };
 
-  // OTP verify simulation
-  const handleOtpLogin = (e) => {
-    e.preventDefault();
-    if (otp.length === 6) {
-      onLogin({ role: selectedRole, mobile, otp });
-    } else {
-      alert("Enter valid 6-digit OTP");
-    }
+
+  const closeModal = () => {
+    setSelectedRole(null);
+    setUsername("");
+    setPassword("");
+    setMobile("");
+    setOtp("");
+    setOtpSent(false);
+    setError("");
   };
 
-  // Close dropdown on outside click
+ 
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -51,158 +118,221 @@ export default function RTOLogin({ onLogin }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  
+  useEffect(() => {
+    function handleModalClickOutside(event) {
+      if (modalRef.current && !modalRef.current.contains(event.target) && selectedRole) {
+        closeModal();
+      }
+    }
+
+    if (selectedRole) {
+      document.addEventListener("mousedown", handleModalClickOutside);
+      
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleModalClickOutside);
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedRole]);
+
+ 
+  useEffect(() => {
+    function handleEscapeKey(event) {
+      if (event.key === 'Escape' && selectedRole) {
+        closeModal();
+      }
+    }
+
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => document.removeEventListener('keydown', handleEscapeKey);
+  }, [selectedRole]);
+
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navbar */}
-      <nav className="bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center">
-        <h1 className="text-lg font-bold text-blue-700">
-          Vehicle Requisition System
-        </h1>
-        <div className="relative" ref={dropdownRef}>
-          <button
-            onClick={() => setShowLoginOptions(!showLoginOptions)}
-            className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700"
-          >
-            Login
-          </button>
-
-          {/* Login Options Card */}
-          {showLoginOptions && (
-            <div className="absolute right-0 mt-2 w-56 bg-white shadow-lg rounded-lg p-2 z-50 border border-gray-200">
-              {[
-                "RTO Login",
-                "Collector Login",
-                "Designated Officer Login",
-                "Department Login",
-              ].map((role) => (
-                <button
-                  key={role}
-                  onClick={() => {
-                    setSelectedRole(role);
-                    setShowLoginOptions(false);
-                    // reset form states
-                    setUsername("");
-                    setPassword("");
-                    setMobile("");
-                    setOtp("");
-                    setOtpSent(false);
-                  }}
-                  className="block w-full text-left px-4 py-2 rounded 
-                             hover:bg-gray-100 hover:text-gray-700 transition"
-                >
-                  {role}
-                </button>
-              ))}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-9xl mx-auto px-1 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">VRS</span>
+              </div>
+              <h1 className="text-xl font-bold text-gray-600">
+                Vehicle Requisition System
+              </h1>
             </div>
-          )}
+
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setShowLoginOptions(!showLoginOptions)}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg 
+                         font-medium transition-colors duration-200 shadow-sm
+                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                Login
+              </button>
+
+              {/* Role Selection Dropdown */}
+              {showLoginOptions && (
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl 
+                              border border-gray-200 py-2 z-50 animate-in slide-in-from-top-2 duration-200
+                              transform origin-top-right">
+
+                  {roles.map((role) => (
+                    <button
+                      key={role.id}
+                      onClick={() => handleRoleSelect(role)}
+                      className="w-full flex items-center px-4 py-3 text-left hover:bg-blue-50 
+                               transition-colors duration-150 group"
+                    >
+
+                      <div>
+                        <div className="font-medium text-gray-900 group-hover:text-blue-700">
+                          {role.name}
+                        </div>
+
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-      </nav>
+      </header>
 
-      {/* Login Form */}
+      {/* Modal Overlay */}
       {selectedRole && (
-        <div className="flex items-center justify-center mt-10">
-          <form
-            onSubmit={
-              selectedRole === "RTO Login" || selectedRole === "Collector Login"
-                ? handlePasswordLogin
-                : handleOtpLogin
-            }
-            className="relative bg-white p-8 rounded-lg shadow-lg w-96 border border-gray-200"
+        <div className="fixed inset-0  bg-opacity-50 z-50 flex items-center justify-center p-4
+                        animate-in fade-in duration-200">
+          <div
+            ref={modalRef}
+            className="bg-white rounded-xl shadow-2xl border border-gray-200 w-full max-w-md 
+                       transform animate-in zoom-in-95 duration-200 origin-center"
           >
-            {/* Close Button */}
-            <button
-              type="button"
-              onClick={() => setSelectedRole(null)}
-              className="absolute top-3 right-3 text-gray-500 hover:text-red-500"
-            >
-              ✖
-            </button>
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div className="flex items-center justify-center space-x-3">
 
-            <h2 className="text-2xl font-bold text-center text-blue-700 mb-6">
-              {selectedRole}
-            </h2>
 
-            {/* Username + Password for RTO / Collector */}
-            {(selectedRole === "RTO Login" ||
-              selectedRole === "Collector Login") && (
+                <h2 className="text-xl font-bold text-gray-900 text-center">
+                  {selectedRole.name}
+                </h2>
+
+                {/* <p className="text-sm text-gray-500">
+                    {selectedRole.authType === 'password' 
+                      ? 'Enter your credentials' 
+                      : 'Login with mobile OTP'
+                    }
+                  </p> */}
+
+              </div>
+              <button
+                onClick={closeModal}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200
+                          focus:outline-none focus:ring-2 focus:ring-gray-300"
+                disabled={isLoading}
+              >
+                <IoMdClose className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            {/* Form Content */}
+            <div className="p-6 space-y-6">
+              {/* Error Message */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 animate-in slide-in-from-top-1 duration-200">
+                  <p className="text-red-700 text-sm">{error}</p>
+                </div>
+              )}
+
+              {/* Username/Password Fields */}
+              {selectedRole.authType === 'password' && (
                 <>
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium">Username</label>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Username
+                    </label>
                     <input
                       type="text"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
-                      className="mt-1 w-full p-2 border rounded"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg 
+                               
+                               transition-colors duration-200"
+                      placeholder="Enter your username"
+                      disabled={isLoading}
+                      autoFocus
                     />
                   </div>
 
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium">Password</label>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Password
+                    </label>
                     <input
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="mt-1 w-full p-2 border rounded"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg 
+                               
+                               transition-colors duration-200"
+                      placeholder="Enter your password"
+                      disabled={isLoading}
+                      onKeyDown={(e) => e.key === 'Enter' && handlePasswordLogin(e)}
                     />
                   </div>
                 </>
               )}
 
-            {/* Mobile + OTP for Designated Officer / Department */}
-            {(selectedRole === "Designated Officer Login" ||
-              selectedRole === "Department Login") && (
-                <>
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium">
-                      Mobile Number
-                    </label>
-                    <input
-                      type="text"
-                      value={mobile}
-                      onChange={(e) => setMobile(e.target.value)}
-                      className="mt-1 w-full p-2 border rounded"
-                      maxLength="10"
-                    />
-                  </div>
+        
 
-                  {!otpSent ? (
-                    <button
-                      type="button"
-                      onClick={handleSendOtp}
-                      className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 mb-4"
-                    >
-                      Send OTP
-                    </button>
-                  ) : (
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium">OTP</label>
-                      <input
-                        type="text"
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value)}
-                        className="mt-1 w-full p-2 border rounded"
-                        maxLength="6"
-                      />
+              {/* Submit Button */}
+              {(selectedRole.authType === 'password' || otpSent) && (
+                <button
+                  type="button"
+                  onClick={selectedRole.authType === 'password' ? handlePasswordLogin : handleOtpLogin}
+                  disabled={isLoading}
+                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 
+                           text-white py-3 rounded-lg font-medium transition-colors duration-200
+                           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                           transform active:scale-95"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center justify-center">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent 
+                                    rounded-full animate-spin mr-2"></div>
+                      {selectedRole.authType === 'password' ? 'Logging in...' : 'Verifying...'}
                     </div>
+                  ) : (
+                    selectedRole.authType === 'password' ? 'Login' : 'Verify OTP'
                   )}
-                </>
+                </button>
               )}
 
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
-            >
-              {selectedRole === "RTO Login" || selectedRole === "Collector Login"
-                ? "Login"
-                : "Verify OTP"}
-            </button>
-            <div>
-              <a href="#">Forgot Password?</a>
+              {/* Forgot Password Link */}
+              {selectedRole.authType === 'password' && (
+                <div className="text-center">
+                  <button
+                    type="button"
+                    className="text-sm text-blue-600 hover:text-blue-700 hover:underline transition-colors duration-200"
+                    disabled={isLoading}
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+              )}
             </div>
-          </form>
-
+          </div>
         </div>
       )}
     </div>
   );
 }
+
+
