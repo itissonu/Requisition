@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Search, Filter, Eye, Edit, FileText, CheckCircle, XCircle, Clock, Download, X } from "lucide-react";
 import { eventAPI } from "../../../apis/apiService";
+import logo from '../../../assests/logo.png';
 
 export default function ShowAllEvents() {
   const [events, setEvents] = useState([]);
@@ -10,7 +11,7 @@ export default function ShowAllEvents() {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [loading, setLoading] = useState(true);
-  
+
   // PDF Modal states
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
   const [pdfUrl, setPdfUrl] = useState(null);
@@ -43,7 +44,7 @@ export default function ShowAllEvents() {
     let filtered = events;
 
     if (searchTerm) {
-      filtered = filtered.filter(event => 
+      filtered = filtered.filter(event =>
         event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         event.requestingDepartment.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (event.collectorName && event.collectorName.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -87,10 +88,10 @@ export default function ShowAllEvents() {
     try {
       setPdfLoading(true);
       setCurrentEventForPdf(event);
-      
-      
+
+
       const pdfViewUrl = `http://localhost:8091/Requisition/api/events/${event.id}/pdf/view`;
-      
+
       setPdfUrl(pdfViewUrl);
       setPdfModalOpen(true);
     } catch (error) {
@@ -107,7 +108,7 @@ export default function ShowAllEvents() {
       const response = await eventAPI.downloadPdf(event.id);
       const blob = new Blob([response.data], { type: 'application/pdf' });
       const url = window.URL.createObjectURL(blob);
-      
+
       // Create download link
       const link = document.createElement('a');
       link.href = url;
@@ -115,7 +116,7 @@ export default function ShowAllEvents() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       // Clean up
       window.URL.revokeObjectURL(url);
     } catch (error) {
@@ -158,7 +159,15 @@ export default function ShowAllEvents() {
     <div className="bg-white min-h-screen">
       {/* Government Header */}
       <div className="bg-blue-900 text-white p-6 shadow-lg">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto  items-center justify-center">
+        
+          <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mr-4">
+            <img
+              src={logo}
+              alt="Odisha Logo"
+              className="w-14 h-14 object-contain"
+            />
+          </div>
           <h1 className="text-2xl font-bold text-center">GOVERNMENT OF ODISHA</h1>
           <h2 className="text-lg text-center opacity-90">Commerce & Transport (Transport) Department</h2>
           <h3 className="text-md text-center font-semibold mt-2 border-t border-blue-700 pt-3">
@@ -282,7 +291,7 @@ export default function ShowAllEvents() {
                         >
                           <Eye className="w-4 h-4" />
                         </button>
-                        
+
                         <button
                           onClick={() => handleViewPdf(event)}
                           disabled={pdfLoading}
@@ -291,7 +300,7 @@ export default function ShowAllEvents() {
                         >
                           <FileText className="w-4 h-4" />
                         </button>
-                        
+
                         {canEdit(event) && (
                           <button
                             onClick={() => console.log('Edit event', event?.id)}
@@ -356,7 +365,7 @@ export default function ShowAllEvents() {
                 </button>
               </div>
             </div>
-            
+
             <div className="p-6 space-y-6">
               {/* Basic Information */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -365,18 +374,18 @@ export default function ShowAllEvents() {
                     <label className="font-semibold text-gray-700 block mb-1">Event Name:</label>
                     <p className="text-gray-900">{selectedEvent.name}</p>
                   </div>
-                  
+
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
                     <label className="font-semibold text-gray-700 block mb-1">Department:</label>
                     <p className="text-gray-900">{selectedEvent.requestingDepartment}</p>
                   </div>
-                  
+
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
                     <label className="font-semibold text-gray-700 block mb-1">Collector:</label>
                     <p className="text-gray-900">{selectedEvent.collectorName || 'Not Assigned'}</p>
                   </div>
                 </div>
-                
+
                 <div className="space-y-4">
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
                     <label className="font-semibold text-gray-700 block mb-1">Status:</label>
@@ -385,7 +394,7 @@ export default function ShowAllEvents() {
                       {getStatusDisplayName(selectedEvent.status)}
                     </span>
                   </div>
-                  
+
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
                     <label className="font-semibold text-gray-700 block mb-1">Duration:</label>
                     <div className="text-gray-900">
@@ -393,14 +402,14 @@ export default function ShowAllEvents() {
                       <div>To: {selectedEvent.dateOfRelease}</div>
                     </div>
                   </div>
-                  
+
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
                     <label className="font-semibold text-gray-700 block mb-1">Created:</label>
                     <p className="text-gray-900">{new Date(selectedEvent.createdAt).toLocaleString('en-IN')}</p>
                   </div>
                 </div>
               </div>
-              
+
               {/* Vehicle Requirements */}
               <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-purple-500">
                 <label className="font-semibold text-gray-700 block mb-3">Vehicle Requirements:</label>
@@ -418,7 +427,7 @@ export default function ShowAllEvents() {
                   ))}
                 </div>
               </div>
-              
+
               {/* Document Section */}
               <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-orange-500">
                 <label className="font-semibold text-gray-700 block mb-3">Supporting Document:</label>
@@ -431,7 +440,7 @@ export default function ShowAllEvents() {
                     <FileText className="w-4 h-4" />
                     {pdfLoading ? 'Opening...' : 'View PDF'}
                   </button>
-                  
+
                   <button
                     onClick={() => handleDownloadPdf(selectedEvent)}
                     className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
@@ -441,13 +450,13 @@ export default function ShowAllEvents() {
                     {pdfLoading ? 'Downloading...' : 'Download PDF'}
                   </button>
                 </div>
-                
+
                 <p className="text-sm text-gray-600 mt-2">
                   {selectedEvent.letterFileName || 'Requisition Letter PDF'}
                 </p>
               </div>
             </div>
-            
+
             {/* Modal Footer */}
             <div className="bg-gray-100 p-4 rounded-b-lg">
               <div className="flex justify-end gap-3">
@@ -498,7 +507,7 @@ export default function ShowAllEvents() {
                   <Download className="w-4 h-4" />
                   Download
                 </button>
-                
+
                 <button
                   onClick={() => window.open(pdfUrl, '_blank')}
                   className="bg-purple-600 text-white px-3 py-2 rounded hover:bg-purple-700 transition-colors flex items-center gap-2"
@@ -506,7 +515,7 @@ export default function ShowAllEvents() {
                   <FileText className="w-4 h-4" />
                   Open in New Tab
                 </button>
-                
+
                 <button
                   onClick={closePdfModal}
                   className="text-white hover:text-gray-300 p-1"
@@ -515,7 +524,7 @@ export default function ShowAllEvents() {
                 </button>
               </div>
             </div>
-            
+
             {/* PDF Content - Native iframe */}
             <div className="h-[calc(95vh-120px)] bg-gray-100">
               {pdfUrl ? (
@@ -537,7 +546,7 @@ export default function ShowAllEvents() {
                   </div>
                 </div>
               )}
-              
+
               {pdfLoading && (
                 <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center">
                   <div className="text-center">

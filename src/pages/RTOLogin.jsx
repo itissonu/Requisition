@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { IoMdClose } from "react-icons/io";
+import { authAPI } from "../apis/apiService";
+import logo from '../assests/home4.png';
 
 export default function RTOLogin({ onLogin }) {
   const [username, setUsername] = useState("");
@@ -14,25 +16,30 @@ export default function RTOLogin({ onLogin }) {
   const dropdownRef = useRef(null);
   const modalRef = useRef(null);
 
+
+
   // Role configuration
   const roles = [
     {
       id: "RTO",
       name: "RTO Login",
       authType: "password",
-      icon: "🏛️"
+      icon: "🏛️",
+       color: "blue",
     },
     {
       id: "Collector",
       name: "Collector Login",
       authType: "password",
-      icon: "👨‍💼"
+      icon: "👨‍💼",
+       color: "blue",
     },
     {
-      id: "Commissioner",  
+      id: "Commissioner",
       name: "Commissioner Login",
       authType: "password",
-      icon: "👮‍♂️"
+      icon: "👮‍♂️",
+       color: "blue",
     }
 
 
@@ -43,11 +50,10 @@ export default function RTOLogin({ onLogin }) {
     setError("");
   }, [username, password, mobile, otp]);
 
- 
+
   const handlePasswordLogin = async (e) => {
     e.preventDefault();
     setError("");
-
     if (!username.trim()) {
       setError("Please enter username");
       return;
@@ -56,33 +62,32 @@ export default function RTOLogin({ onLogin }) {
       setError("Please enter password");
       return;
     }
-
     setIsLoading(true);
 
     try {
-      
       await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Simulate authentication
-      const userData = {
-        role: selectedRole.id,
+      const response = await authAPI.login({
         username,
-        token: `token_${Date.now()}`,
-        name: `${selectedRole.name.split(' ')[0]} User`,
-        loginTime: new Date().toISOString()
-      };
+        password,
 
-      onLogin(userData);
+      });
+
+      console.log(response.data)
+      localStorage.setItem("authToken", response.data.token);
+
+      onLogin({
+        role: selectedRole?.id,
+        username,
+        token: response?.data.token,
+        name: response?.data.name || `${selectedRole?.name.split(" ")[0]} User`,
+        loginTime: new Date().toISOString()
+      });
     } catch (err) {
       setError("Login failed. Please check your credentials.");
     } finally {
       setIsLoading(false);
     }
   };
-
- 
-
- 
 
   // Reset form when role changes
   const handleRoleSelect = (role) => {
@@ -96,7 +101,6 @@ export default function RTOLogin({ onLogin }) {
     setError("");
   };
 
-
   const closeModal = () => {
     setSelectedRole(null);
     setUsername("");
@@ -107,7 +111,6 @@ export default function RTOLogin({ onLogin }) {
     setError("");
   };
 
- 
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -118,7 +121,7 @@ export default function RTOLogin({ onLogin }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  
+
   useEffect(() => {
     function handleModalClickOutside(event) {
       if (modalRef.current && !modalRef.current.contains(event.target) && selectedRole) {
@@ -128,7 +131,6 @@ export default function RTOLogin({ onLogin }) {
 
     if (selectedRole) {
       document.addEventListener("mousedown", handleModalClickOutside);
-      
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
@@ -140,14 +142,13 @@ export default function RTOLogin({ onLogin }) {
     };
   }, [selectedRole]);
 
- 
+
   useEffect(() => {
     function handleEscapeKey(event) {
       if (event.key === 'Escape' && selectedRole) {
         closeModal();
       }
     }
-
     document.addEventListener('keydown', handleEscapeKey);
     return () => document.removeEventListener('keydown', handleEscapeKey);
   }, [selectedRole]);
@@ -176,6 +177,7 @@ export default function RTOLogin({ onLogin }) {
               >
                 Login
               </button>
+
 
               {/* Role Selection Dropdown */}
               {showLoginOptions && (
@@ -218,8 +220,7 @@ export default function RTOLogin({ onLogin }) {
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <div className="flex items-center justify-center space-x-3">
-
-
+              
                 <h2 className="text-xl font-bold text-gray-900 text-center">
                   {selectedRole.name}
                 </h2>
@@ -242,9 +243,8 @@ export default function RTOLogin({ onLogin }) {
               </button>
             </div>
 
-            {/* Form Content */}
             <div className="p-6 space-y-6">
-              {/* Error Message */}
+
               {error && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3 animate-in slide-in-from-top-1 duration-200">
                   <p className="text-red-700 text-sm">{error}</p>
@@ -290,7 +290,7 @@ export default function RTOLogin({ onLogin }) {
                 </>
               )}
 
-        
+
 
               {/* Submit Button */}
               {(selectedRole.authType === 'password' || otpSent) && (
@@ -331,6 +331,9 @@ export default function RTOLogin({ onLogin }) {
           </div>
         </div>
       )}
+      <div>
+        <img src={logo} alt="Description" className="w-full h-[100vh] " />
+      </div>
     </div>
   );
 }

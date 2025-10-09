@@ -8,6 +8,8 @@ import ShowAllRequests from "./components/ShowAllRequests.jsx";
 import ShowAllEvents from "./components/ShowAllEvents";
 import CollectorSidebar from "./components/CollectorSidebar.jsx";
 import ApproveUtilizations from "./components/ApproveUtilizations.jsx";
+import UploadLetterToRTO from "./components/Requisitionrequest.jsx";
+import VehicleRequisitionForm from "./components/VehicleRequisitionForm.jsx";
              
 
 export default function CollectorDashboard({ onLogout }) {
@@ -19,6 +21,9 @@ export default function CollectorDashboard({ onLogout }) {
       case "ApproveRequests": return <ApproveRequests />;
       case "ApproveUtilizations": return <ApproveUtilizations/>;
       case "ShowAllEvents": return <ShowAllEvents />;
+     
+      case "LetterToRTO": return <UploadLetterToRTO />;
+      case "RequisitionForm": return <VehicleRequisitionForm />;
       default: return <CollectorMainDashboard />;
     }
   };

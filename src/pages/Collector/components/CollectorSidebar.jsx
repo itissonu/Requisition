@@ -2,55 +2,109 @@ import React from "react";
 import { 
   LayoutDashboard, 
   CheckSquare, 
-  FileText, 
+  Truck, 
   Calendar, 
-  User,
-  Truck
+  User, 
+  FileText
 } from "lucide-react";
 
 const collectorItems = [
-  { key: "Dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { key: "ApproveRequests", label: "Approve Requests", icon: CheckSquare },
-  { key: "ApproveUtilizations", label: "Approve Utilizations", icon: Truck },
-  // { key: "ShowAllRequests", label: "All Requests", icon: FileText },
-  { key: "ShowAllEvents", label: "All Events", icon: Calendar }
+  { 
+    key: "Dashboard", 
+    label: "Dashboard", 
+    icon: LayoutDashboard, 
+    description: "Overview & Reports" 
+  },
+  { 
+    key: "ApproveRequests", 
+    label: "Approve Requests", 
+    icon: CheckSquare, 
+    description: "Review Pending Requests",
+    //badge: 3 
+  },
+  { 
+    key: "ApproveUtilizations", 
+    label: "Approve Utilizations", 
+    icon: Truck, 
+    description: "Vehicle Usage Approvals"
+  },
+  { 
+    key: "ShowAllEvents", 
+    label: "All Events", 
+    icon: Calendar, 
+    description: "View Event Details" 
+  },
+  { 
+    key: "LetterToRTO", 
+    label: "Letter to RTO", 
+    icon: FileText, 
+    description: "Upload Letter to RTO" 
+  },
+    { 
+    key: "RequisitionForm", 
+    label: "Vehicle Requisition Form", 
+    icon: FileText, 
+    description: "Create a new vehicle requisition" 
+  }
 ];
 
 export default function CollectorSidebar({ activePage, setActivePage }) {
   return (
-    <aside className="w-72 bg-white border-r min-h-screen p-4">
-      <div className="mb-6">
-        <div className="flex items-center gap-3">
-          <User className="w-8 h-8 text-blue-600" />
+    <div className="w-72 bg-blue-900 text-white min-h-screen flex flex-col justify-between">
+      {/* Header Section */}
+      <div className="p-6">
+        <div className="flex items-center mb-8">
+          <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center mr-3">
+            <User className="w-5 h-5 text-blue-900" />
+          </div>
           <div>
-            <h3 className="font-bold text-lg text-gray-900">Collector Dashboard</h3>
-            <p className="text-sm text-gray-600">Vehicle Requisition System</p>
+            <h1 className="text-lg font-bold leading-tight">Collector</h1>
+            <p className="text-xs text-gray-300">Vehicle Requisition System</p>
           </div>
         </div>
+
+        {/* Menu Items */}
+        <nav className="space-y-2">
+          <div className="mb-4">
+            <h2 className="text-gray-300 text-xs uppercase tracking-wide font-semibold">
+              Dashboard Menu
+            </h2>
+          </div>
+
+          {collectorItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activePage === item.key;
+            return (
+              <button
+                key={item.key}
+                onClick={() => setActivePage(item.key)}
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-all ${
+                  isActive
+                    ? "bg-blue-800 border-r-4 border-white shadow-md"
+                    : "hover:bg-blue-800"
+                }`}
+              >
+                <Icon className="w-5 h-5 mr-3" />
+                <div className="flex-1">
+                  <div className="font-medium">{item.label}</div>
+                  <div className="text-xs text-gray-300">{item.description}</div>
+                </div>
+                {item.badge && (
+                  <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1">
+                    {item.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </nav>
       </div>
-      
-      <nav className="space-y-2">
-        {collectorItems.map((item) => {
-          const IconComponent = item.icon;
-          return (
-            <button
-              key={item.key}
-              onClick={() => setActivePage(item.key)}
-              className={`flex items-center gap-3 w-full text-left px-4 py-3 rounded-lg transition-colors ${
-                activePage === item.key 
-                  ? "bg-blue-600 text-white shadow-md" 
-                  : "hover:bg-gray-100 text-gray-700"
-              }`}
-            >
-              <IconComponent className="w-5 h-5" />
-              <span className="font-medium">{item.label}</span>
-              {activePage === item.key && (
-                <div className="ml-auto w-2 h-2 bg-white rounded-full"></div>
-              )}
-            </button>
-          );
-        })}
-      </nav>
-    </aside>
+
+      {/* Footer Section */}
+      <div className="p-6 text-xs text-gray-400">
+        <p>Government of Odisha</p>
+        <p>Transport Department</p>
+      </div>
+    </div>
   );
 }

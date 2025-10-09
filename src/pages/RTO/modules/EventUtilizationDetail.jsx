@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { FileText, Calculator, Save, X, Eye } from "lucide-react";
+import { FileText, Calculator, Save, X } from "lucide-react";
 import { eventAPI, utilizationAPI, vehicleAPI } from "../../../apis/apiService";
 
 export default function EventUtilizationForm() {
@@ -9,44 +9,39 @@ export default function EventUtilizationForm() {
 
   const [event, setEvent] = useState(null);
   const [vehicles, setVehicles] = useState([]);
-  const [quantities, setQuantities] = useState({});
-  const [rowCosts, setRowCosts] = useState({});
+  const [utilizationData, setUtilizationData] = useState({});
   const [totalCost, setTotalCost] = useState(0);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-
   useEffect(() => {
     const fetchData = async () => {
       try {
-
         const eventResponse = await eventAPI.details(eventId);
         const eventData = eventResponse.data;
         setEvent(eventData);
 
-        console.log("Event Data:", eventData);
-
         const vehicleResponse = await vehicleAPI.list();
         setVehicles(vehicleResponse.data);
 
-        // Initialize quantities and costs
-        const initQty = {};
-        const initCosts = {};
-
+        // Initialize utilization data
+        const initData = {};
         if (eventData.vehicles) {
           eventData.vehicles.forEach(eventVehicle => {
             const vehicleInfo = vehicleResponse.data.find(v => v.id === eventVehicle.vehicleId);
+            const ratePerKm = vehicleInfo?.ratePerKm || 0;
             const quantity = eventVehicle.quantity || 0;
-            const ratePerDay = vehicleInfo?.ratePerDay || 0;
-
-            initQty[eventVehicle.vehicleId] = quantity;
-            initCosts[eventVehicle.vehicleId] = quantity * ratePerDay;
+            
+            initData[eventVehicle.vehicleId] = {
+              actualQuantity: quantity,
+              ratePerKm: ratePerKm,
+              totalCost: quantity * ratePerKm,
+              requestedQuantity: quantity
+            };
           });
         }
 
-        setQuantities(initQty);
-        setRowCosts(initCosts);
-
+        setUtilizationData(initData);
       } catch (error) {
         console.error('Error fetching data:', error);
         alert('Failed to load event data. Please try again.');
@@ -61,26 +56,46 @@ export default function EventUtilizationForm() {
     }
   }, [eventId, navigate]);
 
-  // Calculate total cost whenever row costs change
+  // Calculate total cost whenever utilization data changes
   useEffect(() => {
-    const total = Object.values(rowCosts).reduce((sum, cost) => sum + (parseFloat(cost) || 0), 0);
+    const total = Object.values(utilizationData).reduce(
+      (sum, item) => sum + (parseFloat(item.totalCost) || 0), 
+      0
+    );
     setTotalCost(total);
-  }, [rowCosts]);
+  }, [utilizationData]);
 
   const getVehicleInfo = (vehicleId) => {
-    return vehicles.find(v => v.id === vehicleId) || { name: 'Unknown Vehicle', ratePerDay: 0 };
+    return vehicles.find(v => v.id === vehicleId) || { name: 'Unknown Vehicle', ratePerKm: 0 };
   };
 
-  const handleQuantityChange = (vehicleId, newQty) => {
-    const vehicleInfo = getVehicleInfo(vehicleId);
-    const newCost = newQty * vehicleInfo.ratePerDay;
+  const handleQuantityChange = (vehicleId, newQuantity) => {
+    const quantity = parseInt(newQuantity) || 0;
+    const currentData = utilizationData[vehicleId] || {};
+    const ratePerKm = currentData.ratePerKm || 0;
+    const newTotalCost = quantity * ratePerKm;
 
-    setQuantities({ ...quantities, [vehicleId]: newQty });
-    setRowCosts({ ...rowCosts, [vehicleId]: newCost });
+    setUtilizationData({
+      ...utilizationData,
+      [vehicleId]: {
+        ...currentData,
+        actualQuantity: quantity,
+        totalCost: newTotalCost
+      }
+    });
   };
 
-  const handleRowCostChange = (vehicleId, newCost) => {
-    setRowCosts({ ...rowCosts, [vehicleId]: parseFloat(newCost) || 0 });
+  const handleTotalCostChange = (vehicleId, newCost) => {
+    const cost = parseFloat(newCost) || 0;
+    const currentData = utilizationData[vehicleId] || {};
+
+    setUtilizationData({
+      ...utilizationData,
+      [vehicleId]: {
+        ...currentData,
+        totalCost: cost
+      }
+    });
   };
 
   const handleViewEventPdf = () => {
@@ -93,18 +108,21 @@ export default function EventUtilizationForm() {
     try {
       const payload = {
         eventId: parseInt(eventId),
-        vehicleUtilizations: event.vehicles.map(eventVehicle => ({
-          vehicleId: eventVehicle.vehicleId,
-          actualQuantity: quantities[eventVehicle.vehicleId] || 0,
-          totalCost: rowCosts[eventVehicle.vehicleId] || 0
-        })),
         totalCost: totalCost,
-        status: "CREATED"
+        remarks: "",
+        vehicleUtilizations: event.vehicles.map(eventVehicle => {
+          const data = utilizationData[eventVehicle.vehicleId] || {};
+          return {
+            vehicleId: eventVehicle.vehicleId,
+            actualQuantity: data.actualQuantity || 0,
+            totalCost: data.totalCost || 0
+          };
+        })
       };
-   console.log("Submit Utilization:", payload);
-      await utilizationAPI.create(payload);
 
       console.log("Submit Utilization:", payload);
+      await utilizationAPI.create(payload);
+
       alert("Utilization created successfully!");
       navigate("/rto/event-utilization");
 
@@ -216,17 +234,21 @@ export default function EventUtilizationForm() {
                   <tr className="bg-blue-900 text-white">
                     <th className="border border-gray-400 p-3 text-center font-bold">Sl.No</th>
                     <th className="border border-gray-400 p-3 text-left font-bold">Vehicle Type</th>
-                    <th className="border border-gray-400 p-3 text-center font-bold">Rate/Day (₹)</th>
+                    <th className="border border-gray-400 p-3 text-center font-bold">Rate/Km (₹)</th>
                     <th className="border border-gray-400 p-3 text-center font-bold">Requested Qty</th>
                     <th className="border border-gray-400 p-3 text-center font-bold">Actual Qty</th>
+                    <th className="border border-gray-400 p-3 text-center font-bold">Auto Calculated (₹)</th>
                     <th className="border border-gray-400 p-3 text-right font-bold">Total Cost (₹)</th>
                   </tr>
                 </thead>
                 <tbody>
                   {event.vehicles && event.vehicles.map((eventVehicle, idx) => {
                     const vehicleInfo = getVehicleInfo(eventVehicle.vehicleId);
-                    const actualQty = quantities[eventVehicle.vehicleId] || 0;
-                    const rowCost = rowCosts[eventVehicle.vehicleId] || 0;
+                    const data = utilizationData[eventVehicle.vehicleId] || {};
+                    const actualQty = data.actualQuantity || 0;
+                    const ratePerKm = data.ratePerKm || 0;
+                    const autoCalculated = actualQty * ratePerKm;
+                    const totalCost = data.totalCost || 0;
 
                     return (
                       <tr key={eventVehicle.vehicleId} className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}>
@@ -237,9 +259,9 @@ export default function EventUtilizationForm() {
                           {vehicleInfo.name}
                         </td>
                         <td className="border border-gray-300 p-3 text-center font-medium text-green-800">
-                          ₹{vehicleInfo.ratePerDay?.toLocaleString('en-IN') || '0'}
+                          ₹{ratePerKm.toLocaleString('en-IN')}
                         </td>
-                        <td className="border border-gray-300 p-3 text-center font-medium">
+                        <td className="border border-gray-300 p-3 text-center font-medium text-blue-700">
                           {eventVehicle.quantity}
                         </td>
                         <td className="border border-gray-300 p-3 text-center">
@@ -247,17 +269,26 @@ export default function EventUtilizationForm() {
                             type="number"
                             min="0"
                             value={actualQty}
-                            onChange={(e) => handleQuantityChange(eventVehicle.vehicleId, parseInt(e.target.value) || 0)}
-                            className="w-20 border-2 border-gray-300 rounded-lg text-center p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-semibold"
+                            onChange={(e) => handleQuantityChange(eventVehicle.vehicleId, e.target.value)}
+                            className="w-24 border-2 border-gray-300 rounded-lg text-center p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-semibold"
                           />
+                        </td>
+                        <td className="border border-gray-300 p-3 text-center font-medium bg-yellow-50">
+                          <span className="text-orange-700 font-bold">
+                            ₹{autoCalculated.toLocaleString('en-IN')}
+                          </span>
+                          <div className="text-xs text-gray-600 mt-1">
+                            ({actualQty} × ₹{ratePerKm})
+                          </div>
                         </td>
                         <td className="border border-gray-300 p-3 text-right">
                           <input
                             type="number"
                             step="0.01"
-                            value={rowCost}
-                            onChange={(e) => handleRowCostChange(eventVehicle.vehicleId, e.target.value)}
-                            className="w-32 border-2 border-gray-300 rounded-lg text-right p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-semibold"
+                            min="0"
+                            value={totalCost}
+                            onChange={(e) => handleTotalCostChange(eventVehicle.vehicleId, e.target.value)}
+                            className="w-36 border-2 border-green-400 rounded-lg text-right p-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 font-bold text-green-700"
                           />
                         </td>
                       </tr>
@@ -266,17 +297,24 @@ export default function EventUtilizationForm() {
                 </tbody>
                 <tfoot>
                   <tr className="bg-gradient-to-r from-blue-800 to-blue-900 text-white">
-                    <td colSpan="5" className="border border-gray-400 p-4 text-right font-bold text-lg">
-                      TOTAL COST:
+                    <td colSpan="6" className="border border-gray-400 p-4 text-right font-bold text-lg">
+                      TOTAL UTILIZATION COST:
                     </td>
                     <td className="border border-gray-400 p-4 text-right">
                       <div className="text-2xl font-bold text-yellow-300">
-                        ₹{totalCost.toLocaleString('en-IN')}
+                        ₹{totalCost.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </div>
                     </td>
                   </tr>
                 </tfoot>
               </table>
+            </div>
+
+            <div className="mt-4 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+              <p className="text-sm text-blue-800">
+                <strong>💡 How it works:</strong> Enter the actual quantity used. The "Auto Calculated" column shows (Quantity × Rate/Km). 
+                You can edit the "Total Cost" field if the actual cost differs (e.g., due to additional charges or discounts).
+              </p>
             </div>
           </div>
         </div>

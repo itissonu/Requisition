@@ -13,7 +13,7 @@ const menuItems = [
     label: "Pending Approvals",
     icon: Clock,
     description: "Review Utilizations",
-    badge: true
+    // badge: true
   },
   {
     key: "ApprovedUtilizations",

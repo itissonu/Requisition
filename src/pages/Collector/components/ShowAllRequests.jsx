@@ -11,7 +11,7 @@ import {
   User
 } from "lucide-react";
 
-// Demo data for all requests (based on your Event model)
+
 const allRequests = [
   {
     id: 1,

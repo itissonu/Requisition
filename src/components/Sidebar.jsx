@@ -18,12 +18,12 @@ const menuItems = [
     icon: Home,
     description: "Overview & Statistics"
   },
-  {
-    key: "CreateUser",
-    label: "Create User",
-    icon: UserPlus,
-    description: "Register New Accounts"
-  },
+  // {
+  //   key: "CreateUser",
+  //   label: "Create User",
+  //   icon: UserPlus,
+  //   description: "Register New Accounts"
+  // },
   {
     key: "CreateEvent",
     label: "Create Event",

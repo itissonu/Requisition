@@ -84,5 +84,8 @@ export const utilizationAPI = {
   commissionerReject: (id, remarks) => api.patch(`/api/utilizations/${id}/commissioner-reject`, null, {
     params: { remarks }
   }),
+   completePayment: (id, remarks) => 
+    api.put(`/api/utilizations/${id}/complete-payment`, null, { params: { remarks } }),
+  
 
 };
