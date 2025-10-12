@@ -15,8 +15,8 @@ export default function ShowPaymentBills() {
   const [selected, setSelected] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
- 
-console.log(completedBills,"completed bills");
+
+  console.log(completedBills, "completed bills");
 
   useEffect(() => {
     fetchBills();
@@ -30,7 +30,7 @@ console.log(completedBills,"completed bills");
       const approvedResponse = await utilizationAPI.getByStatus("COMMISSIONER_APPROVED");
       const approvedUtilizations = approvedResponse.data;
 
-      console.log(approvedUtilizations,"approved utilizations");
+      console.log(approvedUtilizations, "approved utilizations");
 
       const constructedPendingBills = approvedUtilizations.map(utilization => {
         const startDate = new Date(utilization.dateOfReporting);
@@ -104,8 +104,42 @@ console.log(completedBills,"completed bills");
       <html>
       <head>
         <style>
-          body { font-family: Arial, sans-serif; padding: 20px; }
-          .header { text-align: center; margin-bottom: 30px; }
+          body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            position: relative;
+          }
+          .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.08;
+            z-index: -1;
+            width: 400px;
+            height: 400px;
+            pointer-events: none;
+          }
+          .watermark img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+          }
+          .header { 
+            text-align: center; 
+            margin-bottom: 30px;
+            position: relative;
+          }
+          .header-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 15px;
+          }
+          .header-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+          }
           .header h1 { margin: 5px 0; font-size: 18px; }
           .header h2 { margin: 5px 0; font-size: 14px; font-weight: normal; }
           .bill-info { margin: 20px 0; }
@@ -114,14 +148,24 @@ console.log(completedBills,"completed bills");
           .bill-info td:first-child { font-weight: bold; width: 40%; background: #f5f5f5; }
           .section-title { font-weight: bold; margin-top: 20px; margin-bottom: 10px; font-size: 14px; }
           .vehicle-table, .cost-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-          .vehicle-table th, .cost-table th { background: #2980b9; color: white; padding: 10px; text-align: left; }
+          .vehicle-table th, .cost-table th { background: #2980b9; color: white; padding: 5px; text-align: left; }
           .vehicle-table td, .cost-table td { padding: 8px; border: 1px solid #ddd; }
           .total-row { font-weight: bold; background: #f0f0f0; }
           .footer { margin-top: 30px; text-align: center; font-size: 10px; font-style: italic; }
+          @media print {
+            .watermark { position: absolute; z-index: 100; }
+          }
         </style>
       </head>
       <body>
+        <div class="watermark">
+          <img src="${logo}" alt="Odisha Government Seal" />
+        </div>
+        
         <div class="header">
+          <div class="header-logo">
+            <img src="${logo}" alt="Odisha Government Logo" />
+          </div>
           <h1>GOVERNMENT OF ODISHA</h1>
           <h2>Commerce & Transport (Transport) Department</h2>
           <h1 style="margin-top: 15px;">PAYMENT BILL</h1>
@@ -292,9 +336,12 @@ console.log(completedBills,"completed bills");
                         </td>
                         <td className="p-3 border text-gray-700">{bill.department}</td>
                         <td className="p-3 border text-sm">
-                          <div>{bill.dateOfReporting}</div>
+                          <div>
+                            {new Date(bill.dateOfReporting).toLocaleDateString('en-GB')}
+                          </div>
+
                           <div className="text-gray-500">to</div>
-                          <div>{bill.dateOfRelease}</div>
+                          <div>{new Date(bill.dateOfRelease).toLocaleDateString('en-GB')}</div>
                         </td>
                         <td className="p-3 border text-center font-semibold">{bill.days}</td>
                         <td className="p-3 border text-center font-semibold">{bill.vehiclesUsed}</td>
@@ -387,9 +434,12 @@ console.log(completedBills,"completed bills");
                         </td>
                         <td className="p-3 border text-gray-700">{bill.department}</td>
                         <td className="p-3 border text-sm">
-                          <div>{bill.dateOfReporting}</div>
+                          <div>
+                            {new Date(bill.dateOfReporting).toLocaleDateString('en-GB')}
+                          </div>
+
                           <div className="text-gray-500">to</div>
-                          <div>{bill.dateOfRelease}</div>
+                          <div>{new Date(bill.dateOfRelease).toLocaleDateString('en-GB')}</div>
                         </td>
                         <td className="p-3 border text-center font-semibold">{bill.days}</td>
                         <td className="p-3 border text-center font-semibold">{bill.vehiclesUsed}</td>

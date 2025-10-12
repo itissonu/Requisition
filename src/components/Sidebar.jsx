@@ -23,7 +23,7 @@ const menuItems = [
   //   label: "Create User",
   //   icon: UserPlus,
   //   description: "Register New Accounts"
-  // },
+  // }, 
   {
     key: "CreateEvent",
     label: "Create Event",

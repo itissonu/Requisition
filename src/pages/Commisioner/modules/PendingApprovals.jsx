@@ -9,7 +9,9 @@ import {
   AlertCircle,
   X,
   IndianRupee,
-  FileText
+  FileText,
+  MapPin,
+  Clock
 } from "lucide-react";
 import { utilizationAPI } from "../../../apis/apiService";
 import logo from '../../../assests/logo.png';
@@ -28,6 +30,7 @@ export default function CommissionerApproveUtilizations() {
     (async () => {
       try {
         const res = await utilizationAPI.getByStatus("PENDING_COMMISSIONER_APPROVAL");
+        console.log(res.data);
         setUtilizations(res.data);
       } catch {
         alert("Failed to load utilizations.");
@@ -40,9 +43,10 @@ export default function CommissionerApproveUtilizations() {
   const confirmAction = async () => {
     if (!selected || !comments.trim()) return alert("Enter comments.");
     setBusy(true);
+    
     try {
       if (actionType === "approve") {
-        await utilizationAPI.commissionerApprove(selected.id, 16, comments.trim());
+        await utilizationAPI.commissionerApprove(selected?.id, 16, comments.trim());
       } else {
         await utilizationAPI.commissionerReject(selected.id, comments.trim());
       }
@@ -61,6 +65,19 @@ export default function CommissionerApproveUtilizations() {
   const handleViewDetails = (util) => {
     setSelected(util);
     setShowDetailsModal(true);
+  };
+
+  // Calculate total vehicles across all sub-events
+  const getTotalVehicles = (utilization) => {
+    if (!utilization.subEventUtilizations) return 0;
+    return utilization.subEventUtilizations.reduce((total, subEvent) => {
+      return total + (subEvent.vehicleUtilizations?.reduce((sum, v) => sum + (v.actualQuantity || 0), 0) || 0);
+    }, 0);
+  };
+
+  // Get total sub-events
+  const getTotalSubEvents = (utilization) => {
+    return utilization.subEventUtilizations?.length || 0;
   };
 
   if (loading) {
@@ -82,13 +99,11 @@ export default function CommissionerApproveUtilizations() {
           <div className="text-center">
             <div className="flex items-center justify-center mb-3">
               <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mr-4">
-
                 <img
                   src={logo}
                   alt="Odisha Logo"
                   className="w-14 h-14 object-contain"
                 />
-
               </div>
               <div>
                 <h1 className="text-2xl font-bold">GOVERNMENT OF ODISHA</h1>
@@ -120,7 +135,8 @@ export default function CommissionerApproveUtilizations() {
                     <th className="px-4 py-3 text-left text-sm font-semibold">ID</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold">Event Name</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold">Department</th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold">Duration</th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold">Collector</th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold">Sub-Events</th>
                     <th className="px-4 py-3 text-center text-sm font-semibold">Vehicles</th>
                     <th className="px-4 py-3 text-right text-sm font-semibold">Total Cost</th>
                     <th className="px-4 py-3 text-center text-sm font-semibold">Actions</th>
@@ -128,7 +144,8 @@ export default function CommissionerApproveUtilizations() {
                 </thead>
                 <tbody>
                   {utilizations.map((u, index) => {
-                    const days = Math.ceil((new Date(u.dateOfRelease) - new Date(u.dateOfReporting)) / (1000 * 3600 * 24)) + 1;
+                    const totalVehicles = getTotalVehicles(u);
+                    const totalSubEvents = getTotalSubEvents(u);
 
                     return (
                       <tr
@@ -148,15 +165,19 @@ export default function CommissionerApproveUtilizations() {
                           <span className="text-sm text-gray-700">{u.requestingDepartment}</span>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <div className="flex items-center justify-center gap-1">
-                            <Calendar className="w-4 h-4 text-blue-600" />
-                            <span className="font-semibold text-gray-900">{days} Days</span>
+                          <div className="text-sm">
+                            <div className="font-semibold text-blue-700">{u.collectorApprovedByName}</div>
                           </div>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span className="inline-flex items-center justify-center w-8 h-8 bg-purple-100 text-purple-700 rounded-full font-bold text-sm">
+                            {totalSubEvents}
+                          </span>
                         </td>
                         <td className="px-4 py-3 text-center">
                           <div className="flex items-center justify-center gap-1">
                             <Truck className="w-4 h-4 text-purple-600" />
-                            <span className="font-semibold text-gray-900">{u.vehicleUtilizations?.length || 0}</span>
+                            <span className="font-semibold text-gray-900">{totalVehicles}</span>
                           </div>
                         </td>
                         <td className="px-4 py-3 text-right">
@@ -266,9 +287,9 @@ export default function CommissionerApproveUtilizations() {
 
         {/* Details Modal */}
         {showDetailsModal && selected && (
-          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-t-xl">
+          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 overflow-y-auto">
+            <div className="bg-white rounded-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl my-8">
+              <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-xl sticky top-0 z-10">
                 <div className="flex justify-between items-center">
                   <div>
                     <h3 className="text-2xl font-bold">Utilization Details</h3>
@@ -287,63 +308,123 @@ export default function CommissionerApproveUtilizations() {
                 {/* Basic Information */}
                 <div>
                   <h4 className="text-lg font-bold text-gray-900 mb-3 border-b-2 border-blue-600 pb-2">Event Information</h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-600 mb-1">Event Name</p>
-                      <p className="font-semibold text-gray-900">{selected.eventName}</p>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border-l-4 border-blue-500">
+                      <p className="text-sm text-blue-700 mb-1 font-semibold">Event Name</p>
+                      <p className="font-bold text-gray-900">{selected.eventName}</p>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-600 mb-1">Department</p>
-                      <p className="font-semibold text-gray-900">{selected.requestingDepartment}</p>
+                    <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border-l-4 border-green-500">
+                      <p className="text-sm text-green-700 mb-1 font-semibold">Department</p>
+                      <p className="font-bold text-gray-900">{selected.requestingDepartment}</p>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-600 mb-1">Start Date</p>
-                      <p className="font-semibold text-gray-900">{selected.dateOfReporting}</p>
-                    </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-600 mb-1">End Date</p>
-                      <p className="font-semibold text-gray-900">{selected.dateOfRelease}</p>
+                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border-l-4 border-purple-500">
+                      <p className="text-sm text-purple-700 mb-1 font-semibold">Approved By</p>
+                      <p className="font-bold text-gray-900">{selected.collectorApprovedByName}</p>
                     </div>
                   </div>
                 </div>
 
-                {/* Vehicle Details */}
+                {/* Sub-Events Details */}
                 <div>
-                  <h4 className="text-lg font-bold text-gray-900 mb-3 border-b-2 border-green-600 pb-2">Vehicle Utilization</h4>
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse border-2 border-gray-300">
-                      <thead>
-                        <tr className="bg-blue-900 text-white">
-                          <th className="p-3 border text-left">S.No</th>
-                          <th className="p-3 border text-left">Vehicle Type</th>
-                          <th className="p-3 border text-center">Quantity</th>
-                          <th className="p-3 border text-right">Total Cost (₹)</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {selected.vehicleUtilizations?.map((vehicle, index) => (
-                          <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                            <td className="p-3 border font-medium">{index + 1}</td>
-                            <td className="p-3 border">{vehicle.vehicleName || 'N/A'}</td>
-                            <td className="p-3 border text-center font-semibold">{vehicle.actualQuantity || 0}</td>
-                            <td className="p-3 border text-right font-semibold text-green-600">
-                              ₹{(vehicle.totalCost || 0).toLocaleString('en-IN')}
-                            </td>
-                          </tr>
-                        ))}
-                        <tr className="bg-green-100 border-t-4 border-green-600">
-                          <td colSpan="3" className="p-4 text-right font-bold text-lg">TOTAL AMOUNT:</td>
-                          <td className="p-4 text-right font-bold text-xl text-green-600">
-                            ₹{(selected.totalCost || 0).toLocaleString('en-IN')}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                  <h4 className="text-lg font-bold text-gray-900 mb-3 border-b-2 border-gray-600 pb-2">
+                    Sub-Events Utilization ({selected.subEventUtilizations?.length || 0})
+                  </h4>
+                  
+                  {selected.subEventUtilizations && selected.subEventUtilizations.map((subEvent, subIdx) => {
+                    const subTotal = subEvent.vehicleUtilizations?.reduce((sum, v) => sum + (v.totalCost || 0), 0) || 0;
+                    
+                    return (
+                      <div key={subEvent.id} className="mb-6 bg-gradient-to-br from-purple-50 to-white rounded-lg border-2 border-purple-200 overflow-hidden">
+                        {/* Sub-Event Header */}
+                        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="bg-white text-purple-700 px-3 py-1 rounded-full font-bold text-sm">
+                                  SUB-EVENT {subIdx + 1}
+                                </span>
+                                <span className="font-bold text-lg">ID: SUB{String(subEvent.subEventId).padStart(3, '0')}</span>
+                              </div>
+                              <div className="mt-2 grid grid-cols-3 gap-4 text-sm">
+                                <div className="flex items-center gap-1">
+                                  <MapPin className="w-4 h-4" />
+                                  <span>{subEvent.subEventPlace}</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Calendar className="w-4 h-4" />
+                                  <span>{subEvent.subEventReportingDate}</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <Clock className="w-4 h-4" />
+                                  <span>{subEvent.subEventStartTime} {subEvent.subEventEndTime && `- ${subEvent.subEventEndTime}`}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="bg-yellow-400 text-purple-900 px-4 py-2 rounded-lg font-bold text-lg">
+                              ₹{subTotal.toLocaleString('en-IN')}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Vehicle Table */}
+                        <div className="p-4">
+                          <table className="w-full border-collapse border-2 border-gray-300">
+                            <thead>
+                              <tr className="bg-blue-900 text-white">
+                                <th className="p-3 border text-left text-xs">S.No</th>
+                                <th className="p-3 border text-left text-xs">Vehicle Type</th>
+                                <th className="p-3 border text-center text-xs">Quantity</th>
+                                <th className="p-3 border text-center text-xs">KM Run</th>
+                                <th className="p-3 border text-center text-xs">Fuel (L)</th>
+                                <th className="p-3 border text-left text-xs">Driver</th>
+                                <th className="p-3 border text-right text-xs">Cost (₹)</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {subEvent.vehicleUtilizations?.map((vehicle, vIdx) => (
+                                <tr key={vehicle.id} className={vIdx % 2 === 0 ? 'bg-white' : 'bg-purple-50'}>
+                                  <td className="p-3 border font-medium">{vIdx + 1}</td>
+                                  <td className="p-3 border font-semibold">{vehicle.vehicleName || 'N/A'}</td>
+                                  <td className="p-3 border text-center font-semibold text-blue-700">{vehicle.actualQuantity || 0}</td>
+                                  <td className="p-3 border text-center">{vehicle.kilometersRun || 0} km</td>
+                                  <td className="p-3 border text-center">{vehicle.fuelConsumed || 0} L</td>
+                                  <td className="p-3 border">{vehicle.driverDetails || '-'}</td>
+                                  <td className="p-3 border text-right font-semibold text-green-600">
+                                    ₹{(vehicle.totalCost || 0).toLocaleString('en-IN')}
+                                  </td>
+                                </tr>
+                              ))}
+                              <tr className="bg-purple-100 border-t-2 border-purple-600">
+                                <td colSpan="6" className="p-3 text-right font-bold">SUB-EVENT TOTAL:</td>
+                                <td className="p-3 text-right font-bold text-lg text-purple-700">
+                                  ₹{subTotal.toLocaleString('en-IN')}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Grand Total */}
+                <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-lg p-6 text-white">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h4 className="text-2xl font-bold">GRAND TOTAL</h4>
+                      <p className="text-green-100 text-sm">Total utilization cost across all sub-events</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-4xl font-bold">
+                        ₹{(selected.totalCost || 0).toLocaleString('en-IN')}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-gray-100 p-4 rounded-b-xl flex justify-end">
+              <div className="bg-gray-100 p-4 rounded-b-xl flex justify-end sticky bottom-0">
                 <button
                   onClick={() => setShowDetailsModal(false)}
                   className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors font-semibold"

@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Upload, FileText, CheckCircle, User, Calendar, Hash, Send } from "lucide-react";
-import { userAPI,requestEventAPI } from "../../../apis/apiService";
+import { userAPI, requestEventAPI } from "../../../apis/apiService";
 
 const letterSchema = z.object({
   letterName: z
@@ -11,7 +11,7 @@ const letterSchema = z.object({
     .min(1, "Letter name is required")
     .max(100, "Must be less than 100 characters"),
   letterNo: z.string().min(1, "Letter number is required"),
-  dateOfNeed: z.string().refine(str => !isNaN(Date.parse(str)), "Valid date required"),
+  // dateOfNeed: z.string().refine(str => !isNaN(Date.parse(str)), "Valid date required"),
   rtoUserId: z.string().min(1, "Please select an RTO"),
   letterFile: z
     .any()
@@ -28,15 +28,15 @@ export default function UploadLetterToRTO() {
 
   const { register, handleSubmit, reset, watch, formState: { errors } } = useForm({
     resolver: zodResolver(letterSchema),
-       defaultValues: {
+    defaultValues: {
       letterName: "",
       letterNo: "",
-      dateOfNeed: "",
+      //dateOfNeed: "",
       rtoUserId: "",
       letterFile: null,
     }
   });
-  
+
   const file = watch("letterFile");
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function UploadLetterToRTO() {
         setFetchingRtos(false);
       }
     };
-    
+
     fetchRtos();
   }, []);
 
@@ -63,7 +63,7 @@ export default function UploadLetterToRTO() {
     const formData = new FormData();
     formData.append("letterName", data.letterName);
     formData.append("letterNo", data.letterNo);
-    formData.append("dateOfNeed", data.dateOfNeed);
+    // formData.append("dateOfNeed", data.dateOfNeed);
     formData.append("rtoUserId", data.rtoUserId);
     formData.append("letterPdf", data.letterFile[0]);
     formData.append("status", "CREATED");
@@ -71,10 +71,10 @@ export default function UploadLetterToRTO() {
     try {
       await requestEventAPI.create(formData);
       setSuccess(true);
-     reset({
+      reset({
         letterName: "",
         letterNo: "",
-        dateOfNeed: "",
+        // dateOfNeed: "",
         rtoUserId: "",
         letterFile: null, // Resetting the file input
       });
@@ -116,14 +116,14 @@ export default function UploadLetterToRTO() {
 
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <div className="space-y-6">
-            
+
             <div>
               <label className="flex items-center text-sm font-semibold text-gray-700 mb-2">
                 <User className="w-4 h-4 mr-2 text-blue-600" />
                 Select RTO
                 <span className="text-red-500 ml-1">*</span>
               </label>
-              <select 
+              <select
                 {...register("rtoUserId")}
                 disabled={fetchingRtos}
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all disabled:bg-gray-100"
@@ -147,7 +147,7 @@ export default function UploadLetterToRTO() {
             <div>
               <label className="flex items-center text-sm font-semibold text-gray-700 mb-2">
                 <FileText className="w-4 h-4 mr-2 text-blue-600" />
-                Letter Name
+                Purpose of Letter
                 <span className="text-red-500 ml-1">*</span>
               </label>
               <input
@@ -165,10 +165,10 @@ export default function UploadLetterToRTO() {
             <div>
               <label className="flex items-center text-sm font-semibold text-gray-700 mb-2">
                 <Hash className="w-4 h-4 mr-2 text-blue-600" />
-                Letter Number
+                Requested letter's letter Number
                 <span className="text-red-500 ml-1">*</span>
               </label>
-              <input 
+              <input
                 {...register("letterNo")}
                 placeholder="e.g., RTO/2025/001"
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all"
@@ -180,7 +180,7 @@ export default function UploadLetterToRTO() {
               )}
             </div>
 
-            <div>
+            {/* <div>
               <label className="flex items-center text-sm font-semibold text-gray-700 mb-2">
                 <Calendar className="w-4 h-4 mr-2 text-blue-600" />
                 Date of Need
@@ -197,7 +197,7 @@ export default function UploadLetterToRTO() {
                   <span className="mr-1">⚠</span> {errors.dateOfNeed.message}
                 </p>
               )}
-            </div>
+            </div> */}
 
             <div>
               <label className="flex items-center text-sm font-semibold text-gray-700 mb-2">
@@ -205,14 +205,13 @@ export default function UploadLetterToRTO() {
                 Upload Letter PDF
                 <span className="text-red-500 ml-1">*</span>
               </label>
-              <div className={`border-2 border-dashed rounded-xl p-8 text-center transition-all ${
-                file?.[0] 
-                  ? "border-green-400 bg-green-50" 
-                  : "border-gray-300 hover:border-blue-400 hover:bg-blue-50"
-              }`}>
-                <input 
-                  type="file" 
-                  accept="application/pdf" 
+              <div className={`border-2 border-dashed rounded-xl p-8 text-center transition-all ${file?.[0]
+                ? "border-green-400 bg-green-50"
+                : "border-gray-300 hover:border-blue-400 hover:bg-blue-50"
+                }`}>
+                <input
+                  type="file"
+                  accept="application/pdf"
                   {...register("letterFile")}
                   className="hidden"
                   id="letterFile"
@@ -265,9 +264,9 @@ export default function UploadLetterToRTO() {
                   </>
                 )}
               </button>
-              
-              <button 
-                type="button" 
+
+              <button
+                type="button"
                 onClick={() => reset()}
                 disabled={loading}
                 className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-xl 
@@ -281,8 +280,8 @@ export default function UploadLetterToRTO() {
 
         <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
           <p className="text-sm text-blue-800">
-            <strong>Note:</strong> Make sure all information is correct before submitting. 
-            The letter will be sent to the selected RTO for approval.
+            <strong>Note:</strong> Make sure all information is correct before submitting.
+            The letter will be sent to the selected RTO
           </p>
         </div>
       </div>

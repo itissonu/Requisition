@@ -20,6 +20,12 @@ const menuItems = [
     label: "Approved",
     icon: CheckCircle,
     description: "Completed Approvals"
+  },
+  {
+    key: "BillSanction",
+    label: "Bill Sanction",
+    icon: FileText,
+    description: "Review Bill Sanctions"
   }
 ];
 

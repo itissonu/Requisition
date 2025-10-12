@@ -2,10 +2,14 @@ import axios from "axios";
 import { API_ENDPOINTS } from "./endpoint.js";
 
 const api = axios.create({
-  baseURL:  "http://localhost:8091/Requisition",
+  baseURL: "http://localhost:8091/Requisition",
   withCredentials: true,
 });
 
+const getAuthHeader = () => {
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 // Authentication
 export const authAPI = {
   login: credentials => api.post(API_ENDPOINTS.auth.login(), credentials),
@@ -49,15 +53,37 @@ export const requestEventAPI = {
 
 // Events Management with multipart form data
 export const eventAPI = {
-  create: formData => api.post(API_ENDPOINTS.events.create(), formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  }),
-  list: () => api.get(API_ENDPOINTS.events.list()),
-  details: id => api.get(API_ENDPOINTS.events.details(id)),
-  
-   update: (id, data) => api.patch(API_ENDPOINTS.events.update(id), data, {
-    headers: { "Content-Type": "application/json" },
-  }),
+  create: formData => api.post(
+    API_ENDPOINTS.events.create(),
+    formData,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader()
+      }
+    }
+  ),
+  list: () => api.get(API_ENDPOINTS.events.list(),
+    {
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader()
+      }
+    }),
+  details: id => api.get(API_ENDPOINTS.events.details(id),
+    {
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader()
+      }
+    }),
+
+  update: (id, data) => api.patch(API_ENDPOINTS.events.update(id), data, {
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader()
+      }
+    }),
 
   viewPdf: id => api.get(`${API_ENDPOINTS.events.viewPdf(id)}`, { responseType: "blob" }),
   downloadPdf: (id) => api.get(API_ENDPOINTS.events.downloadPdf(id), { responseType: "blob" }),
@@ -65,27 +91,72 @@ export const eventAPI = {
 
 
 export const utilizationAPI = {
-  create: data => api.post(API_ENDPOINTS.utilizations.create(), data),
-  list: () => api.get(API_ENDPOINTS.utilizations.list()),
-  details: id => api.get(API_ENDPOINTS.utilizations.details(id)),
+  create: data => api.post(API_ENDPOINTS.utilizations.create(), data, {
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader()
+      }
+    }),
+  list: () => api.get(API_ENDPOINTS.utilizations.list(), {
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader()
+      }
+    }),
+  details: id => api.get(API_ENDPOINTS.utilizations.details(id), {
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader()
+      }
+    }),
   update: (id, data) => api.put(API_ENDPOINTS.utilizations.update(id), data),
-  delete: id => api.delete(API_ENDPOINTS.utilizations.delete(id)),
-  getByEvent: eventId => api.get(API_ENDPOINTS.utilizations.byEvent(eventId)),
-  getByStatus: status => api.get(API_ENDPOINTS.utilizations.byStatus(status)),
+  delete: id => api.delete(API_ENDPOINTS.utilizations.delete(id), {
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader()
+      }
+    }),
+  getByEvent: eventId => api.get(API_ENDPOINTS.utilizations.byEvent(eventId), {
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader()
+      }
+    }),
+  getByStatus: status => api.get(API_ENDPOINTS.utilizations.byStatus(status), {
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader()
+      }
+    }),
   approve: (id, approvedBy) => api.put(API_ENDPOINTS.utilizations.approve(id), null, {
     params: { approvedBy }
-  }),
+  }, {
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader()
+      }
+    }),
   reject: (id, remarks) => api.put(API_ENDPOINTS.utilizations.reject(id), null, {
     params: { remarks }
   }),
-    commissionerApprove: (id, commissionerId, remarks) => api.patch(`/api/utilizations/${id}/commissioner-approve`, null, {
+  commissionerApprove: (id, commissionerId, remarks) => api.patch(`/api/utilizations/${id}/commissioner-approve`, null, {
     params: { commissionerApprovedBy: commissionerId, remarks }
-  }),
+  }, {
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader()
+      }
+    }),
   commissionerReject: (id, remarks) => api.patch(`/api/utilizations/${id}/commissioner-reject`, null, {
     params: { remarks }
-  }),
-   completePayment: (id, remarks) => 
+  }, {
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader()
+      }
+    }),
+  completePayment: (id, remarks) =>
     api.put(`/api/utilizations/${id}/complete-payment`, null, { params: { remarks } }),
-  
+
 
 };

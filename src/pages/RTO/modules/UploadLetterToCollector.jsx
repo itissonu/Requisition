@@ -531,7 +531,7 @@ export default function ViewCollectorRequests() {
                 className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 overflow-hidden"
               >
                 {/* Card Header */}
-                <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-4 text-white">
+                <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4 text-white">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <h3 className="font-bold text-lg mb-1 line-clamp-2">
@@ -593,10 +593,10 @@ export default function ViewCollectorRequests() {
 
                     <button
                       onClick={() => handleDownloadPdf(request.id, request.letterName)}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-all"
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium text-xs transition-all"
                     >
                       <Download className="w-4 h-4" />
-                      Download
+                      Download Requested Letter
                     </button>
                   </div>
 

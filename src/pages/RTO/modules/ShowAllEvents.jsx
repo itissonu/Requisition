@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Search, Filter, Eye, Edit, FileText, CheckCircle, XCircle, Clock, Download, X } from "lucide-react";
+import { Search, Filter, Eye, Edit, FileText, CheckCircle, XCircle, Clock, Download, X, ChevronDown, ChevronRight, MapPin, Calendar, Car } from "lucide-react";
 import { eventAPI } from "../../../apis/apiService";
 import logo from '../../../assests/logo.png';
 
@@ -11,6 +11,7 @@ export default function ShowAllEvents() {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [expandedEventId, setExpandedEventId] = useState(null);
 
   // PDF Modal states
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
@@ -45,7 +46,7 @@ export default function ShowAllEvents() {
 
     if (searchTerm) {
       filtered = filtered.filter(event =>
-        event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.requestEventName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         event.requestingDepartment.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (event.collectorName && event.collectorName.toLowerCase().includes(searchTerm.toLowerCase()))
       );
@@ -80,6 +81,10 @@ export default function ShowAllEvents() {
     }
   };
 
+  const toggleEventExpansion = (eventId) => {
+    setExpandedEventId(expandedEventId === eventId ? null : eventId);
+  };
+
   const handleViewDetails = (event) => {
     setSelectedEvent(event);
   };
@@ -88,10 +93,7 @@ export default function ShowAllEvents() {
     try {
       setPdfLoading(true);
       setCurrentEventForPdf(event);
-
-
       const pdfViewUrl = `http://localhost:8091/Requisition/api/events/${event.id}/pdf/view`;
-
       setPdfUrl(pdfViewUrl);
       setPdfModalOpen(true);
     } catch (error) {
@@ -109,15 +111,12 @@ export default function ShowAllEvents() {
       const blob = new Blob([response.data], { type: 'application/pdf' });
       const url = window.URL.createObjectURL(blob);
 
-      // Create download link
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${event.name.replace(/[^a-z0-9]/gi, '_')}_Requisition.pdf`;
+      link.download = `${event.requestEventName.replace(/[^a-z0-9]/gi, '_')}_Requisition.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
-      // Clean up
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error downloading PDF:', error);
@@ -140,8 +139,15 @@ export default function ShowAllEvents() {
   const getStatusDisplayName = (status) => {
     switch (status) {
       case "SET_FOR_RTO_APPROVAL": return "Pending RTO Approval";
+      case "UTILIZATION_SUBMITTED": return "Utilization Submitted";
       default: return status.replace(/_/g, ' ');
     }
+  };
+
+  const getTotalVehicles = (event) => {
+    return event.subEvents?.reduce((total, subEvent) => {
+      return total + subEvent.vehicles.reduce((sum, v) => sum + v.quantity, 0);
+    }, 0) || 0;
   };
 
   if (loading) {
@@ -159,14 +165,9 @@ export default function ShowAllEvents() {
     <div className="bg-white min-h-screen">
       {/* Government Header */}
       <div className="bg-blue-900 text-white p-6 shadow-lg">
-        <div className="max-w-6xl mx-auto  items-center justify-center">
-        
-          <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mr-4">
-            <img
-              src={logo}
-              alt="Odisha Logo"
-              className="w-14 h-14 object-contain"
-            />
+        <div className="max-w-6xl mx-auto items-center justify-center">
+          <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mr-4 mx-auto">
+            <img src={logo} alt="Odisha Logo" className="w-14 h-14 object-contain" />
           </div>
           <h1 className="text-2xl font-bold text-center">GOVERNMENT OF ODISHA</h1>
           <h2 className="text-lg text-center opacity-90">Commerce & Transport (Transport) Department</h2>
@@ -212,6 +213,7 @@ export default function ShowAllEvents() {
                     <option value="APPROVED">Approved</option>
                     <option value="REJECTED">Rejected</option>
                     <option value="COMPLETED">Completed</option>
+                    <option value="UTILIZATION_SUBMITTED">Utilization Completed</option>
                   </select>
                 </div>
               </div>
@@ -223,96 +225,164 @@ export default function ShowAllEvents() {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-blue-900 text-white">
-                  <th className="p-4 text-left font-semibold border-r border-blue-700">Event ID</th>
+                  <th className="p-4 text-center font-semibold border-r border-blue-700 w-12"></th>
                   <th className="p-4 text-left font-semibold border-r border-blue-700">Event Details</th>
                   <th className="p-4 text-left font-semibold border-r border-blue-700">Department</th>
                   <th className="p-4 text-center font-semibold border-r border-blue-700">Status</th>
-                  <th className="p-4 text-center font-semibold border-r border-blue-700">Duration</th>
-                  <th className="p-4 text-left font-semibold border-r border-blue-700">Vehicles</th>
+                  <th className="p-4 text-center font-semibold border-r border-blue-700">Sub-Events</th>
+                  <th className="p-4 text-left font-semibold border-r border-blue-700">Total Vehicles</th>
                   <th className="p-4 text-left font-semibold border-r border-blue-700">Collector</th>
                   <th className="p-4 text-center font-semibold">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredEvents.map((event, index) => (
-                  <tr key={event.id} className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-blue-50 transition-colors border-b border-gray-200`}>
-                    <td className="p-4 border-r border-gray-200">
-                      <div className="font-bold text-blue-900">EV{String(event.id).padStart(3, '0')}</div>
-                      <div className="text-xs text-gray-500">
-                        {new Date(event?.createdAt).toLocaleDateString('en-IN')}
-                      </div>
-                    </td>
-                    <td className="p-4 border-r border-gray-200">
-                      <div className="font-semibold text-gray-900">{event.name}</div>
-                      <div className="text-sm text-gray-600">
-                        Created: {new Date(event?.createdAt).toLocaleTimeString('en-IN')}
-                      </div>
-                    </td>
-                    <td className="p-4 border-r border-gray-200 font-medium text-gray-700">
-                      {event?.requestingDepartmentName}
-                    </td>
-                    <td className="p-4 border-r border-gray-200 text-center">
-                      <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold border ${getStatusColor(event?.status)}`}>
-                        {getStatusIcon(event?.status)}
-                        {getStatusDisplayName(event?.status)}
-                      </span>
-                    </td>
-                    <td className="p-4 border-r border-gray-200 text-center">
-                      <div className="text-xs">
-                        <div className="font-serif">{event?.dateOfReporting}</div>
-                        <div className="text-gray-500">to</div>
-                        <div className="font-serif">{event?.dateOfRelease}</div>
-                      </div>
-                    </td>
-                    <td className="p-4 border-r border-gray-200">
-                      <div className="text-sm space-y-1">
-                        {event.vehicles && event.vehicles.slice(0, 2).map((v, index) => (
-                          <div key={index} className="flex justify-between bg-gray-100 px-2 py-1 rounded">
-                            <span className="truncate">{v?.vehicleName}</span>
-                            <span className="font-semibold">×{v?.quantity}</span>
-                          </div>
-                        ))}
-                        {event.vehicles && event.vehicles.length > 2 && (
-                          <div className="text-xs text-blue-600 font-medium">
-                            +{event.vehicles.length - 2} more
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                    <td className="p-4 border-r border-gray-200 font-medium text-gray-700">
-                      {event.collectorName || 'Not Assigned'}
-                    </td>
-                    <td className="p-4">
-                      <div className="flex gap-2 justify-center ">
+                  <React.Fragment key={event.id}>
+                    {/* Main Event Row */}
+                    <tr className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-blue-50 transition-colors border-b border-gray-200`}>
+                      <td className="p-4 border-r border-gray-200 text-center">
                         <button
-                          onClick={() => handleViewDetails(event)}
-                          className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-colors"
-                          title="View Details"
+                          onClick={() => toggleEventExpansion(event.id)}
+                          className="p-1 hover:bg-blue-100 rounded transition-colors"
                         >
-                          <Eye className="w-4 h-4" />
+                          {expandedEventId === event.id ? (
+                            <ChevronDown className="w-5 h-5 text-blue-600" />
+                          ) : (
+                            <ChevronRight className="w-5 h-5 text-gray-600" />
+                          )}
                         </button>
-
-                        <button
-                          onClick={() => handleViewPdf(event)}
-                          disabled={pdfLoading}
-                          className="bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
-                          title="View PDF"
-                        >
-                          <FileText className="w-4 h-4" />
-                        </button>
-
-                        {canEdit(event) && (
+                      </td>
+                      <td className="p-4 border-r border-gray-200">
+                        <div className="font-bold text-blue-900">EV{String(event.id).padStart(3, '0')}</div>
+                        <div className="font-semibold text-gray-900">{event.requestEventName}</div>
+                        <div className="text-xs text-gray-500">Letter No: {event.requestEventLetterNo}</div>
+                        <div className="text-xs text-gray-500">
+                          Created: {new Date(event?.createdAt).toLocaleDateString('en-IN')}
+                        </div>
+                      </td>
+                      <td className="p-4 border-r border-gray-200 font-medium text-gray-700">
+                        {event?.requestingDepartment}
+                      </td>
+                      <td className="p-4 border-r border-gray-200 text-center">
+                        <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold border ${getStatusColor(event?.status)}`}>
+                          {getStatusIcon(event?.status)}
+                          {getStatusDisplayName(event?.status)}
+                        </span>
+                      </td>
+                      <td className="p-4 border-r border-gray-200 text-center">
+                        <div className="inline-flex items-center gap-2 bg-purple-100 text-purple-800 px-3 py-1 rounded-full font-bold">
+                          <Calendar className="w-4 h-4" />
+                          {event.subEvents?.length || 0}
+                        </div>
+                      </td>
+                      <td className="p-4 border-r border-gray-200">
+                        <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-3 py-1 rounded-full font-bold">
+                          <Car className="w-4 h-4" />
+                          {getTotalVehicles(event)}
+                        </div>
+                      </td>
+                      <td className="p-4 border-r border-gray-200 font-medium text-gray-700">
+                        {event.collectorDistrict ? `${event.collectorDistrict} Collector` : 'Not Assigned'}
+                      </td>
+                      <td className="p-4">
+                        <div className="flex gap-2 justify-center">
                           <button
-                            onClick={() => console.log('Edit event', event?.id)}
-                            className="bg-orange-600 text-white p-2 rounded-lg hover:bg-orange-700 transition-colors"
-                            title="Edit Event"
+                            onClick={() => handleViewDetails(event)}
+                            className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-colors"
+                            title="View Details"
                           >
-                            <Edit className="w-4 h-4" />
+                            <Eye className="w-4 h-4" />
                           </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
+
+                          <button
+                            onClick={() => handleViewPdf(event)}
+                            disabled={pdfLoading}
+                            className="bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                            title="View PDF"
+                          >
+                            <FileText className="w-4 h-4" />
+                          </button>
+
+                          {canEdit(event) && (
+                            <button
+                              onClick={() => console.log('Edit event', event?.id)}
+                              className="bg-orange-600 text-white p-2 rounded-lg hover:bg-orange-700 transition-colors"
+                              title="Edit Event"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+
+                    {/* Expanded Sub-Events Row */}
+                    {expandedEventId === event.id && (
+                      <tr>
+                        <td colSpan="8" className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6">
+                          <div className="space-y-4">
+                            <h4 className="text-lg font-bold text-blue-900 mb-4 flex items-center">
+                              <Calendar className="w-5 h-5 mr-2" />
+                              Sub-Events Details ({event.subEvents?.length || 0})
+                            </h4>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {event.subEvents?.map((subEvent, subIndex) => (
+                                <div key={subEvent.id} className="bg-white rounded-lg border-2 border-blue-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+                                  <div className="flex items-center justify-between mb-3">
+                                    <div className="flex items-center">
+                                      <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm mr-2">
+                                        {subIndex + 1}
+                                      </div>
+                                      <h5 className="font-bold text-gray-800">Sub-Event #{subIndex + 1}</h5>
+                                    </div>
+                                  </div>
+
+                                  <div className="space-y-2 mb-4">
+                                    <div className="flex items-center text-sm">
+                                      <MapPin className="w-4 h-4 mr-2 text-blue-600" />
+                                      <span className="font-semibold text-gray-700 mr-2">Place:</span>
+                                      <span className="text-gray-900">{subEvent.place}</span>
+                                    </div>
+                                    <div className="flex items-center text-sm">
+                                      <Calendar className="w-4 h-4 mr-2 text-blue-600" />
+                                      <span className="font-semibold text-gray-700 mr-2">Date:</span>
+                                      <span className="text-gray-900">{new Date(subEvent.reportingDate).toLocaleDateString('en-GB')}</span>
+                                    </div>
+                                    <div className="flex items-center text-sm">
+                                      <Clock className="w-4 h-4 mr-2 text-blue-600" />
+                                      <span className="font-semibold text-gray-700 mr-2">Time:</span>
+                                      <span className="text-gray-900">{subEvent.startTime}</span>
+                                    </div>
+                                  </div>
+
+                                  <div className="border-t border-gray-200 pt-3">
+                                    <h6 className="text-xs font-semibold text-gray-600 mb-2 flex items-center">
+                                      <Car className="w-3 h-3 mr-1" />
+                                      VEHICLES REQUIRED
+                                    </h6>
+                                    <div className="space-y-1">
+                                      {subEvent.vehicles?.map((vehicle, vIndex) => (
+                                        <div key={vIndex} className="flex items-center justify-between bg-gradient-to-r from-green-50 to-blue-50 px-3 py-2 rounded text-sm border border-green-200">
+                                          <span className="font-medium text-gray-800">{vehicle.vehicleName}</span>
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-xs text-gray-600">Qty:</span>
+                                            <span className="font-bold text-green-700 bg-white px-2 py-1 rounded border border-green-300">
+                                              {vehicle.quantity}
+                                            </span>
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>
@@ -352,7 +422,7 @@ export default function ShowAllEvents() {
 
       {/* Event Details Modal */}
       {selectedEvent && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black/70 bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="bg-blue-900 text-white p-6 rounded-t-lg">
               <div className="flex justify-between items-center">
@@ -372,7 +442,12 @@ export default function ShowAllEvents() {
                 <div className="space-y-4">
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
                     <label className="font-semibold text-gray-700 block mb-1">Event Name:</label>
-                    <p className="text-gray-900">{selectedEvent.name}</p>
+                    <p className="text-gray-900">{selectedEvent.requestEventName}</p>
+                  </div>
+
+                  <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
+                    <label className="font-semibold text-gray-700 block mb-1">Letter No:</label>
+                    <p className="text-gray-900">{selectedEvent.requestEventLetterNo}</p>
                   </div>
 
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
@@ -383,6 +458,7 @@ export default function ShowAllEvents() {
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
                     <label className="font-semibold text-gray-700 block mb-1">Collector:</label>
                     <p className="text-gray-900">{selectedEvent.collectorName || 'Not Assigned'}</p>
+                    <p className="text-sm text-gray-600">{selectedEvent.collectorDistrict}</p>
                   </div>
                 </div>
 
@@ -396,70 +472,87 @@ export default function ShowAllEvents() {
                   </div>
 
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
-                    <label className="font-semibold text-gray-700 block mb-1">Duration:</label>
-                    <div className="text-gray-900">
-                      <div>From: {selectedEvent.dateOfReporting}</div>
-                      <div>To: {selectedEvent.dateOfRelease}</div>
-                    </div>
+                    <label className="font-semibold text-gray-700 block mb-1">Created By:</label>
+                    <p className="text-gray-900">{selectedEvent.createdByName}</p>
+                    <p className="text-sm text-gray-600">{selectedEvent.createdByRole}</p>
                   </div>
 
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
-                    <label className="font-semibold text-gray-700 block mb-1">Created:</label>
+                    <label className="font-semibold text-gray-700 block mb-1">Created At:</label>
                     <p className="text-gray-900">{new Date(selectedEvent.createdAt).toLocaleString('en-IN')}</p>
+                  </div>
+
+                  <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
+                    <label className="font-semibold text-gray-700 block mb-1">Total Sub-Events:</label>
+                    <p className="text-gray-900 font-bold text-xl">{selectedEvent.subEvents?.length || 0}</p>
                   </div>
                 </div>
               </div>
 
-              {/* Vehicle Requirements */}
+              {/* Sub-Events Section */}
               <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-purple-500">
-                <label className="font-semibold text-gray-700 block mb-3">Vehicle Requirements:</label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {selectedEvent.vehicles && selectedEvent.vehicles.map((vehicle, index) => (
-                    <div key={index} className="flex justify-between items-center bg-white p-3 rounded border">
-                      <span className="font-medium text-gray-800">{vehicle.vehicleName}</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-600">Qty:</span>
-                        <span className="font-bold text-blue-600 bg-blue-100 px-2 py-1 rounded">
-                          {vehicle.quantity}
-                        </span>
+                <label className="font-semibold text-gray-700 block mb-3">Sub-Events & Vehicle Requirements:</label>
+                <div className="space-y-4">
+                  {selectedEvent.subEvents?.map((subEvent, index) => (
+                    <div key={subEvent.id} className="bg-white p-4 rounded-lg border-2 border-purple-200">
+                      <div className="flex items-center mb-3">
+                        <div className="w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold text-sm mr-2">
+                          {index + 1}
+                        </div>
+                        <h5 className="font-bold text-gray-800">Sub-Event #{index + 1}</h5>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                        <div className="flex items-center text-sm">
+                          <MapPin className="w-4 h-4 mr-2 text-purple-600" />
+                          <span className="font-semibold mr-1">Place:</span>
+                          <span>{subEvent.place}</span>
+                        </div>
+                        <div className="flex items-center text-sm">
+                          <Calendar className="w-4 h-4 mr-2 text-purple-600" />
+                          <span className="font-semibold mr-1">Date:</span>
+                          <span>{new Date(subEvent.reportingDate).toLocaleDateString('en-GB')}</span>
+                        </div>
+                        <div className="flex items-center text-sm">
+                          <Clock className="w-4 h-4 mr-2 text-purple-600" />
+                          <span className="font-semibold mr-1">Time:</span>
+                          <span>{subEvent.startTime}</span>
+                        </div>
+                      </div>
+
+                      <div className="border-t border-gray-200 pt-3">
+                        <h6 className="text-xs font-semibold text-gray-600 mb-2 flex items-center">
+                          <Car className="w-3 h-3 mr-1" />
+                          VEHICLES
+                        </h6>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {subEvent.vehicles?.map((vehicle, vIndex) => (
+                            <div key={vIndex} className="flex justify-between items-center bg-green-50 p-2 rounded border border-green-200">
+                              <span className="font-medium text-sm">{vehicle.vehicleName}</span>
+                              <span className="font-bold text-green-700 bg-white px-2 py-1 rounded text-sm">
+                                ×{vehicle.quantity}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
-              </div>
-
-              {/* Document Section */}
-              <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-orange-500">
-                <label className="font-semibold text-gray-700 block mb-3">Supporting Document:</label>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => handleViewPdf(selectedEvent)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-                    disabled={pdfLoading}
-                  >
-                    <FileText className="w-4 h-4" />
-                    {pdfLoading ? 'Opening...' : 'View PDF'}
-                  </button>
-
-                  <button
-                    onClick={() => handleDownloadPdf(selectedEvent)}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
-                    disabled={pdfLoading}
-                  >
-                    <Download className="w-4 h-4" />
-                    {pdfLoading ? 'Downloading...' : 'Download PDF'}
-                  </button>
-                </div>
-
-                <p className="text-sm text-gray-600 mt-2">
-                  {selectedEvent.letterFileName || 'Requisition Letter PDF'}
-                </p>
               </div>
             </div>
 
             {/* Modal Footer */}
             <div className="bg-gray-100 p-4 rounded-b-lg">
               <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => handleViewPdf(selectedEvent)}
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+                  disabled={pdfLoading}
+                >
+                  <FileText className="w-4 h-4" />
+                  View PDF
+                </button>
                 {canEdit(selectedEvent) && (
                   <button
                     onClick={() => {
@@ -486,13 +579,13 @@ export default function ShowAllEvents() {
 
       {/* PDF Viewer Modal with Native iframe */}
       {pdfModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black/20 bg-opacity-75 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-6xl w-full max-h-[95vh] overflow-hidden shadow-2xl">
             {/* PDF Modal Header */}
             <div className="bg-blue-900 text-white p-4 flex justify-between items-center">
               <div>
                 <h3 className="text-lg font-semibold">
-                  {currentEventForPdf?.name} - Requisition Letter
+                  {currentEventForPdf?.requestEventName} - Requisition Letter
                 </h3>
                 <p className="text-sm opacity-75">
                   Document Viewer
@@ -531,7 +624,7 @@ export default function ShowAllEvents() {
                 <iframe
                   src={pdfUrl}
                   className="w-full h-full border-0"
-                  title={`${currentEventForPdf?.name} - PDF Document`}
+                  title={`${currentEventForPdf?.requestEventName} - PDF Document`}
                   onLoad={() => setPdfLoading(false)}
                   onError={() => {
                     setPdfLoading(false);

@@ -36,16 +36,16 @@ const collectorItems = [
   },
   { 
     key: "LetterToRTO", 
-    label: "Letter to RTO", 
+    label: "Upload Letter to RTO", 
     icon: FileText, 
     description: "Upload Letter to RTO" 
   },
-    { 
-    key: "RequisitionForm", 
-    label: "Vehicle Requisition Form", 
-    icon: FileText, 
-    description: "Create a new vehicle requisition" 
-  }
+  //   { 
+  //   key: "RequisitionForm", 
+  //   label: "Vehicle Requisition Form", 
+  //   icon: FileText, 
+  //   description: "Create a new vehicle requisition" 
+  // }
 ];
 
 export default function CollectorSidebar({ activePage, setActivePage }) {

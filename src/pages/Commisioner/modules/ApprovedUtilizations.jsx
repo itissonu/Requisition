@@ -30,12 +30,13 @@ export default function ApprovedUtilizations() {
           ...approvedRes.data.map(u => ({ ...u, status: "COMMISSIONER_APPROVED" })),
           ...completedRes.data.map(u => ({ ...u, status: "COMPLETED" }))
         ];
+        console.log("Fetched utilizations:", utilizations);
 
         const list = utilizations.map(u => {
           const start = new Date(u.dateOfReporting);
           const end = new Date(u.dateOfRelease);
           const days = Math.ceil((end - start) / (1000 * 3600 * 24)) + 1;
-          const vehicles = u.vehicleUtilizations?.length || 0;
+          const vehicles = (u.vehicleUtilizations?.reduce((sum, v) => sum + (v.actualQuantity || 0), 0) || 0);
           const totalCost = u.totalCost || 0;
           return {
             id: u.id,
