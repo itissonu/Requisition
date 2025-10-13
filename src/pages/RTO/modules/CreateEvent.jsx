@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Car, File, Plus, Trash2, MapPin, Calendar, Clock, ChevronDown, Building, Edit2, X } from "lucide-react";
+import { Car, File, Plus, Trash2, MapPin, Calendar, Clock, ChevronDown, Building, Edit2, X, CloudCog } from "lucide-react";
 
 import logo from '../../../assests/logo.png';
 import { eventAPI, requestEventAPI, vehicleAPI } from "../../../apis/apiService";
@@ -57,6 +57,8 @@ export default function CreateEvent() {
       setLoading(true);
       const response = await requestEventAPI.list();
       setRequests(response.data);
+
+      console.log("Fetched requests:", response.data);
     } catch (error) {
       console.error("Failed to fetch requests:", error);
       alert("Failed to load requests. Please try again.");
@@ -240,7 +242,7 @@ export default function CreateEvent() {
                       <option value="">Select a requesting event</option>
                       {requests.map(request => (
                         <option key={request.id} value={request.id}>
-                          {request.letterName} - {request.letterNo} ({request.dateOfNeed})
+                          {request.letterName}  (letterNo - {request.letterNo})
                         </option>
                       ))}
                     </select>

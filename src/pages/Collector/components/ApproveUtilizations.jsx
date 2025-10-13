@@ -6,9 +6,9 @@ import {
   User,
   Truck,
   IndianRupee,
-  Eye, // Eye icon for viewing details
-  MapPin, // Icon for sub-event place
-  Calendar, // Icon for sub-event date
+  Eye, 
+  MapPin, 
+  Calendar, 
 } from "lucide-react";
 import { utilizationAPI } from "../../../apis/apiService";
 import logo from '../../../assests/logo.png';
@@ -43,7 +43,7 @@ export default function ApproveUtilizations() {
   const [selectedUtilization, setSelectedUtilization] = useState(null);
   const [showActionModal, setShowActionModal] = useState(false);
   
-  // State for the view details modal
+  
   const [viewingUtilization, setViewingUtilization] = useState(null);
 
   const [approvalComments, setApprovalComments] = useState("");

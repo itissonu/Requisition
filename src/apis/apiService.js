@@ -29,6 +29,12 @@ export const userAPI = {
   signup: data => api.post(API_ENDPOINTS.users.signup(), data),
   requisitionSignin: data => api.post(API_ENDPOINTS.users.requisitionSignin(), data),
   requisitionCreate: data => api.post(API_ENDPOINTS.users.requisitionCreate(), data),
+    getRtosInMyDistrict: () => api.get('/user/rtos/my-district', {
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
 };
 
 // Vehicle Management
@@ -43,7 +49,12 @@ export const requestEventAPI = {
   create: formData => api.post(API_ENDPOINTS.requestEvents.create(), formData, {
     headers: { "Content-Type": "multipart/form-data" },
   }),
-  list: () => api.get(API_ENDPOINTS.requestEvents.list()),
+  list: () => api.get(API_ENDPOINTS.requestEvents.list(),{
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
   details: id => api.get(API_ENDPOINTS.requestEvents.details(id)),
   viewPdf: id => api.get(API_ENDPOINTS.requestEvents.viewPdf(id), { responseType: "blob" }),
   downloadPdf: id => api.get(API_ENDPOINTS.requestEvents.downloadPdf(id), { responseType: "blob" }),
