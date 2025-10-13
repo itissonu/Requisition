@@ -164,7 +164,31 @@ export default function ShowAllEvents() {
   return (
     <div className="bg-white min-h-screen">
       {/* Government Header */}
-      <div className="bg-blue-900 text-white p-6 shadow-lg">
+
+      <div className="bg-gradient-to-r from-orange-500 via-white to-green-600 h-2"></div>
+      <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-6 shadow-xl">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center">
+            <div className="flex items-center justify-center mb-3">
+              <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mr-4">
+                <img
+                  src={logo}
+                  alt="Odisha Logo"
+                  className="w-14 h-14 object-contain"
+                />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold">GOVERNMENT OF ODISHA</h1>
+                <h2 className="text-lg opacity-90">Commerce & Transport (Transport) Department</h2>
+              </div>
+            </div>
+            <div className="mt-3 pt-3 border-t border-blue-700">
+              <h3 className="text-lg font-semibold tracking-wide"> EVENT MANAGEMENT SYSTEM</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* <div className="bg-blue-900 text-white p-6 shadow-lg">
         <div className="max-w-6xl mx-auto items-center justify-center">
           <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mr-4 mx-auto">
             <img src={logo} alt="Odisha Logo" className="w-14 h-14 object-contain" />
@@ -175,7 +199,7 @@ export default function ShowAllEvents() {
             EVENT MANAGEMENT SYSTEM
           </h3>
         </div>
-      </div>
+      </div> */}
 
       <div className="max-w-7xl mx-auto p-6">
         <div className="bg-white rounded-lg shadow-md border border-gray-200">
@@ -325,7 +349,7 @@ export default function ShowAllEvents() {
                               <Calendar className="w-5 h-5 mr-2" />
                               Sub-Events Details ({event.subEvents?.length || 0})
                             </h4>
-                            
+
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               {event.subEvents?.map((subEvent, subIndex) => (
                                 <div key={subEvent.id} className="bg-white rounded-lg border-2 border-blue-200 p-4 shadow-sm hover:shadow-md transition-shadow">
@@ -501,7 +525,7 @@ export default function ShowAllEvents() {
                         </div>
                         <h5 className="font-bold text-gray-800">Sub-Event #{index + 1}</h5>
                       </div>
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
                         <div className="flex items-center text-sm">
                           <MapPin className="w-4 h-4 mr-2 text-purple-600" />

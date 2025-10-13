@@ -40,13 +40,13 @@
 //   const onSubmit = async (data) => {
 //     setLoading(true);
 //     console.log("Letter Upload Data:", data);
-    
+
 //     // Simulate API call
 //     setTimeout(() => {
 //       setUploadSuccess(true);
 //       setLoading(false);
 //       reset();
-      
+
 //       // Hide success message after 3 seconds
 //       setTimeout(() => setUploadSuccess(false), 3000);
 //     }, 2000);
@@ -114,7 +114,7 @@
 //                 <p className="pl-1">or drag and drop</p>
 //               </div>
 //               <p className="text-xs text-gray-500">PDF up to 5MB</p>
-              
+
 //               {selectedFile && selectedFile[0] && (
 //                 <div className="mt-4 flex items-center justify-center gap-2 text-sm text-green-600">
 //                   <FileText className="w-4 h-4" />
@@ -145,7 +145,7 @@
 //               </>
 //             )}
 //           </button>
-          
+
 //           <button
 //             type="button"
 //             onClick={() => reset()}
@@ -436,7 +436,7 @@ export default function ViewCollectorRequests() {
   const getStatusBadge = (status) => {
     const statusConfig = {
       CREATED: { bg: "bg-blue-100", text: "text-blue-700", icon: Clock, label: "Pending" },
-      APPROVED: { bg: "bg-green-100", text: "text-green-700", icon: CheckCircle, label: "Approved" },
+      APPROVED: { bg: "bg-green-100", text: "text-green-700", icon: CheckCircle, label: "Event Created" },
       REJECTED: { bg: "bg-red-100", text: "text-red-700", icon: XCircle, label: "Rejected" },
     };
 
@@ -460,9 +460,11 @@ export default function ViewCollectorRequests() {
     });
   };
 
-  const filteredRequests = filterStatus === "ALL" 
-    ? requests 
+  const filteredRequests = filterStatus === "ALL"
+    ? requests
     : requests.filter(req => req.status === filterStatus);
+
+  console.log("Filtered Requests:", filteredRequests);
 
   if (loading) {
     return (
@@ -479,6 +481,8 @@ export default function ViewCollectorRequests() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
+
+
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -518,8 +522,8 @@ export default function ViewCollectorRequests() {
             <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">No requests found</h3>
             <p className="text-gray-500">
-              {filterStatus === "ALL" 
-                ? "No requests have been submitted yet." 
+              {filterStatus === "ALL"
+                ? "No requests have been submitted yet."
                 : `No ${filterStatus.toLowerCase()} requests found.`}
             </p>
           </div>
@@ -541,7 +545,7 @@ export default function ViewCollectorRequests() {
                         {formatDate(request.createdAt)}
                       </p>
                     </div>
-                    {getStatusBadge(request.status)}
+                    {(getStatusBadge(request.status))}
                   </div>
                 </div>
 
@@ -560,19 +564,19 @@ export default function ViewCollectorRequests() {
                       {request.rtoUserName || "N/A"}
                     </span>
                   </div>
-
+                  {/* 
                   <div className="flex items-center text-sm">
                     <Calendar className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
                     <span className="text-gray-600 mr-2">Date of Need:</span>
                     <span className="font-semibold text-gray-900">
                       {formatDate(request.dateOfNeed)}
                     </span>
-                  </div>
+                  </div> */}
 
                   {request.approvedAt && (
                     <div className="flex items-center text-sm">
                       <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
-                      <span className="text-gray-600 mr-2">Approved:</span>
+                      <span className="text-gray-600 mr-2">Event Created At:</span>
                       <span className="font-semibold text-gray-900">
                         {formatDate(request.approvedAt)}
                       </span>
@@ -600,7 +604,7 @@ export default function ViewCollectorRequests() {
                     </button>
                   </div>
 
-                  {request.status === "CREATED" && (
+                  {/* {request.status === "CREATED" && (
                     <button
                       onClick={() => handleApprove(request.id)}
                       className="w-full mt-2 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-all"
@@ -608,7 +612,7 @@ export default function ViewCollectorRequests() {
                       <CheckCircle className="w-4 h-4" />
                      Mark Completed
                     </button>
-                  )}
+                  )} */}
                 </div>
               </div>
             ))}

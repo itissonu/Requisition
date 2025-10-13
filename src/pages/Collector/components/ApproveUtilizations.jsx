@@ -133,6 +133,7 @@ export default function ApproveUtilizations() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Government Header */}
+       <div className="bg-gradient-to-r from-orange-500 via-white to-green-600 h-2"></div>
       <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-6 shadow-xl">
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
@@ -181,7 +182,7 @@ export default function ApproveUtilizations() {
                       <th className="px-4 py-3 text-left text-sm font-semibold">ID</th>
                       <th className="px-4 py-3 text-left text-sm font-semibold">Event Name</th>
                       <th className="px-4 py-3 text-left text-sm font-semibold">Department</th>
-                      <th className="px-4 py-3 text-center text-sm font-semibold">Duration</th>
+                      {/* <th className="px-4 py-3 text-center text-sm font-semibold">Duration</th> */}
                       <th className="px-4 py-3 text-center text-sm font-semibold">Status</th>
                       <th className="px-4 py-3 text-center text-sm font-semibold">Vehicles</th>
                       <th className="px-4 py-3 text-right text-sm font-semibold">Total Cost</th>
@@ -210,13 +211,13 @@ export default function ApproveUtilizations() {
                             <span className="text-sm text-gray-700">{utilization.requestingDepartment}</span>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-center">
+                        {/* <td className="px-4 py-3 text-center">
                           <div className="text-xs text-gray-600">
                             <div>{startDate}</div>
                             <div className="text-gray-400">to</div>
                             <div>{endDate}</div>
                           </div>
-                        </td>
+                        </td> */}
                         <td className="px-4 py-3 text-center">
                           <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold border ${getStatusColor(utilization.utilizationStatus)}`}>
                             <Clock className="w-3 h-3" />

@@ -101,6 +101,86 @@ export const eventAPI = {
 };
 
 
+
+// Bill Sanction API endpoints
+export const billSanctionAPI = {
+  // Create a new bill (Commissioner for FINAL, RTO for ADVANCE)
+  create: data => api.post('/api/bill-sanctions', data, {
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
+
+  // Get all bills (role-based filtering applied on backend)
+  list: () => api.get('/api/bill-sanctions', {
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
+
+
+  getById: id => api.get(`/api/bill-sanctions/${id}`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
+
+ 
+  getByUtilization: utilizationId => api.get(`/api/bill-sanctions/utilization/${utilizationId}`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
+
+  
+  getByStatus: status => api.get(`/api/bill-sanctions/status/${status}`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
+
+  
+  getByType: type => api.get(`/api/bill-sanctions/type/${type}`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
+
+ 
+  markAsPaid: (id, remarks) => api.patch(`/api/bill-sanctions/${id}/mark-paid`, null, {
+    params: { remarks },
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
+
+
+  getTotalAmount: (utilizationId, type) => api.get(`/api/bill-sanctions/utilization/${utilizationId}/total/${type}`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
+
+  
+  delete: id => api.delete(`/api/bill-sanctions/${id}`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  })
+};
+
+
+
+
 export const utilizationAPI = {
   create: data => api.post(API_ENDPOINTS.utilizations.create(), data, {
       headers: {
@@ -168,6 +248,13 @@ export const utilizationAPI = {
     }),
   completePayment: (id, remarks) =>
     api.put(`/api/utilizations/${id}/complete-payment`, null, { params: { remarks } }),
+
+    getCommissionerApproved: () => api.get('/api/utilizations/status/COMMISSIONER_APPROVED', {
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
 
 
 };

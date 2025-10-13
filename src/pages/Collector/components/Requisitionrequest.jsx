@@ -139,25 +139,25 @@ export default function UploadLetterToRTO() {
     <div className="min-h-screen bg-gradient-to-b from-orange-50 via-white to-green-50">
       {/* Government Header */}
       <div className="bg-gradient-to-r from-orange-500 via-white to-green-600 h-2"></div>
-      
-          <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-6 shadow-xl">
-              <div className="max-w-7xl mx-auto">
-                <div className="text-center">
-                  <div className="flex items-center justify-center mb-3">
-                    <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mr-4">
-                      <img src={logo} alt="Odisha Logo" className="w-14 h-14 object-contain" />
-                    </div>
-                    <div>
-                      <h1 className="text-2xl font-bold">GOVERNMENT OF ODISHA</h1>
-                      <h2 className="text-lg opacity-90">Commerce & Transport (Transport) Department</h2>
-                    </div>
-                  </div>
-                  <div className="mt-3 pt-3 border-t border-blue-700">
-                    <h3 className="text-lg font-semibold tracking-wide">Event Request Submission FormL</h3>
-                  </div>
-                </div>
+
+      <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-6 shadow-xl">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center">
+            <div className="flex items-center justify-center mb-3">
+              <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mr-4">
+                <img src={logo} alt="Odisha Logo" className="w-14 h-14 object-contain" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold">GOVERNMENT OF ODISHA</h1>
+                <h2 className="text-lg opacity-90">Commerce & Transport (Transport) Department</h2>
               </div>
             </div>
+            <div className="mt-3 pt-3 border-t border-blue-700">
+              <h3 className="text-lg font-semibold tracking-wide">Event Request Submission FormL</h3>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Page Title */}
@@ -188,7 +188,7 @@ export default function UploadLetterToRTO() {
           <div className="bg-gray-50 border-b border-gray-200 px-6 py-3">
             <h3 className="font-semibold text-gray-900">Request Details</h3>
           </div>
-          
+
           <div className="p-6 space-y-6">
             {/* RTO Selection */}
             {autoSelectedRto && !showRtoDropdown ? (
@@ -281,11 +281,10 @@ export default function UploadLetterToRTO() {
                 Upload Official Letter (PDF)
                 <span className="text-red-600 ml-1">*</span>
               </label>
-              <div className={`border-2 border-dashed p-8 text-center transition-colors ${
-                file?.[0]
+              <div className={`border-2 border-dashed p-8 text-center transition-colors ${file?.[0]
                   ? "border-green-400 bg-green-50"
                   : "border-gray-300 bg-gray-50 hover:border-blue-900 hover:bg-blue-50"
-              }`}>
+                }`}>
                 <input
                   type="file"
                   accept="application/pdf"
@@ -365,17 +364,18 @@ export default function UploadLetterToRTO() {
         {/* Important Notice */}
         <div className="mt-6 bg-yellow-50 border-l-4 border-yellow-500 p-4 shadow-sm">
           <p className="text-sm text-gray-800">
-            <strong className="text-yellow-800">Important:</strong> Please verify all information before submission. 
-            The request will be sent to  the selected RTO for approval and processing. 
-            Ensure that the uploaded PDF contains all required documentation and official seals.
+            <strong className="text-yellow-800">Important:</strong> Please verify all information before submission.
+            The request will be sent to  the selected RTO for approval and processing.
+            Ensure that the uploaded PDF contains all required data.
           </p>
         </div>
 
-        {/* Footer */}
-        <div className="mt-8 text-center text-sm text-gray-600 pb-4">
-          <p>© 2025 Government of Odisha | Transport Department</p>
-          <p className="mt-1">For technical assistance, contact: support@odisha.gov.in</p>
-        </div>
+
+
+      </div>
+      {/* Footer */}
+      <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">
+        © Government of Odisha - Commerce & Transport Department | Vehicle Requisition System
       </div>
     </div>
   );

@@ -8,7 +8,7 @@ import logo from '../../../assests/logo.png';
 import { eventAPI, requestEventAPI, vehicleAPI } from "../../../apis/apiService";
 
 const subEventSchema = z.object({
-  place: z.string().min(1, "Place is required"),
+  place: z.string().min(2, "Place is required"),
   reportingDate: z.string().min(1, "Reporting date is required"),
   startTime: z.string().min(1, "Start time is required"),
   vehicles: z.array(z.object({
@@ -142,7 +142,7 @@ export default function CreateEvent() {
 
   const onSubmit = async (data) => {
     console.log("Form submitted! Raw data:", data);
-    
+
     if (subEvents.length === 0) {
       alert('Please add at least one sub-event.');
       return;
@@ -197,6 +197,7 @@ export default function CreateEvent() {
   return (
     <div className="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
       {/* Header section */}
+      <div className="bg-gradient-to-r from-orange-500 via-white to-green-600 h-2"></div>
       <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-6 shadow-lg">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-center mb-3">
@@ -237,7 +238,7 @@ export default function CreateEvent() {
                   render={({ field }) => (
                     <select
                       {...field}
-                      className="w-full border-2 border-gray-300 rounded-lg px-3 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                      className="w-full border-2 border-gray-300 rounded-lg px-3 py-3  focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                     >
                       <option value="">Select a requesting event</option>
                       {requests.map(request => (
@@ -327,7 +328,7 @@ export default function CreateEvent() {
                           </button>
                         </div>
                       </div>
-                      
+
                       <div className="space-y-2 text-sm">
                         <div className="flex items-center text-gray-700">
                           <MapPin className="w-4 h-4 mr-2 text-blue-600" />
@@ -366,7 +367,7 @@ export default function CreateEvent() {
                 disabled={loading}
                 className="bg-gradient-to-r from-blue-700 to-blue-800 text-white px-10 py-4 rounded-lg hover:from-blue-800 hover:to-blue-900 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-base shadow-lg transform transition-all hover:scale-105 active:scale-95"
               >
-                {loading ? "⏳ SUBMITTING..." : "✓ SUBMIT REQUISITION"}
+                {loading ? " SUBMITTING..." : "SUBMIT REQUISITION"}
               </button>
 
               <button
@@ -486,15 +487,34 @@ export default function CreateEvent() {
                                 name={`vehicles.${vehicleIndex}.quantity`}
                                 control={controlSubEvent}
                                 render={({ field }) => (
+                                  // <input
+                                  //   type="number"
+                                  //   min="0"
+                                  //   {...field}
+
+                                  //   onChange={(e) => {
+                                  //     const rawValue = e.target.value;
+
+                                  //     const normalizedValue = rawValue.replace(/^0+(?=\d)/, "");
+                                  //     const value = normalizedValue === "" ? 0 : parseInt(normalizedValue, 10);
+
+
+                                  //     field.onChange(value);
+
+                                  //     updateVehicleQuantity(vehicle.id, value);
+                                  //   }}
+                                  //   className="w-24 text-center border-2 border-gray-300 p-2 rounded focus:ring-2 focus:ring-green-500 focus:border-green-500 font-semibold transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                  // />
                                   <input
-                                    type="number"
-                                    min="0"
+                                    type="text"
+                                    inputMode="numeric"
                                     {...field}
+                                    value={vehicle.quantity}
                                     onChange={(e) => {
-                                      field.onChange(parseInt(e.target.value) || 0);
-                                      updateVehicleQuantity(vehicle.id, e.target.value);
+                                      const value = e.target.value.replace(/[^0-9]/g, '');
+                                      updateVehicleQuantity(vehicle.id, value);
                                     }}
-                                    className="w-24 text-center border-2 border-gray-300 p-2 rounded focus:ring-2 focus:ring-green-500 focus:border-green-500 font-semibold transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                    className="w-24 text-center border-2 border-gray-300 p-2 rounded focus:ring-2 focus:ring-green-500 focus:border-green-500 font-semibold transition-all"
                                   />
                                 )}
                               />
