@@ -36,11 +36,7 @@ export default function RTOMainDashboard() {
     return (
         <div className="space-y-6">
             {/* Stat Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                <div className="bg-white p-4 shadow rounded">
-                    <h4 className="text-sm text-gray-500 custom">Total Users</h4>
-                    <p className="text-2xl font-bold">120</p>
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div className="bg-white p-4 shadow rounded">
                     <h4 className="text-sm text-gray-500">Total Events</h4>
                     <p className="text-2xl font-bold">54</p>

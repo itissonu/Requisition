@@ -42,7 +42,7 @@ export default function CommissionerApproveUtilizations() {
     setBusy(true);
     try {
       if (actionType === "approve") {
-        await utilizationAPI.commissionerApprove(selected.id, 16, comments.trim());
+        await utilizationAPI.commissionerApprove(selected.id, 3, comments.trim());
       } else {
         await utilizationAPI.commissionerReject(selected.id, comments.trim());
       }

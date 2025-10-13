@@ -50,7 +50,7 @@ export default function ApproveUtilizations() {
       try {
         if (actionType === "approve") {
 
-          const currentUserId = 13; // Replace with actual user ID from auth
+          const currentUserId = 2; // Replace with actual user ID from auth
           await utilizationAPI.approve(selectedUtilization.id, currentUserId);
         } else {
           await utilizationAPI.reject(selectedUtilization.id, approvalComments.trim());
