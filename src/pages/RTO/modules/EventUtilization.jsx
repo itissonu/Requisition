@@ -9,27 +9,30 @@ export default function EventUtilizationDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const eventsResponse = await eventAPI.list();
-        const approvedEvts = eventsResponse.data.filter(e =>
-          e.status === "COLLECTOR_APPROVED"
-        );
-        setApprovedEvents(approvedEvts);
-        const utilizationsResponse = await utilizationAPI.list();
-        setUtilizations(utilizationsResponse.data);
-
-        console.log(utilizationsResponse.data, 'utilizationsResponse.data');
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        alert('Failed to load data. Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, []);
+
+  const fetchData = async () => {
+    try {
+      const eventsResponse = await eventAPI.list();
+      console.log(eventsResponse.data, 'fetched events');
+
+      const approvedEvts = eventsResponse.data.filter(e =>
+        e.status === "COLLECTOR_APPROVED"
+      );
+      setApprovedEvents(approvedEvts);
+    
+      const utilizationsResponse = await utilizationAPI.list();
+      setUtilizations(utilizationsResponse.data);
+
+      console.log(utilizationsResponse.data, 'utilizationsResponse.data');
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      alert('Failed to load data. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleViewEventPdf = async (eventId) => {
     try {
@@ -46,25 +49,23 @@ export default function EventUtilizationDashboard() {
   };
 
   function formatDateTime(isoString) {
-  if (!isoString) return "";
-
-  const date = new Date(isoString);
-  if (isNaN(date)) return "Invalid date";
-
-  return date.toLocaleString("en-IN", {
-    weekday: "long",   // e.g. Wednesday
-    year: "numeric",   // 2025
-    month: "long",     // October
-    day: "numeric",    // 8
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  });
-}
+    if (!isoString) return "";
+    const date = new Date(isoString);
+    if (isNaN(date)) return "Invalid date";
+    return date.toLocaleString("en-IN", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
+  }
 
   const getUtilizationStatusColor = (status) => {
     switch (status) {
-      case "CREATED": return "bg-yellow-100 text-yellow-800 border-yellow-300";
+      case "PENDING": return "bg-yellow-100 text-yellow-800 border-yellow-300";
       case "SUBMITTED": return "bg-blue-100 text-blue-800 border-blue-300";
       case "APPROVED": return "bg-green-100 text-green-800 border-green-300";
       case "REJECTED": return "bg-red-100 text-red-800 border-red-300";
@@ -75,15 +76,28 @@ export default function EventUtilizationDashboard() {
 
   const getStatusMessage = (status) => {
     switch (status) {
-      case "UTILIZATION_SUBMITTED": return "Awaiting Approval from Collector";
+      case "PENDING": return "Awaiting Collector Approval";
       case "SUBMITTED": return "Awaiting Approval";
-      case "APPROVED": return "Approved";
+      case "APPROVED": return "Approved by Collector";
       case "REJECTED": return "Rejected";
-      case "PENDING_COMMISSIONER_APPROVAL": return "Awaiting Approval from Commissioner";
-      case "COMMISSIONER_APPROVED": return "Approved by Commissioner";
+      case "PENDING_COMMISSIONER_APPROVAL": return "Awaiting Commissioner";
+      case "COMMISSIONER_APPROVED": return "Commissioner Approved";
       case "COMPLETED": return "Completed";
-      default: return "Unknown";
+      default: return status;
     }
+  };
+
+  // Calculate total sub-events for an event
+  const getTotalSubEvents = (event) => {
+    return event.subEvents?.length || 0;
+  };
+
+  // Calculate total vehicles across all sub-events
+  const getTotalVehicles = (event) => {
+    if (!event.subEvents) return 0;
+    return event.subEvents.reduce((total, subEvent) => {
+      return total + (subEvent.vehicles?.reduce((sum, v) => sum + (v.quantity || 0), 0) || 0);
+    }, 0);
   };
 
   if (loading) {
@@ -100,6 +114,7 @@ export default function EventUtilizationDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Government Header */}
+       <div className="bg-gradient-to-r from-orange-500 via-white to-green-600 h-2"></div>
       <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-6 shadow-xl">
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
@@ -147,17 +162,20 @@ export default function EventUtilizationDashboard() {
                   <thead>
                     <tr className="bg-gradient-to-r from-green-900 to-green-800 text-white">
                       <th className="px-4 py-3 text-left text-sm font-semibold">Event ID</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold">Event Name</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold">Event Purpose</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold">Request Event</th>
                       <th className="px-4 py-3 text-left text-sm font-semibold">Department</th>
-                      <th className="px-4 py-3 text-center text-sm font-semibold">Duration</th>
-                      <th className="px-4 py-3 text-center text-sm font-semibold">Status</th>
+                      <th className="px-4 py-3 text-center text-sm font-semibold">Collector</th>
+                      <th className="px-4 py-3 text-center text-sm font-semibold">Sub-Events</th>
                       <th className="px-4 py-3 text-center text-sm font-semibold">Vehicles</th>
+                      <th className="px-4 py-3 text-center text-sm font-semibold">Status</th>
                       <th className="px-4 py-3 text-center text-sm font-semibold">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {approvedEvents.map((event, index) => {
-                      const totalVehicles = event.vehicles?.reduce((sum, v) => sum + (v.quantity || 0), 0) || 0;
+                      const totalVehicles = getTotalVehicles(event);
+                      const totalSubEvents = getTotalSubEvents(event);
 
                       return (
                         <tr
@@ -174,21 +192,26 @@ export default function EventUtilizationDashboard() {
                             </div>
                           </td>
                           <td className="px-4 py-3">
+                            <div className="text-sm">
+                              <div className="font-semibold text-purple-700">{event.requestEventName}</div>
+                              <div className="text-xs text-gray-500">{event.requestEventLetterNo}</div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
                             <div className="flex items-center gap-1">
                               <User className="w-4 h-4 text-green-600" />
-                              <span className="text-sm text-gray-700">{event.requestingDepartmentName}</span>
+                              <span className="text-sm text-gray-700">{event.requestingDepartment}</span>
                             </div>
                           </td>
                           <td className="px-4 py-3 text-center">
-                            <div className="text-[10px] text-gray-600">
-                              <div className="font-serif">{event.dateOfReporting}</div>
-                              <div className="text-gray-400">to</div>
-                              <div>{event.dateOfRelease}</div>
+                            <div className="text-sm">
+                              <div className="font-semibold text-blue-700">{event.collectorName}</div>
+                              <div className="text-xs text-gray-500">{event.collectorDistrict}</div>
                             </div>
                           </td>
                           <td className="px-4 py-3 text-center">
-                            <span className="px-2 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 border border-green-300">
-                              APPROVED
+                            <span className="inline-flex items-center justify-center w-8 h-8 bg-purple-100 text-purple-700 rounded-full font-bold">
+                              {totalSubEvents}
                             </span>
                           </td>
                           <td className="px-4 py-3 text-center">
@@ -196,6 +219,11 @@ export default function EventUtilizationDashboard() {
                               <Car className="w-4 h-4 text-purple-600" />
                               <span className="font-semibold text-gray-900">{totalVehicles}</span>
                             </div>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <span className="px-2 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-800 border border-green-300">
+                              APPROVED FOR UTILIZATION
+                            </span>
                           </td>
                           <td className="px-4 py-3">
                             <div className="flex items-center justify-center gap-2">
@@ -262,10 +290,12 @@ export default function EventUtilizationDashboard() {
                 <table className="w-full">
                   <thead>
                     <tr className="bg-gradient-to-r from-blue-900 to-blue-800 text-white">
-                      <th className="px-4 py-3 text-left text-sm font-semibold">Utilization ID</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold">Event Name</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold">Util. ID</th>
+                      <th className="px-4 py-3 text-left text-sm font-semibold">Event Purpose</th>
+                      {/* <th className="px-4 py-3 text-left text-sm font-semibold">Request Event</th> */}
                       <th className="px-4 py-3 text-left text-sm font-semibold">Department</th>
-                      <th className="px-4 py-3 text-center text-sm font-semibold">Duration</th>
+                      {/* <th className="px-4 py-3 text-center text-sm font-semibold">Collector</th> */}
+                      <th className="px-4 py-3 text-center text-sm font-semibold">Sub-Events</th>
                       <th className="px-4 py-3 text-center text-sm font-semibold">Status</th>
                       <th className="px-4 py-3 text-right text-sm font-semibold">Total Cost (₹)</th>
                       <th className="px-4 py-3 text-center text-sm font-semibold">Created</th>
@@ -280,19 +310,29 @@ export default function EventUtilizationDashboard() {
                         <td className="px-4 py-3">
                           <span className="font-medium text-gray-900">{util.eventName}</span>
                         </td>
+                        {/* <td className="px-4 py-3">
+                          <div className="text-sm">
+                            <div className="font-semibold text-purple-700">{util.requestEventName}</div>
+                            <div className="text-xs text-gray-500">{util.requestEventLetterNo}</div>
+                          </div>
+                        </td> */}
                         <td className="px-4 py-3">
                           <span className="text-sm text-gray-700">{util.requestingDepartment}</span>
                         </td>
-                        <td className="px-4 py-3 text-center">
-                          <div className="text-xs text-gray-600">
-                            <div>{util.dateOfReporting}</div>
-                            <div className="text-gray-400">to</div>
-                            <div>{util.dateOfRelease}</div>
+                        {/* <td className="px-4 py-3 text-center">
+                          <div className="text-sm">
+                            <div className="font-semibold text-blue-700">{util.collectorName}</div>
+                            <div className="text-xs text-gray-500">{util.collectorDistrict}</div>
                           </div>
+                        </td> */}
+                        <td className="px-4 py-3 text-center">
+                          <span className="inline-flex items-center justify-center w-8 h-8 bg-purple-100 text-purple-700 rounded-full font-bold text-sm">
+                            {util.subEventUtilizations?.length || 0}
+                          </span>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <span className={`px-2 py-1 rounded-full text-xs font-bold border ${getUtilizationStatusColor(util.status)}`}>
-                            {getStatusMessage(util?.utilizationStatus)}
+                          <span className={`px-2 py-1 rounded-full text-xs font-bold border ${getUtilizationStatusColor(util.utilizationStatus)}`}>
+                            {getStatusMessage(util.utilizationStatus)}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-right">

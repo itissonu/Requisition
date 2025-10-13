@@ -7,6 +7,7 @@ import CommissionerMainDashboard from "./modules/CommissionerMainDashboard";
 import PendingApprovals from "./modules/PendingApprovals";
 import ApprovedUtilizations from "./modules/ApprovedUtilizations";
 import CommissionerApproveUtilizations from "./modules/PendingApprovals";
+import BillSanction from "./modules/BillSanction";
 
 export default function CommissionerDashboard({ user, onLogout }) {
   const [activePage, setActivePage] = useState("Dashboard");
@@ -19,6 +20,8 @@ export default function CommissionerDashboard({ user, onLogout }) {
         return <CommissionerApproveUtilizations />;
       case "ApprovedUtilizations": 
         return <ApprovedUtilizations />;
+        case "BillSanction":
+          return <BillSanction />;
       default: 
         return <CommissionerMainDashboard />;
     }

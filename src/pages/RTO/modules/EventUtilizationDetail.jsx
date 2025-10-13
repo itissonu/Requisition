@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { FileText, Calculator, Save, X } from "lucide-react";
+import { FileText, Calculator, Save, X, ChevronLeft, MapPin, Calendar, Clock } from "lucide-react";
 import { eventAPI, utilizationAPI, vehicleAPI } from "../../../apis/apiService";
 
 export default function EventUtilizationForm() {
@@ -9,7 +9,7 @@ export default function EventUtilizationForm() {
 
   const [event, setEvent] = useState(null);
   const [vehicles, setVehicles] = useState([]);
-  const [utilizationData, setUtilizationData] = useState({});
+  const [subEventUtilizations, setSubEventUtilizations] = useState({});
   const [totalCost, setTotalCost] = useState(0);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -24,24 +24,40 @@ export default function EventUtilizationForm() {
         const vehicleResponse = await vehicleAPI.list();
         setVehicles(vehicleResponse.data);
 
-        // Initialize utilization data
+        // Initialize utilization data for each sub-event
         const initData = {};
-        if (eventData.vehicles) {
-          eventData.vehicles.forEach(eventVehicle => {
-            const vehicleInfo = vehicleResponse.data.find(v => v.id === eventVehicle.vehicleId);
-            const ratePerKm = vehicleInfo?.ratePerKm || 0;
-            const quantity = eventVehicle.quantity || 0;
+        if (eventData.subEvents) {
+          eventData.subEvents.forEach(subEvent => {
+            const vehicleUtilData = {};
             
-            initData[eventVehicle.vehicleId] = {
-              actualQuantity: quantity,
-              ratePerKm: ratePerKm,
-              totalCost: quantity * ratePerKm,
-              requestedQuantity: quantity
+            if (subEvent.vehicles) {
+              subEvent.vehicles.forEach(subEventVehicle => {
+                const ratePerKm = subEventVehicle.ratePerKm || 0;
+                const quantity = subEventVehicle.quantity || 0;
+                
+                vehicleUtilData[subEventVehicle.vehicleId] = {
+                  actualQuantity: quantity,
+                  ratePerKm: ratePerKm,
+                  totalCost: quantity * ratePerKm,
+                  requestedQuantity: quantity,
+                  utilizationNotes: '',
+                  fuelConsumed: 0,
+                  kilometersRun: 0,
+                  driverDetails: ''
+                };
+              });
+            }
+
+            initData[subEvent.id] = {
+              subEventId: subEvent.id,
+              remarks: '',
+              vehicles: vehicleUtilData,
+              subTotalCost: 0
             };
           });
         }
 
-        setUtilizationData(initData);
+        setSubEventUtilizations(initData);
       } catch (error) {
         console.error('Error fetching data:', error);
         alert('Failed to load event data. Please try again.');
@@ -56,47 +72,96 @@ export default function EventUtilizationForm() {
     }
   }, [eventId, navigate]);
 
-  // Calculate total cost whenever utilization data changes
+  // Calculate totals whenever utilization data changes
   useEffect(() => {
-    const total = Object.values(utilizationData).reduce(
-      (sum, item) => sum + (parseFloat(item.totalCost) || 0), 
-      0
-    );
-    setTotalCost(total);
-  }, [utilizationData]);
+    let grandTotal = 0;
+    const updatedUtilizations = { ...subEventUtilizations };
+    
+    Object.keys(updatedUtilizations).forEach(subEventId => {
+      const subEventData = updatedUtilizations[subEventId];
+      const subTotal = Object.values(subEventData.vehicles).reduce(
+        (sum, vehicle) => sum + (parseFloat(vehicle.totalCost) || 0), 
+        0
+      );
+      
+      subEventData.subTotalCost = subTotal;
+      grandTotal += subTotal;
+    });
 
-  const getVehicleInfo = (vehicleId) => {
-    return vehicles.find(v => v.id === vehicleId) || { name: 'Unknown Vehicle', ratePerKm: 0 };
-  };
+    setTotalCost(grandTotal);
+  }, [subEventUtilizations]);
 
-  const handleQuantityChange = (vehicleId, newQuantity) => {
+  const handleQuantityChange = (subEventId, vehicleId, newQuantity) => {
     const quantity = parseInt(newQuantity) || 0;
-    const currentData = utilizationData[vehicleId] || {};
-    const ratePerKm = currentData.ratePerKm || 0;
+    const subEventData = subEventUtilizations[subEventId];
+    const vehicleData = subEventData.vehicles[vehicleId];
+    const ratePerKm = vehicleData.ratePerKm || 0;
     const newTotalCost = quantity * ratePerKm;
 
-    setUtilizationData({
-      ...utilizationData,
-      [vehicleId]: {
-        ...currentData,
-        actualQuantity: quantity,
-        totalCost: newTotalCost
+    setSubEventUtilizations({
+      ...subEventUtilizations,
+      [subEventId]: {
+        ...subEventData,
+        vehicles: {
+          ...subEventData.vehicles,
+          [vehicleId]: {
+            ...vehicleData,
+            actualQuantity: quantity,
+            totalCost: newTotalCost
+          }
+        }
       }
     });
   };
 
-  const handleTotalCostChange = (vehicleId, newCost) => {
+  const handleTotalCostChange = (subEventId, vehicleId, newCost) => {
     const cost = parseFloat(newCost) || 0;
-    const currentData = utilizationData[vehicleId] || {};
+    const subEventData = subEventUtilizations[subEventId];
+    const vehicleData = subEventData.vehicles[vehicleId];
 
-    setUtilizationData({
-      ...utilizationData,
-      [vehicleId]: {
-        ...currentData,
-        totalCost: cost
+    setSubEventUtilizations({
+      ...subEventUtilizations,
+      [subEventId]: {
+        ...subEventData,
+        vehicles: {
+          ...subEventData.vehicles,
+          [vehicleId]: {
+            ...vehicleData,
+            totalCost: cost
+          }
+        }
       }
     });
   };
+
+  // const handleFieldChange = (subEventId, vehicleId, field, value) => {
+  //   const subEventData = subEventUtilizations[subEventId];
+  //   const vehicleData = subEventData.vehicles[vehicleId];
+
+  //   setSubEventUtilizations({
+  //     ...subEventUtilizations,
+  //     [subEventId]: {
+  //       ...subEventData,
+  //       vehicles: {
+  //         ...subEventData.vehicles,
+  //         [vehicleId]: {
+  //           ...vehicleData,
+  //           [field]: value
+  //         }
+  //       }
+  //     }
+  //   });
+  // };
+
+  // const handleSubEventRemarksChange = (subEventId, remarks) => {
+  //   setSubEventUtilizations({
+  //     ...subEventUtilizations,
+  //     [subEventId]: {
+  //       ...subEventUtilizations[subEventId],
+  //       remarks: remarks
+  //     }
+  //   });
+  // };
 
   const handleViewEventPdf = () => {
     const pdfUrl = `http://localhost:8091/Requisition/api/events/${eventId}/pdf/view`;
@@ -108,23 +173,35 @@ export default function EventUtilizationForm() {
     try {
       const payload = {
         eventId: parseInt(eventId),
-        totalCost: totalCost,
         remarks: "",
-        vehicleUtilizations: event.vehicles.map(eventVehicle => {
-          const data = utilizationData[eventVehicle.vehicleId] || {};
+        totalCost: totalCost,
+        subEventUtilizations: event.subEvents.map(subEvent => {
+          const subEventData = subEventUtilizations[subEvent.id];
           return {
-            vehicleId: eventVehicle.vehicleId,
-            actualQuantity: data.actualQuantity || 0,
-            totalCost: data.totalCost || 0
+            subEventId: subEvent.id,
+            remarks: subEventData.remarks || "",
+            
+            vehicleUtilizations: subEvent.vehicles.map(subEventVehicle => {
+              const vehicleData = subEventData.vehicles[subEventVehicle.vehicleId] || {};
+              return {
+                vehicleId: subEventVehicle.vehicleId,
+                actualQuantity: vehicleData.actualQuantity || 0,
+                totalCost: vehicleData.totalCost || 0,
+                utilizationNotes: vehicleData.utilizationNotes || "",
+                fuelConsumed: vehicleData.fuelConsumed || 0,
+                kilometersRun: vehicleData.kilometersRun || 0,
+                driverDetails: vehicleData.driverDetails || ""
+              };
+            })
           };
         })
       };
 
       console.log("Submit Utilization:", payload);
-      await utilizationAPI.create(payload);
+  await utilizationAPI.create(payload);
 
       alert("Utilization created successfully!");
-      navigate("/rto/event-utilization");
+  navigate("/rto/event-utilization");
 
     } catch (error) {
       console.error('Error submitting utilization:', error);
@@ -177,19 +254,32 @@ export default function EventUtilizationForm() {
       </div>
 
       <div className="max-w-7xl mx-auto p-6">
+        {/* Breadcrumb */}
+        <div className="mb-4 flex items-center gap-2 text-sm">
+          <button
+            onClick={() => navigate('/rto/event-utilization')}
+            className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Back to Dashboard
+          </button>
+          <span className="text-gray-400">/</span>
+          <span className="text-gray-900 font-semibold">Create Utilization - EV{String(event.id).padStart(3, '0')}</span>
+        </div>
+
         {/* Event Details Card */}
         <div className="bg-white rounded-lg shadow-lg border border-gray-200 mb-8">
-          <div className="bg-blue-100 border-b border-blue-200 p-4 rounded-t-lg">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 border-b border-blue-800 p-4 rounded-t-lg">
             <div className="flex justify-between items-center">
               <div>
-                <h3 className="text-xl font-bold text-blue-900">
-                  CREATE UTILIZATION - EV{String(event.id).padStart(3, '0')}
+                <h3 className="text-xl font-bold text-white">
+                  EVENT DETAILS - EV{String(event.id).padStart(3, '0')}
                 </h3>
-                <h4 className="text-lg font-semibold text-blue-800 mt-1">{event.name}</h4>
+                <h4 className="text-lg font-semibold text-blue-100 mt-1">{event.name}</h4>
               </div>
               <button
                 onClick={handleViewEventPdf}
-                className="bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition-colors"
+                className="bg-white text-blue-700 p-3 rounded-lg hover:bg-blue-50 transition-colors shadow-md"
                 title="View Original Event PDF"
               >
                 <FileText className="w-6 h-6" />
@@ -198,123 +288,172 @@ export default function EventUtilizationForm() {
           </div>
 
           <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
-                <label className="font-semibold text-gray-700 block mb-1">Requesting Department:</label>
-                <p className="text-gray-900 font-medium">{event.requestingDepartmentName}</p>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border-l-4 border-purple-500">
+                <label className="font-semibold text-purple-900 block mb-1 text-sm">Request Event:</label>
+                <p className="text-purple-800 font-bold">{event.requestEventName}</p>
+                <p className="text-purple-600 text-xs mt-1">{event.requestEventLetterNo}</p>
               </div>
 
-              <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
-                <label className="font-semibold text-gray-700 block mb-1">Start Date:</label>
-                <p className="text-gray-900 font-medium">{event.dateOfReporting}</p>
+              <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border-l-4 border-green-500">
+                <label className="font-semibold text-green-900 block mb-1 text-sm">Department:</label>
+                <p className="text-green-800 font-bold">{event.requestingDepartment}</p>
               </div>
 
-              <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-orange-500">
-                <label className="font-semibold text-gray-700 block mb-1">End Date:</label>
-                <p className="text-gray-900 font-medium">{event.dateOfRelease}</p>
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border-l-4 border-blue-500">
+                <label className="font-semibold text-blue-900 block mb-1 text-sm">Collector:</label>
+                <p className="text-blue-800 font-bold">{event.collectorName}</p>
+                <p className="text-blue-600 text-xs mt-1">{event.collectorDistrict}</p>
+              </div>
+
+              <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg border-l-4 border-orange-500">
+                <label className="font-semibold text-orange-900 block mb-1 text-sm">Sub-Events:</label>
+                <p className="text-orange-800 font-bold text-2xl">{event.subEvents?.length || 0}</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Utilization Table */}
-        <div className="bg-white rounded-lg shadow-lg border border-gray-200 mb-8">
-          <div className="bg-green-100 border-b border-green-200 p-4 rounded-t-lg">
-            <div className="flex items-center gap-3">
-              <Calculator className="w-6 h-6 text-green-800" />
-              <h3 className="text-xl font-bold text-green-900">VEHICLE UTILIZATION DETAILS</h3>
-            </div>
-            <p className="text-sm text-green-700 mt-1">Enter actual quantities and costs for vehicle utilization</p>
-          </div>
+        {/* Sub-Events with Utilization */}
+        {event.subEvents && event.subEvents.map((subEvent, subIdx) => {
+          const subEventData = subEventUtilizations[subEvent.id] || { vehicles: {}, subTotalCost: 0 };
+          
+          return (
+            <div key={subEvent.id} className="bg-white rounded-lg shadow-lg border border-gray-200 mb-6">
+              {/* Sub-Event Header -- COLOR CHANGED HERE */}
+              <div className="bg-gradient-to-r from-gray-700 to-gray-800 border-b border-gray-900 p-4 rounded-t-lg">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3">
+                      <span className="bg-white text-gray-800 font-bold px-3 py-1 rounded-full text-sm">
+                        SUB-EVENT {subIdx + 1}
+                      </span>
+                      <h3 className="text-xl font-bold text-white">
+                        ID: SUB{String(subEvent.id).padStart(3, '0')}
+                      </h3>
+                    </div>
+                    
+                    <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div className="flex items-center gap-2 text-gray-200">
+                        <MapPin className="w-4 h-4" />
+                        <span className="text-sm"><span className="font-semibold">Place:</span> {subEvent.place}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-200">
+                        <Calendar className="w-4 h-4" />
+                        <span className="text-sm"><span className="font-semibold">Date:</span> {subEvent.reportingDate}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-200">
+                        <Clock className="w-4 h-4" />
+                        <span className="text-sm"><span className="font-semibold">Time:</span> {subEvent.startTime} {subEvent.endTime && `- ${subEvent.endTime}`}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-lg font-bold">
+                    ₹{subEventData.subTotalCost.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                  </div> */}
+                </div>
+              </div>
 
-          <div className="p-6">
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse border-2 border-gray-300">
-                <thead>
-                  <tr className="bg-blue-900 text-white">
-                    <th className="border border-gray-400 p-3 text-center font-bold">Sl.No</th>
-                    <th className="border border-gray-400 p-3 text-left font-bold">Vehicle Type</th>
-                    <th className="border border-gray-400 p-3 text-center font-bold">Rate/Km (₹)</th>
-                    <th className="border border-gray-400 p-3 text-center font-bold">Requested Qty</th>
-                    <th className="border border-gray-400 p-3 text-center font-bold">Actual Qty</th>
-                    <th className="border border-gray-400 p-3 text-center font-bold">Auto Calculated (₹)</th>
-                    <th className="border border-gray-400 p-3 text-right font-bold">Total Cost (₹)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {event.vehicles && event.vehicles.map((eventVehicle, idx) => {
-                    const vehicleInfo = getVehicleInfo(eventVehicle.vehicleId);
-                    const data = utilizationData[eventVehicle.vehicleId] || {};
-                    const actualQty = data.actualQuantity || 0;
-                    const ratePerKm = data.ratePerKm || 0;
-                    const autoCalculated = actualQty * ratePerKm;
-                    const totalCost = data.totalCost || 0;
+              {/* Vehicle Utilization Table */}
+              <div className="p-6">
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse border-2 border-gray-300">
+                    <thead>
+                      {/* TABLE HEADER -- COLOR CHANGED HERE */}
+                      <tr className="bg-gradient-to-r from-gray-200 to-gray-300 text-gray-800">
+                        <th className="border border-gray-400 p-2 text-center text-xs font-semibold uppercase">Sl.No</th>
+                        <th className="border border-gray-400 p-2 text-left text-xs font-semibold uppercase">Vehicle Type</th>
+                        <th className="border border-gray-400 p-2 text-center text-xs font-semibold uppercase">Price</th>
+                        <th className="border border-gray-400 p-2 text-center text-xs font-semibold uppercase">Requested</th>
+                        <th className="border border-gray-400 p-2 text-center text-xs font-semibold uppercase">Updated Qty</th>
+                        {/* <th className="border border-gray-400 p-2 text-center text-xs font-semibold uppercase">Auto Calc</th> */}
+                        <th className="border border-gray-400 p-2 text-center text-xs font-semibold uppercase">Total Cost</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {subEvent.vehicles && subEvent.vehicles.map((subEventVehicle, vIdx) => {
+                        const vehicleData = subEventData.vehicles[subEventVehicle.vehicleId] || {};
+                        const actualQty = vehicleData.actualQuantity || 0;
+                        const ratePerKm = vehicleData.ratePerKm || 0;
+                        const autoCalculated = actualQty * ratePerKm;
+                        const totalCost = vehicleData.totalCost || 0;
 
-                    return (
-                      <tr key={eventVehicle.vehicleId} className={idx % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                        <td className="border border-gray-300 p-3 text-center font-bold text-blue-900">
-                          {idx + 1}
+                        return (
+                          // ROW COLOR -- CHANGED HERE
+                          <tr key={subEventVehicle.vehicleId} className={vIdx % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                            <td className="border border-gray-300 p-2 text-center font-bold text-gray-700">
+                              {vIdx + 1}
+                            </td>
+                            <td className="border border-gray-300 p-2 font-medium text-sm">
+                              {subEventVehicle.vehicleName}
+                            </td>
+                            <td className="border border-gray-300 p-2 text-center font-medium text-green-700 text-sm">
+                              ₹{ratePerKm.toLocaleString('en-IN')}
+                            </td>
+                            <td className="border border-gray-300 p-2 text-center font-medium text-blue-700">
+                              {subEventVehicle.quantity}
+                            </td>
+                            <td className="border border-gray-300 p-2 text-center">
+                              <input
+                                type="number"
+                                min="0"
+                                value={actualQty}
+                                onChange={(e) => handleQuantityChange(subEvent.id, subEventVehicle.vehicleId, e.target.value)}
+                                // FOCUS COLOR -- CHANGED HERE
+                                className="w-20 border-2 border-gray-300 rounded text-center p-1 outline-none font-semibold text-sm"
+                              />
+                            </td>
+                            {/* <td className="border border-gray-300 p-2 text-center bg-yellow-50">
+                              <span className="text-orange-700 font-bold text-sm">
+                                ₹{autoCalculated.toLocaleString('en-IN')}
+                              </span>
+                            </td> */}
+                            <td className="border  p-2 text-center">
+                              <input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                value={totalCost}
+                                onChange={(e) => handleTotalCostChange(subEvent.id, subEventVehicle.vehicleId, e.target.value)}
+                                className="w-28  border-green-400 rounded text-center p-1 focus:ring-2 focus:ring-green-500 font-bold text-green-700 text-sm"
+                              />
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                    <tfoot>
+                      {/* FOOTER COLOR -- CHANGED HERE */}
+                      {/* <tr className="bg-gradient-to-r from-gray-800 to-gray-900 text-white">
+                        <td colSpan="6" className="border border-gray-400 p-3 text-right font-bold">
+                          SUB-EVENT TOTAL:
                         </td>
-                        <td className="border border-gray-300 p-3 font-medium">
-                          {vehicleInfo.name}
-                        </td>
-                        <td className="border border-gray-300 p-3 text-center font-medium text-green-800">
-                          ₹{ratePerKm.toLocaleString('en-IN')}
-                        </td>
-                        <td className="border border-gray-300 p-3 text-center font-medium text-blue-700">
-                          {eventVehicle.quantity}
-                        </td>
-                        <td className="border border-gray-300 p-3 text-center">
-                          <input
-                            type="number"
-                            min="0"
-                            value={actualQty}
-                            onChange={(e) => handleQuantityChange(eventVehicle.vehicleId, e.target.value)}
-                            className="w-24 border-2 border-gray-300 rounded-lg text-center p-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-semibold"
-                          />
-                        </td>
-                        <td className="border border-gray-300 p-3 text-center font-medium bg-yellow-50">
-                          <span className="text-orange-700 font-bold">
-                            ₹{autoCalculated.toLocaleString('en-IN')}
-                          </span>
-                          <div className="text-xs text-gray-600 mt-1">
-                            ({actualQty} × ₹{ratePerKm})
+                        <td colSpan="4" className="border border-gray-400 p-3 text-center">
+                          <div className="text-xl font-bold text-yellow-300">
+                            ₹{subEventData.subTotalCost.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </div>
                         </td>
-                        <td className="border border-gray-300 p-3 text-right">
-                          <input
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            value={totalCost}
-                            onChange={(e) => handleTotalCostChange(eventVehicle.vehicleId, e.target.value)}
-                            className="w-36 border-2 border-green-400 rounded-lg text-right p-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 font-bold text-green-700"
-                          />
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-                <tfoot>
-                  <tr className="bg-gradient-to-r from-blue-800 to-blue-900 text-white">
-                    <td colSpan="6" className="border border-gray-400 p-4 text-right font-bold text-lg">
-                      TOTAL UTILIZATION COST:
-                    </td>
-                    <td className="border border-gray-400 p-4 text-right">
-                      <div className="text-2xl font-bold text-yellow-300">
-                        ₹{totalCost.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </div>
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
+                      </tr> */}
+                    </tfoot>
+                  </table>
+                </div>
+              </div>
             </div>
+          );
+        })}
 
-            <div className="mt-4 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-              <p className="text-sm text-blue-800">
-                <strong>💡 How it works:</strong> Enter the actual quantity used. The "Auto Calculated" column shows (Quantity × Rate/Km). 
-                You can edit the "Total Cost" field if the actual cost differs (e.g., due to additional charges or discounts).
-              </p>
+        {/* Grand Total Card */}
+        <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-lg shadow-xl border-1 border-green-800 p-6 mb-8">
+          <div className="flex justify-between items-center">
+            <div className="text-white">
+              <h3 className="text-2xl font-bold">GRAND TOTAL UTILIZATION COST</h3>
+              <p className="text-green-100 text-sm mt-1">Total cost across all sub-events</p>
+            </div>
+            <div className="bg-white text-green-700 px-8 py-4 rounded-lg shadow-lg">
+              <div className="text-4xl font-bold">
+                ₹{totalCost.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
             </div>
           </div>
         </div>
@@ -343,7 +482,7 @@ export default function EventUtilizationForm() {
 
           <div className="mt-6 p-4 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
             <p className="text-sm text-yellow-800">
-              <strong>Note:</strong> Please verify all vehicle quantities and costs before submitting.
+              <strong>Note:</strong> Please verify all vehicle quantities, costs, and additional details for each sub-event before submitting.
               Once submitted, the utilization will be sent for approval.
             </p>
           </div>

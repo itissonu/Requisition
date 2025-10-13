@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { 
-  Search, 
-  Filter, 
-  Eye, 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
+import {
+  Search,
+  Filter,
+  Eye,
+  CheckCircle,
+  XCircle,
+  Clock,
   Calendar,
   User,
   Car,
@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { eventAPI } from "../../../apis/apiService";
 
-import logo from '../../../assests/homepage.png';
+import logo from '../../../assests/logo.png';
 
 export default function ShowAllEvents() {
   const [events, setEvents] = useState([]);
@@ -27,7 +27,7 @@ export default function ShowAllEvents() {
   const [pdfUrl, setPdfUrl] = useState(null);
   const [currentEventForPdf, setCurrentEventForPdf] = useState(null);
 
- 
+
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -49,7 +49,7 @@ export default function ShowAllEvents() {
     let filtered = events;
 
     if (searchTerm) {
-      filtered = filtered.filter(event => 
+      filtered = filtered.filter(event =>
         event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         event.requestingDepartment.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -130,7 +130,26 @@ export default function ShowAllEvents() {
   return (
     <div className="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
       {/* Government Header */}
-      <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-6 shadow-lg">
+      <div className="bg-gradient-to-r from-orange-500 via-white to-green-600 h-2"></div>
+      <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-6 shadow-xl">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center">
+            <div className="flex items-center justify-center mb-3">
+              <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mr-4">
+                <img src={logo} alt="Odisha Logo" className="w-14 h-14 object-contain" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold">GOVERNMENT OF ODISHA</h1>
+                <h2 className="text-lg opacity-90">Commerce & Transport (Transport) Department</h2>
+              </div>
+            </div>
+            <div className="mt-3 pt-3 border-t border-blue-700">
+              <h3 className="text-lg font-semibold tracking-wide">ALL EVENTS MANAGEMENT SYSTEM</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-6 shadow-lg">
         <div className="max-w-6xl mx-auto">
           <div className="text-center">
             <h1 className="text-2xl font-bold">GOVERNMENT OF ODISHA</h1>
@@ -140,7 +159,7 @@ export default function ShowAllEvents() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className="max-w-7xl mx-auto p-6">
         <div className="bg-white rounded-lg shadow-lg border border-gray-200">
@@ -262,7 +281,7 @@ export default function ShowAllEvents() {
                           >
                             <Eye className="w-4 h-4" />
                           </button>
-                          
+
                           <button
                             onClick={() => handleViewPdf(event)}
                             className="bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 transition-colors"
@@ -306,7 +325,7 @@ export default function ShowAllEvents() {
                 </button>
               </div>
             </div>
-            
+
             <div className="p-6 space-y-6">
               {/* Basic Information */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -315,18 +334,18 @@ export default function ShowAllEvents() {
                     <label className="font-semibold text-gray-700 block mb-1">Event Name:</label>
                     <p className="text-gray-900">{selectedEvent.name}</p>
                   </div>
-                  
+
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
                     <label className="font-semibold text-gray-700 block mb-1">Department:</label>
                     <p className="text-gray-900">{selectedEvent.requestingDepartment}</p>
                   </div>
-                  
+
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
                     <label className="font-semibold text-gray-700 block mb-1">Collector:</label>
                     <p className="text-gray-900">{selectedEvent.collectorName || 'Not Assigned'}</p>
                   </div>
                 </div>
-                
+
                 <div className="space-y-4">
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
                     <label className="font-semibold text-gray-700 block mb-1">Status:</label>
@@ -335,7 +354,7 @@ export default function ShowAllEvents() {
                       {getStatusDisplayName(selectedEvent.status)}
                     </span>
                   </div>
-                  
+
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
                     <label className="font-semibold text-gray-700 block mb-1">Duration:</label>
                     <div className="text-gray-900">
@@ -343,14 +362,14 @@ export default function ShowAllEvents() {
                       <div>To: {selectedEvent.dateOfRelease}</div>
                     </div>
                   </div>
-                  
+
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
                     <label className="font-semibold text-gray-700 block mb-1">Created:</label>
                     <p className="text-gray-900">{new Date(selectedEvent.createdAt).toLocaleString('en-IN')}</p>
                   </div>
                 </div>
               </div>
-              
+
               {/* Vehicle Requirements */}
               <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-purple-500">
                 <label className="font-semibold text-gray-700 block mb-3">Vehicle Requirements:</label>
@@ -369,7 +388,7 @@ export default function ShowAllEvents() {
                 </div>
               </div>
             </div>
-            
+
             {/* Modal Footer */}
             <div className="bg-gray-100 p-4 rounded-b-lg flex justify-end gap-3">
               <button
@@ -401,7 +420,7 @@ export default function ShowAllEvents() {
                   {currentEventForPdf?.name} - Event Document
                 </h3>
                 <p className="text-sm opacity-75">
-                  Event ID: EV{String(currentEventForPdf?.id).padStart(3,'0')}
+                  Event ID: EV{String(currentEventForPdf?.id).padStart(3, '0')}
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -412,7 +431,7 @@ export default function ShowAllEvents() {
                   <FileText className="w-4 h-4" />
                   Open in New Tab
                 </button>
-                
+
                 <button
                   onClick={closePdfModal}
                   className="text-white hover:text-gray-300 p-1"
@@ -421,7 +440,7 @@ export default function ShowAllEvents() {
                 </button>
               </div>
             </div>
-            
+
             {/* PDF Content - Native iframe */}
             <div className="h-[calc(95vh-120px)] bg-gray-100">
               {pdfUrl ? (
