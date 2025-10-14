@@ -604,15 +604,15 @@ export default function ViewCollectorRequests() {
                     </button>
                   </div>
 
-                  {/* {request.status === "CREATED" && (
+                  {request.status === "CREATED" && (
                     <button
                       onClick={() => handleApprove(request.id)}
                       className="w-full mt-2 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-all"
                     >
                       <CheckCircle className="w-4 h-4" />
-                     Mark Completed
+                     Mark Event cretaed for this letter
                     </button>
-                  )} */}
+                  )}
                 </div>
               </div>
             ))}

@@ -29,7 +29,7 @@ export const userAPI = {
   signup: data => api.post(API_ENDPOINTS.users.signup(), data),
   requisitionSignin: data => api.post(API_ENDPOINTS.users.requisitionSignin(), data),
   requisitionCreate: data => api.post(API_ENDPOINTS.users.requisitionCreate(), data),
-    getRtosInMyDistrict: () => api.get('/user/rtos/my-district', {
+  getRtosInMyDistrict: () => api.get('/user/rtos/my-district', {
     headers: {
       "Content-Type": "application/json",
       ...getAuthHeader()
@@ -49,7 +49,7 @@ export const requestEventAPI = {
   create: formData => api.post(API_ENDPOINTS.requestEvents.create(), formData, {
     headers: { "Content-Type": "multipart/form-data" },
   }),
-  list: () => api.get(API_ENDPOINTS.requestEvents.list(),{
+  list: () => api.get(API_ENDPOINTS.requestEvents.list(), {
     headers: {
       "Content-Type": "application/json",
       ...getAuthHeader()
@@ -90,11 +90,11 @@ export const eventAPI = {
     }),
 
   update: (id, data) => api.patch(API_ENDPOINTS.events.update(id), data, {
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeader()
-      }
-    }),
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
 
   viewPdf: id => api.get(`${API_ENDPOINTS.events.viewPdf(id)}`, { responseType: "blob" }),
   downloadPdf: (id) => api.get(API_ENDPOINTS.events.downloadPdf(id), { responseType: "blob" }),
@@ -128,7 +128,7 @@ export const billSanctionAPI = {
     }
   }),
 
- 
+
   getByUtilization: utilizationId => api.get(`/api/bill-sanctions/utilization/${utilizationId}`, {
     headers: {
       "Content-Type": "application/json",
@@ -136,7 +136,7 @@ export const billSanctionAPI = {
     }
   }),
 
-  
+
   getByStatus: status => api.get(`/api/bill-sanctions/status/${status}`, {
     headers: {
       "Content-Type": "application/json",
@@ -144,7 +144,7 @@ export const billSanctionAPI = {
     }
   }),
 
-  
+
   getByType: type => api.get(`/api/bill-sanctions/type/${type}`, {
     headers: {
       "Content-Type": "application/json",
@@ -152,7 +152,7 @@ export const billSanctionAPI = {
     }
   }),
 
- 
+
   markAsPaid: (id, remarks) => api.patch(`/api/bill-sanctions/${id}/mark-paid`, null, {
     params: { remarks },
     headers: {
@@ -169,7 +169,7 @@ export const billSanctionAPI = {
     }
   }),
 
-  
+
   delete: id => api.delete(`/api/bill-sanctions/${id}`, {
     headers: {
       "Content-Type": "application/json",
@@ -183,73 +183,83 @@ export const billSanctionAPI = {
 
 export const utilizationAPI = {
   create: data => api.post(API_ENDPOINTS.utilizations.create(), data, {
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeader()
-      }
-    }),
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
   list: () => api.get(API_ENDPOINTS.utilizations.list(), {
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeader()
-      }
-    }),
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
   details: id => api.get(API_ENDPOINTS.utilizations.details(id), {
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeader()
-      }
-    }),
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
   update: (id, data) => api.put(API_ENDPOINTS.utilizations.update(id), data),
   delete: id => api.delete(API_ENDPOINTS.utilizations.delete(id), {
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeader()
-      }
-    }),
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
   getByEvent: eventId => api.get(API_ENDPOINTS.utilizations.byEvent(eventId), {
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeader()
-      }
-    }),
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
   getByStatus: status => api.get(API_ENDPOINTS.utilizations.byStatus(status), {
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeader()
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
+  approve: (id, approvedBy) =>
+    api.put(
+      API_ENDPOINTS.utilizations.approve(id),
+      null,
+      {
+        params: { approvedBy },
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader()
+        }
       }
-    }),
-  approve: (id, approvedBy) => api.put(API_ENDPOINTS.utilizations.approve(id), null, {
-    params: { approvedBy }
-  }, {
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeader()
-      }
-    }),
+    ),
+
   reject: (id, remarks) => api.put(API_ENDPOINTS.utilizations.reject(id), null, {
     params: { remarks }
   }),
-  commissionerApprove: (id, commissionerId, remarks) => api.patch(`/api/utilizations/${id}/commissioner-approve`, null, {
-    params: { commissionerApprovedBy: commissionerId, remarks }
-  }, {
+commissionerApprove: (id, commissionerId, remarks) =>
+  api.patch(
+    `/api/utilizations/${id}/commissioner-approve`,
+    null,
+    {
+      params: { commissionerApprovedBy: commissionerId, remarks },
       headers: {
         "Content-Type": "application/json",
         ...getAuthHeader()
       }
-    }),
+    }
+  ),
+
   commissionerReject: (id, remarks) => api.patch(`/api/utilizations/${id}/commissioner-reject`, null, {
     params: { remarks }
   }, {
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeader()
-      }
-    }),
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
   completePayment: (id, remarks) =>
     api.put(`/api/utilizations/${id}/complete-payment`, null, { params: { remarks } }),
 
-    getCommissionerApproved: () => api.get('/api/utilizations/status/COMMISSIONER_APPROVED', {
+  getCommissionerApproved: () => api.get('/api/utilizations/status/COMMISSIONER_APPROVED', {
     headers: {
       "Content-Type": "application/json",
       ...getAuthHeader()
