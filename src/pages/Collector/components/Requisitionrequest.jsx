@@ -238,13 +238,13 @@ export default function UploadLetterToRTO() {
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 <FileText className="w-4 h-4 inline mr-2 text-blue-900" />
-                Event Name
+                Event Purpose
                 <span className="text-red-600 ml-1">*</span>
               </label>
               <input
                 type="text"
                 {...register("letterName")}
-                placeholder="Enter the event name (e.g., Annual Cultural Festival Vehicle Requisition)"
+                placeholder="Enter the event purpose (e.g., Annual Cultural Festival Vehicle Requisition)"
                 className="w-full px-4 py-2.5 border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-200 outline-none"
               />
               {errors.letterName && (

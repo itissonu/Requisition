@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Search, Filter, Eye, Edit, FileText, CheckCircle, XCircle, Clock, Download, X, ChevronDown, ChevronRight, MapPin, Calendar, Car } from "lucide-react";
 import { eventAPI } from "../../../apis/apiService";
+import EventUtilizationPDFViewer from "./EventUtilizationPDFViewer";
 import logo from '../../../assests/logo.png';
 
 export default function ShowAllEvents() {
@@ -15,8 +16,6 @@ export default function ShowAllEvents() {
 
   // PDF Modal states
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
-  const [pdfUrl, setPdfUrl] = useState(null);
-  const [pdfLoading, setPdfLoading] = useState(false);
   const [currentEventForPdf, setCurrentEventForPdf] = useState(null);
 
   const { register, watch } = useForm();
@@ -89,46 +88,63 @@ export default function ShowAllEvents() {
     setSelectedEvent(event);
   };
 
-  const handleViewPdf = async (event) => {
-    try {
-      setPdfLoading(true);
-      setCurrentEventForPdf(event);
-      const pdfViewUrl = `http://localhost:8091/Requisition/api/events/${event.id}/pdf/view`;
-      setPdfUrl(pdfViewUrl);
-      setPdfModalOpen(true);
-    } catch (error) {
-      console.error('Error viewing PDF:', error);
-      alert('Failed to open document. Please try again.');
-    } finally {
-      setPdfLoading(false);
-    }
+  // Convert event data to PDF format
+  const convertEventToPdfData = (event) => {
+    return {
+      id: event.id,
+      eventId: event.id,
+      eventName: event.requestEventName,
+      requestingDepartment: event.requestingDepartment,
+      totalCost: getTotalCost(event),
+      remarks: event.remarks || "Event requisition request",
+      utilizationStatus: event.status,
+      collectorApprovedByName: event.collectorName || "Pending Approval",
+      createdAt: event.createdAt,
+      dateOfReporting: event.subEvents?.[0]?.reportingDate || event.createdAt,
+      dateOfRelease: event.subEvents?.[event.subEvents?.length - 1]?.reportingDate || event.createdAt,
+      district: event.collectorDistrict || "Ganjam",
+      collectorPhone: "+91-9876543210",
+      collectorEmail: "collector@odisha.gov.in",
+      createdByName: event.createdByName || "RTO Officer",
+      createdByRole: event.createdByRole || "RTO",
+      requestEventLetterNo: event.requestEventLetterNo,
+      subEventUtilizations: event.subEvents?.map((subEvent, idx) => ({
+        id: subEvent.id,
+        subEventId: subEvent.id,
+        subEventPlace: subEvent.place,
+        subEventReportingDate: subEvent.reportingDate,
+        subEventStartTime: subEvent.startTime,
+        vehicleUtilizations: subEvent.vehicles?.map((vehicle, vIdx) => ({
+          id: `${subEvent.id}_${vIdx}`,
+          vehicleId: vIdx + 1,
+          vehicleName: vehicle.vehicleName,
+          actualQuantity: vehicle.quantity,
+          totalCost: vehicle.estimatedCost || 0,
+          utilizationNotes: `Requisition for ${event.requestEventName}`,
+          fuelConsumed: Math.round(vehicle.quantity * 15), // Demo calculation
+          kilometersRun: Math.round(vehicle.quantity * 50), // Demo calculation
+          driverDetails: `Driver: Demo Driver ${vIdx + 1}, Ph: 987654321${vIdx}`
+        })) || []
+      })) || []
+    };
   };
 
-  const handleDownloadPdf = async (event) => {
-    try {
-      setPdfLoading(true);
-      const response = await eventAPI.downloadPdf(event.id);
-      const blob = new Blob([response.data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
+  const getTotalCost = (event) => {
+    return event.subEvents?.reduce((total, subEvent) => {
+      return total + (subEvent.vehicles?.reduce((subTotal, vehicle) => {
+        return subTotal + (vehicle.estimatedCost || vehicle.quantity * 500); // Demo cost calculation
+      }, 0) || 0);
+    }, 0) || 0;
+  };
 
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${event.requestEventName.replace(/[^a-z0-9]/gi, '_')}_Requisition.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading PDF:', error);
-      alert('Failed to download document. Please try again.');
-    } finally {
-      setPdfLoading(false);
-    }
+  const handleViewPdf = (event) => {
+    const pdfData = convertEventToPdfData(event);
+    setCurrentEventForPdf(pdfData);
+    setPdfModalOpen(true);
   };
 
   const closePdfModal = () => {
     setPdfModalOpen(false);
-    setPdfUrl(null);
     setCurrentEventForPdf(null);
   };
 
@@ -164,7 +180,6 @@ export default function ShowAllEvents() {
   return (
     <div className="bg-white min-h-screen">
       {/* Government Header */}
-
       <div className="bg-gradient-to-r from-orange-500 via-white to-green-600 h-2"></div>
       <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-6 shadow-xl">
         <div className="max-w-7xl mx-auto">
@@ -188,18 +203,6 @@ export default function ShowAllEvents() {
           </div>
         </div>
       </div>
-      {/* <div className="bg-blue-900 text-white p-6 shadow-lg">
-        <div className="max-w-6xl mx-auto items-center justify-center">
-          <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mr-4 mx-auto">
-            <img src={logo} alt="Odisha Logo" className="w-14 h-14 object-contain" />
-          </div>
-          <h1 className="text-2xl font-bold text-center">GOVERNMENT OF ODISHA</h1>
-          <h2 className="text-lg text-center opacity-90">Commerce & Transport (Transport) Department</h2>
-          <h3 className="text-md text-center font-semibold mt-2 border-t border-blue-700 pt-3">
-            EVENT MANAGEMENT SYSTEM
-          </h3>
-        </div>
-      </div> */}
 
       <div className="max-w-7xl mx-auto p-6">
         <div className="bg-white rounded-lg shadow-md border border-gray-200">
@@ -255,7 +258,6 @@ export default function ShowAllEvents() {
                   <th className="p-4 text-center font-semibold border-r border-blue-700">Status</th>
                   <th className="p-4 text-center font-semibold border-r border-blue-700">Sub-Events</th>
                   <th className="p-4 text-left font-semibold border-r border-blue-700">Total Vehicles</th>
-                  {/* <th className="p-4 text-left font-semibold border-r border-blue-700">Collector</th> */}
                   <th className="p-4 text-center font-semibold">Actions</th>
                 </tr>
               </thead>
@@ -277,7 +279,6 @@ export default function ShowAllEvents() {
                         </button>
                       </td>
                       <td className="p-4 border-r border-gray-200">
-                        {/* <div className="font-bold text-blue-900">EV{String(event.id).padStart(3, '0')}</div> */}
                         <div className="font-semibold text-gray-900">{event.requestEventName}</div>
                         <div className="text-xs text-gray-500">Letter No: {event.requestEventLetterNo}</div>
                         <div className="text-xs text-gray-500">
@@ -305,9 +306,6 @@ export default function ShowAllEvents() {
                           {getTotalVehicles(event)}
                         </div>
                       </td>
-                      {/* <td className="p-4 border-r border-gray-200 font-medium text-gray-700">
-                        {event.collectorDistrict ? `${event.collectorDistrict} Collector` : 'Not Assigned'}
-                      </td> */}
                       <td className="p-4">
                         <div className="flex gap-2 justify-center">
                           <button
@@ -320,22 +318,11 @@ export default function ShowAllEvents() {
 
                           <button
                             onClick={() => handleViewPdf(event)}
-                            disabled={pdfLoading}
-                            className="bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                            className="bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 transition-colors"
                             title="View PDF"
                           >
                             <FileText className="w-4 h-4" />
                           </button>
-
-                          {/* {canEdit(event) && (
-                            <button
-                              onClick={() => console.log('Edit event', event?.id)}
-                              className="bg-orange-600 text-white p-2 rounded-lg hover:bg-orange-700 transition-colors"
-                              title="Edit Event"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </button>
-                          )} */}
                         </div>
                       </td>
                     </tr>
@@ -343,7 +330,7 @@ export default function ShowAllEvents() {
                     {/* Expanded Sub-Events Row */}
                     {expandedEventId === event.id && (
                       <tr>
-                        <td colSpan="8" className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6">
+                        <td colSpan="7" className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6">
                           <div className="space-y-4">
                             <h4 className="text-lg font-bold text-blue-900 mb-4 flex items-center">
                               <Calendar className="w-5 h-5 mr-2" />
@@ -572,7 +559,6 @@ export default function ShowAllEvents() {
                 <button
                   onClick={() => handleViewPdf(selectedEvent)}
                   className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
-                  disabled={pdfLoading}
                 >
                   <FileText className="w-4 h-4" />
                   View PDF
@@ -601,81 +587,12 @@ export default function ShowAllEvents() {
         </div>
       )}
 
-      {/* PDF Viewer Modal with Native iframe */}
-      {pdfModalOpen && (
-        <div className="fixed inset-0 bg-black/20 bg-opacity-75 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-6xl w-full max-h-[95vh] overflow-hidden shadow-2xl">
-            {/* PDF Modal Header */}
-            <div className="bg-blue-900 text-white p-4 flex justify-between items-center">
-              <div>
-                <h3 className="text-lg font-semibold">
-                  {currentEventForPdf?.requestEventName} - Requisition Letter
-                </h3>
-                <p className="text-sm opacity-75">
-                  Document Viewer
-                </p>
-              </div>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => handleDownloadPdf(currentEventForPdf)}
-                  className="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 transition-colors flex items-center gap-2"
-                  disabled={pdfLoading}
-                >
-                  <Download className="w-4 h-4" />
-                  Download
-                </button>
-
-                <button
-                  onClick={() => window.open(pdfUrl, '_blank')}
-                  className="bg-purple-600 text-white px-3 py-2 rounded hover:bg-purple-700 transition-colors flex items-center gap-2"
-                >
-                  <FileText className="w-4 h-4" />
-                  Open in New Tab
-                </button>
-
-                <button
-                  onClick={closePdfModal}
-                  className="text-white hover:text-gray-300 p-1"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-            </div>
-
-            {/* PDF Content - Native iframe */}
-            <div className="h-[calc(95vh-120px)] bg-gray-100">
-              {pdfUrl ? (
-                <iframe
-                  src={pdfUrl}
-                  className="w-full h-full border-0"
-                  title={`${currentEventForPdf?.requestEventName} - PDF Document`}
-                  onLoad={() => setPdfLoading(false)}
-                  onError={() => {
-                    setPdfLoading(false);
-                    alert('Failed to load PDF. The document may not exist or there may be a server error.');
-                  }}
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full">
-                  <div className="text-center text-gray-500">
-                    <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                    <p>Loading PDF...</p>
-                  </div>
-                </div>
-              )}
-
-              {pdfLoading && (
-                <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading PDF...</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* PDF Viewer Modal */}
+      <EventUtilizationPDFViewer
+        eventData={currentEventForPdf}
+        isOpen={pdfModalOpen}
+        onClose={closePdfModal}
+      />
 
       {/* Footer */}
       <div className="bg-blue-900 text-white p-4 text-center text-sm mt-8">
