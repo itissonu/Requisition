@@ -7,6 +7,12 @@ export default function EventUtilizationDashboard() {
   const [approvedEvents, setApprovedEvents] = useState([]);
   const [utilizations, setUtilizations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedUtil, setSelectedUtil] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedUtil(null);
+  };
 
   useEffect(() => {
     fetchData();
@@ -18,10 +24,10 @@ export default function EventUtilizationDashboard() {
       console.log(eventsResponse.data, 'fetched events');
 
       const approvedEvts = eventsResponse.data.filter(e =>
-        e.status === "COLLECTOR_APPROVED"
+        e.status === "CREATED"
       );
       setApprovedEvents(approvedEvts);
-    
+
       const utilizationsResponse = await utilizationAPI.list();
       setUtilizations(utilizationsResponse.data);
 
@@ -72,6 +78,9 @@ export default function EventUtilizationDashboard() {
       case "COMPLETED": return "bg-gray-100 text-gray-800 border-gray-300";
       default: return "bg-gray-100 text-gray-800 border-gray-300";
     }
+  }; const handleViewDetails = (util) => {
+    setSelectedUtil(util);
+    setShowModal(true);
   };
 
   const getStatusMessage = (status) => {
@@ -114,7 +123,7 @@ export default function EventUtilizationDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Government Header */}
-       <div className="bg-gradient-to-r from-orange-500 via-white to-green-600 h-2"></div>
+      <div className="bg-gradient-to-r from-orange-500 via-white to-green-600 h-2"></div>
       <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-6 shadow-xl">
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
@@ -162,10 +171,10 @@ export default function EventUtilizationDashboard() {
                   <thead>
                     <tr className="bg-gradient-to-r from-green-900 to-green-800 text-white">
                       <th className="px-4 py-3 text-left text-sm font-semibold">Event ID</th>
-                      <th className="px-4 py-3 text-left text-sm font-semibold">Event Purpose</th>
+                      {/* <th className="px-4 py-3 text-left text-sm font-semibold">Event Purpose</th> */}
                       <th className="px-4 py-3 text-left text-sm font-semibold">Request Event</th>
                       <th className="px-4 py-3 text-left text-sm font-semibold">Department</th>
-                      <th className="px-4 py-3 text-center text-sm font-semibold">Collector</th>
+                      {/* <th className="px-4 py-3 text-center text-sm font-semibold">Collector</th> */}
                       <th className="px-4 py-3 text-center text-sm font-semibold">Sub-Events</th>
                       <th className="px-4 py-3 text-center text-sm font-semibold">Vehicles</th>
                       <th className="px-4 py-3 text-center text-sm font-semibold">Status</th>
@@ -185,12 +194,12 @@ export default function EventUtilizationDashboard() {
                           <td className="px-4 py-3">
                             <span className="font-mono font-bold text-blue-600">EV{String(event.id).padStart(3, '0')}</span>
                           </td>
-                          <td className="px-4 py-3">
+                          {/* <td className="px-4 py-3">
                             <div className="flex items-center gap-2">
                               <FileText className="w-4 h-4 text-blue-600 flex-shrink-0" />
                               <span className="font-medium text-gray-900">{event.name}</span>
                             </div>
-                          </td>
+                          </td> */}
                           <td className="px-4 py-3">
                             <div className="text-sm">
                               <div className="font-semibold text-purple-700">{event.requestEventName}</div>
@@ -203,12 +212,12 @@ export default function EventUtilizationDashboard() {
                               <span className="text-sm text-gray-700">{event.requestingDepartment}</span>
                             </div>
                           </td>
-                          <td className="px-4 py-3 text-center">
+                          {/* <td className="px-4 py-3 text-center">
                             <div className="text-sm">
                               <div className="font-semibold text-blue-700">{event.collectorName}</div>
                               <div className="text-xs text-gray-500">{event.collectorDistrict}</div>
                             </div>
-                          </td>
+                          </td> */}
                           <td className="px-4 py-3 text-center">
                             <span className="inline-flex items-center justify-center w-8 h-8 bg-purple-100 text-purple-700 rounded-full font-bold">
                               {totalSubEvents}
@@ -339,6 +348,13 @@ export default function EventUtilizationDashboard() {
                           <span className="font-bold text-green-700">₹{util.totalCost?.toLocaleString('en-IN') || '0'}</span>
                         </td>
                         <td className="px-4 py-3 text-center">
+                          <button
+                            onClick={() => handleViewDetails(util)}
+                            className="p-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors shadow-sm"
+                            title="View Details"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
                           <span className="text-xs text-gray-600">{formatDateTime(util.createdAt)}</span>
                         </td>
                       </tr>
@@ -364,7 +380,127 @@ export default function EventUtilizationDashboard() {
           </div>
         </div>
       </div>
+      {showModal && selectedUtil && (
+        <div className="fixed inset-0 bg-black/60 bg-opacity-60 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-gray-300">
+            <div className="bg-blue-900 text-white p-6 rounded-t-lg">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-2xl font-bold">Utilization  Details</h3>
+                  {/* <p className="text-blue-200 mt-1">Certificate No: UC-{String(selectedUtil.id).padStart(4, '0')}</p> */}
+                </div>
+                <button
+                  onClick={closeModal}
+                  className="text-white hover:bg-blue-800 p-2 rounded-full transition-colors"
+                >
+                 <span> x</span>
+                </button>
+              </div>
+            </div>
 
+            <div className="p-6 space-y-6">
+              {/* Basic Information */}
+              {/* <div>
+                <h4 className="text-lg font-bold text-gray-900 mb-3 pb-2 border-b-2 border-blue-600">Event Information</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-gray-50 border border-gray-300 p-4 rounded">
+                    <p className="text-sm text-gray-600 mb-1 font-semibold">Event Name</p>
+                    <p className="font-semibold text-gray-900">{selectedUtil.eventName}</p>
+                  </div>
+                  <div className="bg-gray-50 border border-gray-300 p-4 rounded">
+                    <p className="text-sm text-gray-600 mb-1 font-semibold">Department</p>
+                    <p className="font-semibold text-gray-900">{selectedUtil.department}</p>
+                  </div>
+                  <div className="bg-gray-50 border border-gray-300 p-4 rounded">
+                    <p className="text-sm text-gray-600 mb-1 font-semibold">Approved By</p>
+                    <p className="font-semibold text-gray-900">{selectedUtil.approvedBy}</p>
+                  </div>
+                  <div className="bg-gray-50 border border-gray-300 p-4 rounded">
+                    <p className="text-sm text-gray-600 mb-1 font-semibold">Approval Date</p>
+                    <p className="font-semibold text-gray-900">{selectedUtil.approvedDate}</p>
+                  </div>
+                </div>
+                {selectedUtil.remarks && (
+                  <div className="mt-4 bg-yellow-50 border border-yellow-300 p-4 rounded">
+                    <p className="text-sm text-gray-600 mb-1 font-semibold">Remarks</p>
+                    <p className="text-gray-900">{selectedUtil.remarks}</p>
+                  </div>
+                )}
+              </div> */}
+
+              {/* Sub-Event Details */}
+              <div>
+                <h4 className="text-lg font-bold text-gray-900 mb-3 pb-2 border-b-2 border-green-600">Sub-Event & Vehicle Utilization</h4>
+                {selectedUtil.subEventUtilizations.map((subEvent, idx) => (
+                  <div key={subEvent.id} className="mb-6 border-2 border-gray-300 rounded overflow-hidden">
+                    <div className="bg-gray-100 p-4 border-b-2 border-gray-300">
+                      <h5 className="font-bold text-lg text-gray-900">Sub-Event {idx + 1}</h5>
+                      <div className="flex items-center gap-6 mt-2 text-sm text-gray-700">
+                        <span className="flex items-center gap-2">
+                          <MapPin className="w-4 h-4 text-blue-600" />
+                          <span className="font-semibold">Place:</span> {subEvent.subEventPlace}
+                        </span>
+                        <span className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4 text-blue-600" />
+                          <span className="font-semibold">Date:</span> {new Date(subEvent.subEventReportingDate).toLocaleDateString('en-GB')}
+                        </span>
+                      </div>
+                      {subEvent.subEventStartTime && (
+                        <div className="mt-2 text-sm text-gray-700">
+                          <span className="font-semibold">Time:</span> {subEvent.subEventStartTime} {subEvent.subEventEndTime && `- ${subEvent.subEventEndTime}`}
+                        </div>
+                      )}
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse">
+                        <thead className="bg-blue-900 text-white">
+                          <tr>
+                            <th className="p-3 border-r border-blue-800 text-left">Vehicle Type</th>
+                            <th className="p-3 border-r border-blue-800 text-center">Quantity</th>
+                            <th className="p-3 text-right">Total Cost (₹)</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {subEvent.vehicleUtilizations.map((vehicle, vIdx) => (
+                            <tr key={vehicle.id} className={`${vIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'} border-b border-gray-200`}>
+                              <td className="p-3 font-semibold text-gray-800 border-r border-gray-200">{vehicle.vehicleName || 'N/A'}</td>
+                              <td className="p-3 text-center font-bold text-gray-900 border-r border-gray-200">{vehicle.actualQuantity || 0}</td>
+                              <td className="p-3 text-right font-bold text-green-700">₹{(vehicle.totalCost || 0).toLocaleString('en-IN')}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ))}
+                <div className="  rounded p-4">
+                  <div className="flex justify-between items-center">
+                    {/* <span className="text-lg font-bold text-gray-900">TOTAL AMOUNT:</span>
+                    <span className="text-2xl font-bold text-green-700">₹{selectedUtil.totalAmount.toLocaleString('en-IN')}</span> */}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="bg-gray-50 border-t-2 border-gray-300 p-4 rounded-b-lg flex justify-end gap-3">
+              {/* <button
+                onClick={() => downloadPDF(selectedUtil)}
+                className="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 transition-colors flex items-center gap-2 font-bold shadow-md"
+              >
+                <Download className="w-5 h-5" />
+                Download Certificate
+              </button> */}
+              <button
+                onClick={closeModal}
+                className="bg-gray-600 text-white px-6 py-3 rounded hover:bg-gray-700 transition-colors font-bold shadow-md"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Footer */}
       <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">
         <p>© Government of Odisha – Commerce & Transport Department | Vehicle Utilization Management System</p>

@@ -232,7 +232,7 @@ export default function ShowPaymentBills() {
     );
 }
 
-// Modal for Viewing Bills
+
 function ViewBillsModal({ utilization, onClose }) {
     return (
         <div className="fixed inset-0 bg-black/60 bg-opacity-60 flex items-center justify-center p-4 z-50">
@@ -382,11 +382,11 @@ function AdvanceModal({ utilization, onClose, onRefresh }) {
                     <div className="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-500">
                         <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
-                                <span className="font-medium text-gray-600">Total Sanctioned:</span>
+                                <span className="font-medium text-gray-600">Total Amount:</span>
                                 <p className="text-gray-900 font-bold">₹{utilization.totalCost.toLocaleString('en-IN')}</p>
                             </div>
                             <div>
-                                <span className="font-medium text-gray-600">Available Balance:</span>
+                                <span className="font-medium text-gray-600">Remained Balance:</span>
                                 <p className="text-orange-600 font-bold">₹{utilization.remaining.toLocaleString('en-IN')}</p>
                             </div>
                         </div>

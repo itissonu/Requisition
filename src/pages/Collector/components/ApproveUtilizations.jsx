@@ -89,7 +89,8 @@ export default function ApproveUtilizations() {
       setActionLoading(true);
       try { 
         if (actionType === "approve") {
-          const currentUserId = null; 
+          const currentUserId = 1; 
+          
           await utilizationAPI.approve(selectedUtilization.id, currentUserId);
         } else {
           await utilizationAPI.reject(selectedUtilization.id, approvalComments.trim());

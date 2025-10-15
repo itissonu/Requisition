@@ -48,6 +48,8 @@ const DashboardRouter = () => {
 
 
   const getDashboardPath = (role) => {
+
+    console.log("User role:", role);
     const dashboardPaths = {
       'RTO': '/rto/dashboard',
       'Collector': '/collector/dashboard',
@@ -58,6 +60,7 @@ const DashboardRouter = () => {
 
 
   if (user) {
+    console.log("Redirecting to dashboard for role:", user.role);
     return <Navigate to={getDashboardPath(user.role)} replace />;
   }
 
@@ -72,7 +75,7 @@ const UnauthorizedPage = () => {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full text-center">
         <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <span className="text-2xl">🚫</span>
+          <span className="text-2xl"></span>
         </div>
         <h2 className="text-xl font-bold text-gray-900 mb-2">Access Denied</h2>
         <p className="text-gray-600 mb-4">

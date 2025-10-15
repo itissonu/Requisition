@@ -56,13 +56,13 @@ const SanctionModal = ({ isOpen, onClose, utilization, onSanction, userRole }) =
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-white">
-                  Sanction a Bill 
+                  Sanction a Bill
                 </h2>
                 <p className="text-emerald-100 text-sm mt-1">Generate bill for approved utilization</p>
               </div>
             </div>
-            <button 
-              onClick={onClose} 
+            <button
+              onClick={onClose}
               className="text-white hover:bg-white/20 rounded-full p-2 transition-all"
             >
               <XCircle className="w-6 h-6" />

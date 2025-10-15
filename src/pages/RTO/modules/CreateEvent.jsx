@@ -6,6 +6,7 @@ import { Car, File, Plus, Trash2, MapPin, Calendar, Clock, ChevronDown, Building
 
 import logo from '../../../assests/logo.png';
 import { eventAPI, requestEventAPI, vehicleAPI } from "../../../apis/apiService";
+import EventUtilizationPDFViewer from "./EventUtilizationPDFViewer";
 
 const subEventSchema = z.object({
   place: z.string().min(2, "Place is required"),
@@ -30,6 +31,9 @@ export default function CreateEvent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
   const [currentSubEvent, setCurrentSubEvent] = useState(null);
+  const [pdfOpen, setPdfOpen] = useState(false);
+  const [createdEvent, setCreatedEvent] = useState(null);
+
 
   const { register, handleSubmit, control, formState: { errors }, reset } = useForm({
     resolver: zodResolver(eventSchema),
@@ -56,9 +60,10 @@ export default function CreateEvent() {
     try {
       setLoading(true);
       const response = await requestEventAPI.list();
-      setRequests(response.data);
+      const filtereddata = response.data.filter(request => request.status !== "APPROVED");
+      setRequests(filtereddata);
 
-      console.log("Fetched requests:", response.data);
+      console.log("Fetched requests:", filtereddata);
     } catch (error) {
       console.error("Failed to fetch requests:", error);
       alert("Failed to load requests. Please try again.");
@@ -80,13 +85,24 @@ export default function CreateEvent() {
 
   const openModal = (index = null) => {
     if (index !== null) {
-      // Editing existing sub-event
+
       setEditingIndex(index);
       const subEvent = subEvents[index];
       setValueSubEvent('place', subEvent.place);
       setValueSubEvent('reportingDate', subEvent.reportingDate);
       setValueSubEvent('startTime', subEvent.startTime);
-      setValueSubEvent('vehicles', subEvent.vehicles);
+      // setValueSubEvent('vehicles', subEvent.vehicles);
+      const mappedVehicles = vehicles.map(vehicle => {
+        const existingVehicle = subEvent.vehicles.find(v => v.vehicleId === vehicle.id);
+        return {
+          vehicleId: vehicle.id,
+          quantity: existingVehicle ? existingVehicle.quantity : 0
+        };
+      });
+      console.log("Mapped Vehicles for Modal:", mappedVehicles);
+      setValueSubEvent('vehicles', mappedVehicles);
+
+
       setCurrentSubEvent(subEvent);
     } else {
       // Creating new sub-event
@@ -177,6 +193,11 @@ export default function CreateEvent() {
       console.log('Event created successfully:', response.data);
       alert('Event created successfully!');
       resetForm();
+
+      console.log(response.data, "response.data");
+      setCreatedEvent(response.data);
+      setPdfOpen(true);
+
 
     } catch (error) {
       console.error('Error creating event:', error);
@@ -483,33 +504,16 @@ export default function CreateEvent() {
                               <div className="font-medium">{vehicle.name}</div>
                             </td>
                             <td className="p-2 text-center">
-                              <Controller
+                              {/* <Controller
                                 name={`vehicles.${vehicleIndex}.quantity`}
                                 control={controlSubEvent}
                                 render={({ field }) => (
-                                  // <input
-                                  //   type="number"
-                                  //   min="0"
-                                  //   {...field}
-
-                                  //   onChange={(e) => {
-                                  //     const rawValue = e.target.value;
-
-                                  //     const normalizedValue = rawValue.replace(/^0+(?=\d)/, "");
-                                  //     const value = normalizedValue === "" ? 0 : parseInt(normalizedValue, 10);
-
-
-                                  //     field.onChange(value);
-
-                                  //     updateVehicleQuantity(vehicle.id, value);
-                                  //   }}
-                                  //   className="w-24 text-center border-2 border-gray-300 p-2 rounded focus:ring-2 focus:ring-green-500 focus:border-green-500 font-semibold transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                  // />
+                                 
                                   <input
                                     type="text"
                                     inputMode="numeric"
                                     {...field}
-                                    value={vehicle.quantity}
+                                    value={vehicle?.quantity}
                                     onChange={(e) => {
                                       const value = e.target.value.replace(/[^0-9]/g, '');
                                       updateVehicleQuantity(vehicle.id, value);
@@ -517,7 +521,27 @@ export default function CreateEvent() {
                                     className="w-24 text-center border-2 border-gray-300 p-2 rounded focus:ring-2 focus:ring-green-500 focus:border-green-500 font-semibold transition-all"
                                   />
                                 )}
+                              /> */}
+
+                              <Controller
+                                name={`vehicles.${vehicleIndex}.quantity`}
+                                control={controlSubEvent}
+                                render={({ field }) => (
+                                  <input
+                                    type="text"
+                                    inputMode="numeric"
+                                    value={field.value || ''}  
+                                    onChange={(e) => {
+                                      const value = e.target.value.replace(/[^0-9]/g, '');
+                                      const numValue = value === '' ? '' : parseInt(value, 10);
+                                      field.onChange(numValue);  
+                                      updateVehicleQuantity(vehicle.id, numValue);
+                                    }}
+                                    className="w-24 text-center border-2 border-gray-300 p-2 rounded focus:ring-2 focus:ring-green-500 focus:border-green-500 font-semibold transition-all"
+                                  />
+                                )}
                               />
+
                             </td>
                           </tr>
                         ))}
@@ -548,6 +572,13 @@ export default function CreateEvent() {
           </div>
         </div>
       )}
+
+      <EventUtilizationPDFViewer
+        eventData={createdEvent}
+        isOpen={pdfOpen}
+        onClose={() => setPdfOpen(false)}
+      />
+
 
       {/* Footer */}
       <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-4 mt-12 shadow-lg">

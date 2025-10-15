@@ -532,7 +532,7 @@ export default function RTOLogin({ onLogin }) {
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-in fade-in">
           <div
             ref={modalRef}
-            className="bg-white rounded-2xl shadow-2xl border-[1px] border-white w-full max-w-5xl 
+            className="bg-white rounded-2xl shadow-2xl border-[1px] border-gray-50 w-full max-w-5xl 
                        transform animate-in zoom-in-95 duration-200 origin-center overflow-hidden"
           >
             <div className="grid md:grid-cols-2">

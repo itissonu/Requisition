@@ -198,10 +198,10 @@ export default function EventUtilizationForm() {
       };
 
       console.log("Submit Utilization:", payload);
-      await utilizationAPI.create(payload);
+     await utilizationAPI.create(payload);
 
       alert("Utilization created successfully!");
-      navigate("/rto/event-utilization");
+     navigate("/rto/event-utilization");
 
     } catch (error) {
       console.error('Error submitting utilization:', error);
