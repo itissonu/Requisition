@@ -1,21 +1,21 @@
 import React, { useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, Legend, Sector } from "recharts";
-  const renderActiveShape = (props) => {
+const renderActiveShape = (props) => {
     const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props;
     return (
-      <Sector
-        cx={cx}
-        cy={cy}
-        innerRadius={innerRadius}
-        outerRadius={outerRadius + 10} // +10 px for pop-out
-        startAngle={startAngle}
-        endAngle={endAngle}
-        fill={fill}
-      />
+        <Sector
+            cx={cx}
+            cy={cy}
+            innerRadius={innerRadius}
+            outerRadius={outerRadius + 10} // +10 px for pop-out
+            startAngle={startAngle}
+            endAngle={endAngle}
+            fill={fill}
+        />
     );
-  };
+};
 export default function RTOMainDashboard() {
-  const [activeIndex, setActiveIndex] = useState(null);
+    const [activeIndex, setActiveIndex] = useState(null);
     // Dummy data (replace with API later)
     const eventsData = [
         { month: "Jan", events: 12 },
@@ -35,11 +35,19 @@ export default function RTOMainDashboard() {
 
     return (
         <div className="space-y-6">
+            <div>
+                <h1 className="text-2xl font-bold text-gray-900">RTO Dashboard</h1>
+                <p className="text-gray-600">Overview & Statistics</p>
+            </div>
             {/* Stat Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <div className="bg-white p-4 shadow rounded">
                     <h4 className="text-sm text-gray-500">Total Events</h4>
                     <p className="text-2xl font-bold">54</p>
+                </div>
+                <div className="bg-white p-4 shadow rounded">
+                    <h4 className="text-sm text-gray-500">Approved Events</h4>
+                    <p className="text-2xl font-bold text-orange-600">7</p>
                 </div>
                 <div className="bg-white p-4 shadow rounded">
                     <h4 className="text-sm text-gray-500">Pending Events</h4>
@@ -93,7 +101,7 @@ export default function RTOMainDashboard() {
                 </div>
             </div>
 
-        
+
         </div>
     );
 }

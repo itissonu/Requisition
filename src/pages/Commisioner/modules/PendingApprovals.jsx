@@ -287,7 +287,7 @@ export default function CommissionerApproveUtilizations() {
 
         {/* Details Modal */}
         {showDetailsModal && selected && (
-          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="fixed inset-0 bg-black/60 bg-opacity-60 flex items-center justify-center p-4 z-50 overflow-y-auto">
             <div className="bg-white rounded-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl my-8">
               <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-xl sticky top-0 z-10">
                 <div className="flex justify-between items-center">
@@ -374,9 +374,9 @@ export default function CommissionerApproveUtilizations() {
                                 <th className="p-3 border text-left text-xs">S.No</th>
                                 <th className="p-3 border text-left text-xs">Vehicle Type</th>
                                 <th className="p-3 border text-center text-xs">Quantity</th>
-                                <th className="p-3 border text-center text-xs">KM Run</th>
+                                {/* <th className="p-3 border text-center text-xs">KM Run</th>
                                 <th className="p-3 border text-center text-xs">Fuel (L)</th>
-                                <th className="p-3 border text-left text-xs">Driver</th>
+                                <th className="p-3 border text-left text-xs">Driver</th> */}
                                 <th className="p-3 border text-right text-xs">Cost (₹)</th>
                               </tr>
                             </thead>
@@ -386,19 +386,19 @@ export default function CommissionerApproveUtilizations() {
                                   <td className="p-3 border font-medium">{vIdx + 1}</td>
                                   <td className="p-3 border font-semibold">{vehicle.vehicleName || 'N/A'}</td>
                                   <td className="p-3 border text-center font-semibold text-blue-700">{vehicle.actualQuantity || 0}</td>
-                                  <td className="p-3 border text-center">{vehicle.kilometersRun || 0} km</td>
+                                  {/* <td className="p-3 border text-center">{vehicle.kilometersRun || 0} km</td>
                                   <td className="p-3 border text-center">{vehicle.fuelConsumed || 0} L</td>
-                                  <td className="p-3 border">{vehicle.driverDetails || '-'}</td>
+                                  <td className="p-3 border">{vehicle.driverDetails || '-'}</td> */}
                                   <td className="p-3 border text-right font-semibold text-green-600">
                                     ₹{(vehicle.totalCost || 0).toLocaleString('en-IN')}
                                   </td>
                                 </tr>
                               ))}
                               <tr className="bg-purple-100 border-t-2 border-purple-600">
-                                <td colSpan="6" className="p-3 text-right font-bold">SUB-EVENT TOTAL:</td>
-                                <td className="p-3 text-right font-bold text-lg text-purple-700">
+                                <td colSpan="6" className="p-3 text-right font-bold">SUB-EVENT TOTAL: ₹{subTotal.toLocaleString('en-IN')}</td>
+                                {/* <td className="p-3 text-right font-bold text-lg text-purple-700">
                                   ₹{subTotal.toLocaleString('en-IN')}
-                                </td>
+                                </td> */}
                               </tr>
                             </tbody>
                           </table>

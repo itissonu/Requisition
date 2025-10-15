@@ -29,12 +29,12 @@ export default function EventUtilizationForm() {
         if (eventData.subEvents) {
           eventData.subEvents.forEach(subEvent => {
             const vehicleUtilData = {};
-            
+
             if (subEvent.vehicles) {
               subEvent.vehicles.forEach(subEventVehicle => {
                 const ratePerKm = subEventVehicle.ratePerKm || 0;
                 const quantity = subEventVehicle.quantity || 0;
-                
+
                 vehicleUtilData[subEventVehicle.vehicleId] = {
                   actualQuantity: quantity,
                   ratePerKm: ratePerKm,
@@ -76,14 +76,14 @@ export default function EventUtilizationForm() {
   useEffect(() => {
     let grandTotal = 0;
     const updatedUtilizations = { ...subEventUtilizations };
-    
+
     Object.keys(updatedUtilizations).forEach(subEventId => {
       const subEventData = updatedUtilizations[subEventId];
       const subTotal = Object.values(subEventData.vehicles).reduce(
-        (sum, vehicle) => sum + (parseFloat(vehicle.totalCost) || 0), 
+        (sum, vehicle) => sum + (parseFloat(vehicle.totalCost) || 0),
         0
       );
-      
+
       subEventData.subTotalCost = subTotal;
       grandTotal += subTotal;
     });
@@ -180,7 +180,7 @@ export default function EventUtilizationForm() {
           return {
             subEventId: subEvent.id,
             remarks: subEventData.remarks || "",
-            
+
             vehicleUtilizations: subEvent.vehicles.map(subEventVehicle => {
               const vehicleData = subEventData.vehicles[subEventVehicle.vehicleId] || {};
               return {
@@ -198,10 +198,10 @@ export default function EventUtilizationForm() {
       };
 
       console.log("Submit Utilization:", payload);
-  await utilizationAPI.create(payload);
+      await utilizationAPI.create(payload);
 
       alert("Utilization created successfully!");
-  navigate("/rto/event-utilization");
+      navigate("/rto/event-utilization");
 
     } catch (error) {
       console.error('Error submitting utilization:', error);
@@ -273,17 +273,18 @@ export default function EventUtilizationForm() {
             <div className="flex justify-between items-center">
               <div>
                 <h3 className="text-xl font-bold text-white">
-                  EVENT DETAILS - EV{String(event.id).padStart(3, '0')}
+                  EVENT DETAILS
+                  {/* EVENT DETAILS - EV{String(event.id).padStart(3, '0')} */}
                 </h3>
                 <h4 className="text-lg font-semibold text-blue-100 mt-1">{event.name}</h4>
               </div>
-              <button
+              {/* <button
                 onClick={handleViewEventPdf}
                 className="bg-white text-blue-700 p-3 rounded-lg hover:bg-blue-50 transition-colors shadow-md"
                 title="View Original Event PDF"
               >
                 <FileText className="w-6 h-6" />
-              </button>
+              </button> */}
             </div>
           </div>
 
@@ -317,7 +318,7 @@ export default function EventUtilizationForm() {
         {/* Sub-Events with Utilization */}
         {event.subEvents && event.subEvents.map((subEvent, subIdx) => {
           const subEventData = subEventUtilizations[subEvent.id] || { vehicles: {}, subTotalCost: 0 };
-          
+
           return (
             <div key={subEvent.id} className="bg-white rounded-lg shadow-lg border border-gray-200 mb-6">
               {/* Sub-Event Header -- COLOR CHANGED HERE */}
@@ -332,7 +333,7 @@ export default function EventUtilizationForm() {
                         ID: SUB{String(subEvent.id).padStart(3, '0')}
                       </h3>
                     </div>
-                    
+
                     <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
                       <div className="flex items-center gap-2 text-gray-200">
                         <MapPin className="w-4 h-4" />
@@ -348,7 +349,7 @@ export default function EventUtilizationForm() {
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-lg font-bold">
                     ₹{subEventData.subTotalCost.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                   </div> */}
@@ -396,11 +397,15 @@ export default function EventUtilizationForm() {
                             </td>
                             <td className="border border-gray-300 p-2 text-center">
                               <input
-                                type="number"
-                                min="0"
+                                type="text"
+                                inputMode="numeric"
                                 value={actualQty}
-                                onChange={(e) => handleQuantityChange(subEvent.id, subEventVehicle.vehicleId, e.target.value)}
-                                // FOCUS COLOR -- CHANGED HERE
+                                onChange={(e) => {
+                                  const value = e.target.value.replace(/[^0-9]/g, '');
+                                  handleQuantityChange(subEvent.id, subEventVehicle.vehicleId, value);
+                                }}
+                                // onChange={(e) => handleQuantityChange(subEvent.id, subEventVehicle.vehicleId, e.target.value)}
+
                                 className="w-20 border-2 border-gray-300 rounded text-center p-1 outline-none font-semibold text-sm"
                               />
                             </td>
@@ -411,11 +416,14 @@ export default function EventUtilizationForm() {
                             </td> */}
                             <td className="border  p-2 text-center">
                               <input
-                                type="number"
-                                step="0.01"
-                                min="0"
+                                type="text"
+                                inputMode="numeric"
                                 value={totalCost}
-                                onChange={(e) => handleTotalCostChange(subEvent.id, subEventVehicle.vehicleId, e.target.value)}
+                                onChange={(e) => {
+                                  const value = e.target.value.replace(/[^0-9]/g, '');
+                                  handleTotalCostChange(subEvent.id, subEventVehicle.vehicleId, value)
+                                }}
+                                // onChange={(e) => handleTotalCostChange(subEvent.id, subEventVehicle.vehicleId, e.target.value)}
                                 className="w-28  border-green-400 rounded text-center p-1 focus:ring-2 focus:ring-green-500 font-bold text-green-700 text-sm"
                               />
                             </td>

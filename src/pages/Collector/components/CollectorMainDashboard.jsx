@@ -83,7 +83,7 @@ export default function CollectorMainDashboard() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Collector Dashboard</h1>
-            {/* <p className="text-gray-600 mt-1">Welcome back! Here's what's happening today.</p> */}
+            <p className="text-gray-600 mt-1">Overview & Reports</p>
           </div>
           {/* <div className="text-right">
             <div className="text-lg font-semibold text-gray-900">
@@ -97,7 +97,7 @@ export default function CollectorMainDashboard() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-lg shadow border-l-4 border-yellow-500">
           <div className="flex items-center justify-between">
             <div>

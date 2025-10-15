@@ -255,7 +255,7 @@ export default function ShowAllEvents() {
                   <th className="p-4 text-center font-semibold border-r border-blue-700">Status</th>
                   <th className="p-4 text-center font-semibold border-r border-blue-700">Sub-Events</th>
                   <th className="p-4 text-left font-semibold border-r border-blue-700">Total Vehicles</th>
-                  <th className="p-4 text-left font-semibold border-r border-blue-700">Collector</th>
+                  {/* <th className="p-4 text-left font-semibold border-r border-blue-700">Collector</th> */}
                   <th className="p-4 text-center font-semibold">Actions</th>
                 </tr>
               </thead>
@@ -277,7 +277,7 @@ export default function ShowAllEvents() {
                         </button>
                       </td>
                       <td className="p-4 border-r border-gray-200">
-                        <div className="font-bold text-blue-900">EV{String(event.id).padStart(3, '0')}</div>
+                        {/* <div className="font-bold text-blue-900">EV{String(event.id).padStart(3, '0')}</div> */}
                         <div className="font-semibold text-gray-900">{event.requestEventName}</div>
                         <div className="text-xs text-gray-500">Letter No: {event.requestEventLetterNo}</div>
                         <div className="text-xs text-gray-500">
@@ -305,9 +305,9 @@ export default function ShowAllEvents() {
                           {getTotalVehicles(event)}
                         </div>
                       </td>
-                      <td className="p-4 border-r border-gray-200 font-medium text-gray-700">
+                      {/* <td className="p-4 border-r border-gray-200 font-medium text-gray-700">
                         {event.collectorDistrict ? `${event.collectorDistrict} Collector` : 'Not Assigned'}
-                      </td>
+                      </td> */}
                       <td className="p-4">
                         <div className="flex gap-2 justify-center">
                           <button
@@ -327,7 +327,7 @@ export default function ShowAllEvents() {
                             <FileText className="w-4 h-4" />
                           </button>
 
-                          {canEdit(event) && (
+                          {/* {canEdit(event) && (
                             <button
                               onClick={() => console.log('Edit event', event?.id)}
                               className="bg-orange-600 text-white p-2 rounded-lg hover:bg-orange-700 transition-colors"
@@ -335,7 +335,7 @@ export default function ShowAllEvents() {
                             >
                               <Edit className="w-4 h-4" />
                             </button>
-                          )}
+                          )} */}
                         </div>
                       </td>
                     </tr>

@@ -87,10 +87,9 @@ export default function ApproveUtilizations() {
       
     if (selectedUtilization) {
       setActionLoading(true);
-      try {
+      try { 
         if (actionType === "approve") {
-          // You should get the current user ID from your authentication context/store
-          const currentUserId = 13; 
+          const currentUserId = null; 
           await utilizationAPI.approve(selectedUtilization.id, currentUserId);
         } else {
           await utilizationAPI.reject(selectedUtilization.id, approvalComments.trim());

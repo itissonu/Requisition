@@ -227,13 +227,13 @@ export default function EventUtilizationDashboard() {
                           </td>
                           <td className="px-4 py-3">
                             <div className="flex items-center justify-center gap-2">
-                              <button
+                              {/* <button
                                 onClick={() => handleViewEventPdf(event.id)}
                                 className="p-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
                                 title="View Requisition"
                               >
                                 <Eye className="w-4 h-4" />
-                              </button>
+                              </button> */}
                               <button
                                 onClick={() => handleCreateUtilization(event.id)}
                                 className="flex items-center gap-1 bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 transition-colors font-semibold text-sm"
