@@ -429,7 +429,7 @@ export default function CreateEvent() {
             <div className="p-6 max-h-[calc(100vh-200px)] overflow-y-auto">
               <div className="space-y-6">
                 {/* Sub-event Details */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                       <MapPin className="inline w-4 h-4 mr-1" />
@@ -460,7 +460,7 @@ export default function CreateEvent() {
                     )}
                   </div>
 
-                  <div>
+                  {/* <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                       <Clock className="inline w-4 h-4 mr-1" />
                       Event Time <span className="text-red-500">*</span>
@@ -473,7 +473,7 @@ export default function CreateEvent() {
                     {errorsSubEvent.startTime && (
                       <p className="text-red-500 text-sm mt-1">{errorsSubEvent.startTime.message}</p>
                     )}
-                  </div>
+                  </div> */}
                 </div>
 
                 {/* Vehicle Requirements - Excel Style */}

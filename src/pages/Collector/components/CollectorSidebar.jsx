@@ -10,36 +10,29 @@ import {
 } from "lucide-react";
 
 const collectorItems = [
-  { 
-    key: "Dashboard", 
-    label: "Dashboard", 
-    icon: LayoutDashboard, 
-    description: "Overview & Reports" 
+  {
+    key: "Dashboard",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    description: "Overview & Reports"
   },
-  { 
-    key: "ApproveRequests", 
-    label: "Approve Requests", 
-    icon: CheckSquare, 
-    description: "Review Pending Requests",
-    //badge: 3 
-  },
-  { 
-    key: "ApproveUtilizations", 
-    label: "Approve Utilizations", 
-    icon: Truck, 
+  {
+    key: "ApproveUtilizations",
+    label: "Approve Utilizations",
+    icon: Truck,
     description: "Vehicle Usage Approvals"
   },
-  { 
-    key: "ShowAllEvents", 
-    label: "All Events", 
-    icon: Calendar, 
-    description: "View Event Details" 
+  {
+    key: "ShowAllEvents",
+    label: "All Events",
+    icon: Calendar,
+    description: "View Event Details"
   },
-  { 
-    key: "LetterToRTO", 
-    label: "Upload Letter to RTO", 
-    icon: FileText, 
-    description: "Upload Letter to RTO" 
+  {
+    key: "LetterToRTO",
+    label: "Create Event For RTO",
+    icon: FileText,
+    description: "Event Creation"
   },
     { 
     key: "AdvancePaymentRequest", 
@@ -79,11 +72,10 @@ export default function CollectorSidebar({ activePage, setActivePage }) {
               <button
                 key={item.key}
                 onClick={() => setActivePage(item.key)}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-all ${
-                  isActive
+                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-all ${isActive
                     ? "bg-blue-800 border-r-4 border-white shadow-md"
                     : "hover:bg-blue-800"
-                }`}
+                  }`}
               >
                 <Icon className="w-5 h-5 mr-3" />
                 <div className="flex-1">
@@ -102,9 +94,11 @@ export default function CollectorSidebar({ activePage, setActivePage }) {
       </div>
 
       {/* Footer Section */}
-      <div className="p-6 text-xs text-gray-400">
-        <p>Government of Odisha</p>
-        <p>Transport Department</p>
+      <div className="absolute bottom-0 w-64 p-6">
+        <div className="text-xs text-gray-400">
+          <p>Government of Odisha</p>
+          <p>Revenue & Disaster Management Department</p>
+        </div>
       </div>
     </div>
   );

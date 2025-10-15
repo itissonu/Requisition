@@ -11,17 +11,10 @@ export default function CommissionerHeader({ user, onLogout }) {
       </div>
       
       <div className="flex items-center space-x-4">
-        <div className="relative">
-          <Bell className="w-6 h-6 text-gray-500 hover:text-gray-700 cursor-pointer" />
-          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-            2
-          </span>
-        </div>
-        
         <div className="flex items-center space-x-3">
           <User className="w-8 h-8 text-gray-400" />
           <div>
-            <p className="text-sm font-medium text-gray-900">{user?.name || 'Commissioner'}</p>
+            <p className="text-sm font-medium text-gray-900">{user?.name}</p>
             <p className="text-xs text-gray-500">{user?.role}</p>
           </div>
         </div>

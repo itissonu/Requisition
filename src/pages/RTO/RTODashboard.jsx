@@ -11,15 +11,15 @@ import UploadLetterToCollector from "./modules/UploadLetterToCollector";
 import EventActivity from "./modules/EventActivity";
 import RTOMainDashboard from "./modules/RTOMainDashboard";
 
-export default function RTODashboard({ onLogout }) {
+export default function RTODashboard({ user, onLogout }) {
   const [activePage, setActivePage] = useState("DashBoard");
 
   const renderPage = () => {
     switch (activePage) {
-      case "DashBoard": return <RTOMainDashboard/>;
+      case "DashBoard": return <RTOMainDashboard />;
       case "CreateUser": return <CreateUser />;
       case "CreateEvent": return <CreateEvent />;
-      case "EventUtilization": return <EventUtilization/>;
+      case "EventUtilization": return <EventUtilization />;
       case "ShowAllEvents": return <ShowAllEvents />;
       case "ShowPaymentBill": return <ShowPaymentBill />;
       case "UploadLetterToCollector": return <UploadLetterToCollector />;
@@ -32,7 +32,7 @@ export default function RTODashboard({ onLogout }) {
     <div className="flex min-h-screen">
       <Sidebar activePage={activePage} setActivePage={setActivePage} />
       <div className="flex-1 flex flex-col">
-        <Header onLogout={onLogout} />
+        <Header user={user} onLogout={onLogout} />
         <main className="p-6">{renderPage()}</main>
       </div>
     </div>
