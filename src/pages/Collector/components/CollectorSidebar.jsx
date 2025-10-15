@@ -29,9 +29,9 @@ const collectorItems = [
   },
   {
     key: "LetterToRTO",
-    label: "Upload Letter to RTO",
+    label: "Create Event For RTO",
     icon: FileText,
-    description: "Upload Letter to RTO"
+    description: "Event Creation"
   },
 ];
 
@@ -87,9 +87,11 @@ export default function CollectorSidebar({ activePage, setActivePage }) {
       </div>
 
       {/* Footer Section */}
-      <div className="p-6 text-xs text-gray-400">
-        <p>Government of Odisha</p>
-        <p>Transport Department</p>
+      <div className="absolute bottom-0 w-64 p-6">
+        <div className="text-xs text-gray-400">
+          <p>Government of Odisha</p>
+          <p>Revenue & Disaster Management Department</p>
+        </div>
       </div>
     </div>
   );

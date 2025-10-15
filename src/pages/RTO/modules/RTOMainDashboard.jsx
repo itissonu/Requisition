@@ -79,14 +79,10 @@ export default function RTOMainDashboard() {
                 <p className="text-gray-600">Overview & Statistics</p>
             </div>
             {/* Stat Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="bg-white p-4 shadow rounded">
                     <h4 className="text-sm text-gray-500">Total Events</h4>
                     <p className="text-2xl font-bold">{totalEvents}</p>
-                </div>
-                <div className="bg-white p-4 shadow rounded">
-                    <h4 className="text-sm text-gray-500">Approved Events</h4>
-                    <p className="text-2xl font-bold text-orange-600">7</p>
                 </div>
                 <div className="bg-white p-4 shadow rounded">
                     <h4 className="text-sm text-gray-500">Pending Events</h4>

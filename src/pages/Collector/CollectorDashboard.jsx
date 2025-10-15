@@ -1,10 +1,6 @@
 import React, { useState } from "react";
-import Sidebar from "../../components/Sidebar";
 import Header from "../../components/Header";
-
 import CollectorMainDashboard from "./components/CollectorMainDashboard.jsx";
-import ApproveRequests from "./components/ApproveRequests.jsx";
-import ShowAllRequests from "./components/ShowAllRequests.jsx";
 import ShowAllEvents from "./components/ShowAllEvents";
 import CollectorSidebar from "./components/CollectorSidebar.jsx";
 import ApproveUtilizations from "./components/ApproveUtilizations.jsx";

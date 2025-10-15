@@ -106,7 +106,7 @@ export default function Sidebar({ activePage, setActivePage }) {
         </nav>
       </div>
 
-     <div className="w-full p-6 mt-auto"> 
+     <div className="absolute bottom-0 w-64 p-6"> 
         <div className="text-xs text-gray-400">
           <p>Government of Odisha</p>
           <p>Commerce & Transport Department</p>

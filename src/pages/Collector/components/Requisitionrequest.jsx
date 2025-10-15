@@ -2,13 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Upload, FileText, CheckCircle, User, Hash, Send, AlertCircle, Shield } from "lucide-react";
+import { Upload, FileText, CheckCircle, User, Hash, Send, AlertCircle, Shield, House, HousePlug, Landmark, Tag } from "lucide-react";
 import { userAPI, requestEventAPI } from "../../../apis/apiService";
 import logo from '../../../assests/logo.png';
 const letterSchema = z.object({
   letterName: z
     .string()
     .min(1, "Event name is required")
+    .max(100, "Must be less than 100 characters"),
+  requestedOffice: z
+    .string()
+    .min(1, "Requested Office Name is required")
     .max(100, "Must be less than 100 characters"),
   letterNo: z.string().min(1, "Letter number is required"),
   rtoUserId: z.string().min(1, "RTO selection is required"),
@@ -31,6 +35,7 @@ export default function UploadLetterToRTO() {
     resolver: zodResolver(letterSchema),
     defaultValues: {
       letterName: "",
+      requestedOffice: "",
       letterNo: "",
       rtoUserId: "",
       letterFile: null,
@@ -76,16 +81,23 @@ export default function UploadLetterToRTO() {
 
     const formData = new FormData();
     formData.append("letterName", data.letterName);
+    formData.append("requestedOffice", data.requestedOffice);
     formData.append("letterNo", data.letterNo);
     formData.append("rtoUserId", data.rtoUserId);
     formData.append("letterPdf", data.letterFile[0]);
     formData.append("status", "CREATED");
 
+// for (const [key, value] of formData.entries()) {
+//   console.log(key, value);
+// }
+
     try {
-      await requestEventAPI.create(formData);
+      // console.log(formData,'formdataaaaa')
+     await requestEventAPI.create(formData);
       setSuccess(true);
       reset({
         letterName: "",
+        requestedOffice: "",
         letterNo: "",
         rtoUserId: autoSelectedRto ? autoSelectedRto.id.toString() : "",
         letterFile: null,
@@ -153,7 +165,7 @@ export default function UploadLetterToRTO() {
               </div>
             </div>
             <div className="mt-3 pt-3 border-t border-blue-700">
-              <h3 className="text-lg font-semibold tracking-wide">Event Request Submission FormL</h3>
+              <h3 className="text-lg font-semibold tracking-wide uppercase">Event Request Submission Form</h3>
             </div>
           </div>
         </div>
@@ -254,10 +266,30 @@ export default function UploadLetterToRTO() {
               )}
             </div>
 
+            {/* Requested Office Name */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <Landmark className="w-4 h-4 inline mr-2 text-blue-900" />
+                Requested Office Name
+                <span className="text-red-600 ml-1">*</span>
+              </label>
+              <input
+                type="text"
+                {...register("requestedOffice")}
+                placeholder="Enter the name of the requesting office (e.g., Police Department, Bhubaneswar)"
+                className="w-full px-4 py-2.5 border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-200 outline-none"
+              />
+              {errors.requestedOffice && (
+                <p className="text-red-600 text-sm mt-1.5">
+                  ⚠ {errors.requestedOffice.message}
+                </p>
+              )}
+            </div>
+
             {/* Letter Number */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <Hash className="w-4 h-4 inline mr-2 text-blue-900" />
+                <Tag className="w-4 h-4 inline mr-2 text-blue-900" />
                 Letter/Reference Number
                 <span className="text-red-600 ml-1">*</span>
               </label>
@@ -278,12 +310,12 @@ export default function UploadLetterToRTO() {
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 <Upload className="w-4 h-4 inline mr-2 text-blue-900" />
-                Upload Official Letter (PDF)
+                Upload Requesting Letter (PDF)
                 <span className="text-red-600 ml-1">*</span>
               </label>
               <div className={`border-2 border-dashed p-8 text-center transition-colors ${file?.[0]
-                  ? "border-green-400 bg-green-50"
-                  : "border-gray-300 bg-gray-50 hover:border-blue-900 hover:bg-blue-50"
+                ? "border-green-400 bg-green-50"
+                : "border-gray-300 bg-gray-50 hover:border-blue-900 hover:bg-blue-50"
                 }`}>
                 <input
                   type="file"
