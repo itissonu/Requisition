@@ -178,6 +178,75 @@ export const billSanctionAPI = {
   })
 };
 
+// Advance Payment Request API endpoints
+export const advancePaymentAPI = {
+
+  create: data => api.post('/api/advance-payments', data, {
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
+
+  
+  list: () => api.get('/api/advance-payments', {
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
+
+  
+  getById: id => api.get(`/api/advance-payments/${id}`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
+
+  
+  getByStatus: status => api.get(`/api/advance-payments/status/${status}`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
+
+  
+  getByEvent: eventId => api.get(`/api/advance-payments/event/${eventId}`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
+
+  
+  approve: (id, remarks) => api.put(`/api/advance-payments/${id}/approve`, null, {
+    params: { remarks },
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
+
+  
+  reject: (id, remarks) => api.put(`/api/advance-payments/${id}/reject`, null, {
+    params: { remarks },
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
+
+  
+  markAsPaid: (id, remarks) => api.put(`/api/advance-payments/${id}/mark-paid`, null, {
+    params: { remarks },
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  })
+};
 
 
 

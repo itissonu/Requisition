@@ -258,14 +258,14 @@ export default function ShowAllEvents() {
                         </span>
                       </td>
                       <td className="p-4 border border-gray-300 text-center">
-                        <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-bold border border-purple-300">
+                        <span className="bg-purple-100 text-purple-800 px-1 py-1 rounded-full text-[10px] font-bold border border-purple-300">
                           {event.subEvents?.length || 0} Events
                         </span>
                       </td>
                       <td className="p-4 border border-gray-300">
                         <div className="text-sm space-y-1">
                           {event.subEvents && event.subEvents[0]?.vehicles?.slice(0, 2).map((v, idx) => (
-                            <div key={idx} className="flex justify-between bg-gray-100 px-2 py-1 rounded">
+                            <div key={idx} className="flex justify-between  px-2 py-1 rounded">
                               <span className="truncate text-xs">{v.vehicleName}</span>
                               <span className="font-semibold text-xs">×{v.quantity}</span>
                             </div>

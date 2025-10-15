@@ -8,21 +8,24 @@ import PendingApprovals from "./modules/PendingApprovals";
 import ApprovedUtilizations from "./modules/ApprovedUtilizations";
 import CommissionerApproveUtilizations from "./modules/PendingApprovals";
 import BillSanction from "./modules/BillSanction";
+import CommissionerAdvancePayments from "./modules/CommissionerAdvancePayments";
 
 export default function CommissionerDashboard({ user, onLogout }) {
   const [activePage, setActivePage] = useState("Dashboard");
 
   const renderPage = () => {
     switch (activePage) {
-      case "Dashboard": 
+      case "Dashboard":
         return <CommissionerMainDashboard />;
-      case "PendingApprovals": 
+      case "PendingApprovals":
         return <CommissionerApproveUtilizations />;
-      case "ApprovedUtilizations": 
+      case "ApprovedUtilizations":
         return <ApprovedUtilizations />;
-        case "BillSanction":
-          return <BillSanction />;
-      default: 
+      case "BillSanction":
+        return <BillSanction />;
+      case "AdvancePayment":
+        return <CommissionerAdvancePayments />;
+      default:
         return <CommissionerMainDashboard />;
     }
   };

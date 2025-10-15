@@ -1,5 +1,5 @@
 import React from "react";
-import { Home, Clock, CheckCircle, FileText } from "lucide-react";
+import { Home, Clock, CheckCircle, FileText, IndianRupee } from "lucide-react";
 
 const menuItems = [
   {
@@ -26,6 +26,12 @@ const menuItems = [
     label: "Bill Sanction",
     icon: FileText,
     description: "Review Bill Sanctions"
+  },
+   {
+    key: "AdvancePayment",
+    label: "Advance Payment",
+    icon: IndianRupee,
+    description: "Review Advance Payment Requests"
   }
 ];
 

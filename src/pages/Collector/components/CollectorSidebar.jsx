@@ -5,7 +5,8 @@ import {
   Truck, 
   Calendar, 
   User, 
-  FileText
+  FileText,
+  IndianRupee
 } from "lucide-react";
 
 const collectorItems = [
@@ -40,12 +41,12 @@ const collectorItems = [
     icon: FileText, 
     description: "Upload Letter to RTO" 
   },
-  //   { 
-  //   key: "RequisitionForm", 
-  //   label: "Vehicle Requisition Form", 
-  //   icon: FileText, 
-  //   description: "Create a new vehicle requisition" 
-  // }
+    { 
+    key: "AdvancePaymentRequest", 
+    label: "Approve Advance Payment", 
+    icon: IndianRupee, 
+    description: "Approve Advance Payment" 
+  }
 ];
 
 export default function CollectorSidebar({ activePage, setActivePage }) {

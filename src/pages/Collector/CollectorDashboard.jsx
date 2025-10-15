@@ -10,6 +10,7 @@ import CollectorSidebar from "./components/CollectorSidebar.jsx";
 import ApproveUtilizations from "./components/ApproveUtilizations.jsx";
 import UploadLetterToRTO from "./components/Requisitionrequest.jsx";
 import VehicleRequisitionForm from "./components/VehicleRequisitionForm.jsx";
+import CollectorAdvancePayments from "./components/CollectorAdvancePayments.jsx";
              
 
 export default function CollectorDashboard({ onLogout }) {
@@ -24,6 +25,7 @@ export default function CollectorDashboard({ onLogout }) {
      
       case "LetterToRTO": return <UploadLetterToRTO />;
       case "RequisitionForm": return <VehicleRequisitionForm />;
+         case "AdvancePaymentRequest": return <CollectorAdvancePayments />;
       default: return <CollectorMainDashboard />;
     }
   };

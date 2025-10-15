@@ -282,8 +282,8 @@ export default function UploadLetterToRTO() {
                 <span className="text-red-600 ml-1">*</span>
               </label>
               <div className={`border-2 border-dashed p-8 text-center transition-colors ${file?.[0]
-                  ? "border-green-400 bg-green-50"
-                  : "border-gray-300 bg-gray-50 hover:border-blue-900 hover:bg-blue-50"
+                ? "border-green-400 bg-green-50"
+                : "border-gray-300 bg-gray-50 hover:border-blue-900 hover:bg-blue-50"
                 }`}>
                 <input
                   type="file"
