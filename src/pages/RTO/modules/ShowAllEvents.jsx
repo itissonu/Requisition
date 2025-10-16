@@ -253,6 +253,7 @@ export default function ShowAllEvents() {
               <thead>
                 <tr className="bg-blue-900 text-white">
                   <th className="p-4 text-center font-semibold border-r border-blue-700 w-12"></th>
+                  <th className="p-4 text-left font-semibold border-r border-blue-700">Event ID</th>
                   <th className="p-4 text-left font-semibold border-r border-blue-700">Event Details</th>
                   <th className="p-4 text-left font-semibold border-r border-blue-700">Department</th>
                   <th className="p-4 text-center font-semibold border-r border-blue-700">Status</th>
@@ -279,11 +280,15 @@ export default function ShowAllEvents() {
                         </button>
                       </td>
                       <td className="p-4 border-r border-gray-200">
+                       
+                        <div className="text-lg text-gray-900 font-bold">
+                          {event.id} 
+                        </div>
+                      </td>
+                      <td className="p-4 border-r border-gray-200">
                         <div className="font-semibold text-gray-900">{event.requestEventName}</div>
                         <div className="text-xs text-gray-500">Letter No: {event.requestEventLetterNo}</div>
-                        <div className="text-xs text-gray-500">
-                          Created: {new Date(event?.createdAt).toLocaleDateString('en-IN')}
-                        </div>
+                       
                       </td>
                       <td className="p-4 border-r border-gray-200 font-medium text-gray-700">
                         {event?.requestingDepartment}
@@ -360,11 +365,11 @@ export default function ShowAllEvents() {
                                       <span className="font-semibold text-gray-700 mr-2">Date:</span>
                                       <span className="text-gray-900">{new Date(subEvent.reportingDate).toLocaleDateString('en-GB')}</span>
                                     </div>
-                                    <div className="flex items-center text-sm">
+                                    {/* <div className="flex items-center text-sm">
                                       <Clock className="w-4 h-4 mr-2 text-blue-600" />
                                       <span className="font-semibold text-gray-700 mr-2">Time:</span>
                                       <span className="text-gray-900">{subEvent.startTime}</span>
-                                    </div>
+                                    </div> */}
                                   </div>
 
                                   <div className="border-t border-gray-200 pt-3">
@@ -524,11 +529,11 @@ export default function ShowAllEvents() {
                           <span className="font-semibold mr-1">Date:</span>
                           <span>{new Date(subEvent.reportingDate).toLocaleDateString('en-GB')}</span>
                         </div>
-                        <div className="flex items-center text-sm">
+                        {/* <div className="flex items-center text-sm">
                           <Clock className="w-4 h-4 mr-2 text-purple-600" />
                           <span className="font-semibold mr-1">Time:</span>
                           <span>{subEvent.startTime}</span>
-                        </div>
+                        </div> */}
                       </div>
 
                       <div className="border-t border-gray-200 pt-3">

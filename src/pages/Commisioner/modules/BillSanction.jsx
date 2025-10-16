@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Search, Eye, CheckCircle, XCircle, IndianRupee, FileText, Calendar, Plus, Wallet, CreditCard, Building2, Receipt, DollarSign } from "lucide-react";
-import { billSanctionAPI, utilizationAPI } from "../../../apis/apiService";
+import { Search, Eye, CheckCircle, XCircle, IndianRupee, FileText, Calendar, Plus, Wallet, CreditCard, Building2, Receipt, DollarSign, AlertCircle, CloudCog } from "lucide-react";
+import { billSanctionAPI, utilizationAPI, advancePaymentAPI } from "../../../apis/apiService";
 import logo from '../../../assests/logo.png';
 
 const SanctionModal = ({ isOpen, onClose, utilization, onSanction, userRole }) => {
   const [sanctionAmount, setSanctionAmount] = useState(0);
   const [remarks, setRemarks] = useState("");
-  const [billNumber, setBillNumber] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (utilization) {
       setSanctionAmount(0);
       setRemarks("");
-      setBillNumber("");
     }
   }, [utilization]);
 
@@ -23,13 +21,19 @@ const SanctionModal = ({ isOpen, onClose, utilization, onSanction, userRole }) =
       return;
     }
 
+    if (sanctionAmount > utilization.remainingAmount) {
+      alert("Bill amount cannot exceed remaining amount");
+      return;
+    }
+
     setLoading(true);
     try {
+      const billType = sanctionAmount >= utilization.remainingAmount ? 'FINAL' : 'PARTIAL_PAID';
+
       const billData = {
-        eventUtilizationId: utilization.id,
-        type: 'FINAL',
-        amount: sanctionAmount,
-        billNumber: billNumber,
+        eventId: utilization.eventId,
+        type: billType,
+        amount: parseFloat(sanctionAmount),
         remarks: remarks
       };
 
@@ -71,6 +75,7 @@ const SanctionModal = ({ isOpen, onClose, utilization, onSanction, userRole }) =
         </div>
 
         <div className="p-6">
+          {/* Utilization Summary */}
           <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-xl mb-6 border border-blue-200">
             <div className="flex items-center gap-2 mb-4">
               <FileText className="w-5 h-5 text-blue-600" />
@@ -92,19 +97,40 @@ const SanctionModal = ({ isOpen, onClose, utilization, onSanction, userRole }) =
                 <p className="text-gray-900 font-medium">{utilization.requestingDepartment}</p>
               </div>
               <div className="bg-gradient-to-br from-emerald-500 to-teal-600 p-4 rounded-lg shadow-md md:col-span-2">
-                <div className="flex items-center justify-between">
+                <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <Wallet className="w-4 h-4 text-white" />
-                      <span className="text-xs font-semibold text-emerald-100 uppercase">Total Amount</span>
-                    </div>
-                    <p className="text-white text-2xl font-bold">₹{utilization.totalCost?.toLocaleString('en-IN')}</p>
+                    <p className="text-xs font-semibold text-emerald-100 uppercase">Total Cost</p>
+                    <p className="text-white text-lg font-bold">₹{utilization.totalCost?.toLocaleString('en-IN')}</p>
                   </div>
-                  <IndianRupee className="w-12 h-12 text-white/30" />
+                  <div>
+                    <p className="text-xs font-semibold text-emerald-100 uppercase">Advance Requested</p>
+                    <p className="text-white text-lg font-bold">₹{utilization.totalAdvanceRequested?.toLocaleString('en-IN')}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-emerald-100 uppercase">Available to Sanction</p>
+                    <p className="text-white text-lg font-bold">₹{utilization.remainingAmount?.toLocaleString('en-IN')}</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Warning if advance not fully sanctioned */}
+          {utilization.totalAdvanceRequested > 0 && !utilization.canSanctionFinal && (
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded-lg">
+              <div className="flex items-center">
+                <AlertCircle className="w-5 h-5 text-yellow-400 mr-2" />
+                <div>
+                  <p className="text-yellow-800 font-medium">Advance Payment Pending</p>
+                  <p className="text-yellow-700 text-sm">
+                    All advance payments must be fully sanctioned before creating final bills.
+                    Requested: ₹{utilization.totalAdvanceRequested?.toLocaleString('en-IN')},
+                    Sanctioned: ₹{utilization.totalAdvanceSanctioned?.toLocaleString('en-IN')}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="mb-6">
             <label className="block text-sm font-bold text-gray-700 mb-3  items-center gap-2">
@@ -120,16 +146,19 @@ const SanctionModal = ({ isOpen, onClose, utilization, onSanction, userRole }) =
                   const value = e.target.value.replace(/[^0-9]/g, '');
                   setSanctionAmount(value);
                 }}
-                max={utilization.totalCost}
+                max={utilization.remainingAmount}
                 value={sanctionAmount}
                 className="w-full pl-10 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-lg font-semibold transition-all"
                 placeholder="Enter bill amount"
               />
             </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Maximum available: ₹{utilization.remainingAmount?.toLocaleString('en-IN')}
+            </p>
           </div>
 
           <div className="mb-6">
-            <label className=" text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
+            <label className="block text-sm font-bold text-gray-700 mb-3  items-center gap-2">
               <FileText className="w-5 h-5 text-blue-600" />
               Remarks
             </label>
@@ -175,6 +204,7 @@ const SanctionModal = ({ isOpen, onClose, utilization, onSanction, userRole }) =
 const BillSanction = () => {
   const [utilizations, setUtilizations] = useState([]);
   const [bills, setBills] = useState([]);
+  const [advanceRequests, setAdvanceRequests] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -185,6 +215,8 @@ const BillSanction = () => {
   const [selectedBills, setSelectedBills] = useState([]);
   const [userRole, setUserRole] = useState('COMMISSIONER');
 
+
+  console.log(selectedUtilization,"selectedUtilization")
   useEffect(() => {
     fetchData();
     getUserRole();
@@ -192,7 +224,7 @@ const BillSanction = () => {
 
   useEffect(() => {
     filterData();
-  }, [utilizations, bills, searchTerm, statusFilter]);
+  }, [utilizations, bills, advanceRequests, searchTerm, statusFilter]);
 
   const getUserRole = () => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -203,14 +235,18 @@ const BillSanction = () => {
     try {
       setLoading(true);
 
-      const [utilizationsResponse, billsResponse] = await Promise.all([
+      const [utilizationsResponse, billsResponse, advanceRequestsResponse] = await Promise.all([
         utilizationAPI.getCommissionerApproved(),
-        billSanctionAPI.list()
+        billSanctionAPI.list(),
+        advancePaymentAPI.list()
       ]);
 
-      console.log("Bills:", billsResponse.data);
+      //  console.log("Bills:", billsResponse.data);
+      //  console.log("Advance Requests:", advanceRequestsResponse.data);
+
       setUtilizations(utilizationsResponse.data);
       setBills(billsResponse.data);
+      setAdvanceRequests(advanceRequestsResponse.data);
     } catch (error) {
       console.error("Failed to fetch data:", error);
       alert("Failed to load data. Please try again.");
@@ -220,24 +256,58 @@ const BillSanction = () => {
   };
 
   const filterData = () => {
-    const billsByUtilization = bills.reduce((acc, bill) => {
-      if (!acc[bill.eventUtilizationId]) {
-        acc[bill.eventUtilizationId] = [];
-      }
-      acc[bill.eventUtilizationId].push(bill);
+    const billsByEvent = bills.reduce((acc, bill) => {
+      const key = bill.eventId;
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(bill);
+      return acc;
+    }, {});
+
+    const advanceRequestsByEvent = advanceRequests.reduce((acc, request) => {
+      const key = request.eventId;
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(request);
       return acc;
     }, {});
 
     let combinedData = utilizations.map(util => {
-      const utilizationBills = billsByUtilization[util.id] || [];
-      const totalBilled = utilizationBills.reduce((sum, bill) => sum + bill.amount, 0);
-      const remainingAmount = util.totalCost - totalBilled;
+      // Find all advance requests for this event
+      // console.log(util,'utilsss')
+      const eventAdvanceRequests = advanceRequestsByEvent[util.eventId] || [];
+      const totalAdvanceRequested = eventAdvanceRequests
+        .filter(ar => ar.status === 'APPROVED')
+        .reduce((sum, ar) => sum + ar.requestedAmount, 0);
+
+
+        console.log(bills,'billsssss')
+      // Find all bills for advance requests of this event
+      const advanceBills = bills.filter(b =>
+        eventAdvanceRequests.some(ar => ar.id === b.advancePaymentRequestId) &&
+        ( b.type === 'PARTIAL_PAYMENT_ADVANCE' || b.type === 'ADVANCE' || b.type === 'FINAL' )
+      );
+      console.log(advanceBills,'advanceBills')
+      const totalAdvanceSanctioned = advanceBills.reduce((sum, b) => sum + b.amount, 0);
+
+
+      const eventBills = billsByEvent[util.eventId] || [];
+      const utilizationBills = eventBills.filter(b => !b.advancePaymentRequestId);
+      const totalUtilizationBilled = utilizationBills.reduce((sum, b) => sum + b.amount, 0);
+
+      const remainingAmount = util.totalCost - totalAdvanceRequested - totalUtilizationBilled;
+
+
+      const canSanctionFinal = totalAdvanceRequested === 0 || totalAdvanceRequested === totalAdvanceSanctioned;
 
       return {
         ...util,
-        bills: utilizationBills,
-        totalBilled,
-        remainingAmount
+        bills: [...advanceBills, ...utilizationBills],
+        advanceRequests: eventAdvanceRequests,
+        totalAdvanceRequested,
+        totalAdvanceSanctioned,
+        totalBilled: totalAdvanceSanctioned + totalUtilizationBilled,
+        totalUtilizationBilled,
+        remainingAmount: Math.max(0, remainingAmount),
+        canSanctionFinal
       };
     });
 
@@ -252,12 +322,12 @@ const BillSanction = () => {
     if (statusFilter !== "all") {
       combinedData = combinedData.filter((item) => {
         if (statusFilter === "pending") return item.totalBilled === 0;
-        if (statusFilter === "partial") return item.totalBilled > 0 && item.totalBilled < item.totalCost;
-        if (statusFilter === "full") return item.totalBilled >= item.totalCost;
+        if (statusFilter === "partial") return item.totalBilled > 0 && item.totalBilled < (item.totalCost);
+        if (statusFilter === "full") return item.remainingAmount <= 0;
         return true;
       });
     }
-
+    console.log(combinedData, "filtred datata")
     setFilteredData(combinedData);
   };
 
@@ -305,6 +375,8 @@ const BillSanction = () => {
     setSelectedBills([]);
   };
 
+  console.log(selectedBills,"seleectedbils")
+
   const getStatusBadge = (status) => {
     const statusStyles = {
       'CREATED': 'bg-yellow-100 text-yellow-800',
@@ -313,6 +385,21 @@ const BillSanction = () => {
       'PAID': 'bg-purple-100 text-purple-800'
     };
     return statusStyles[status] || 'bg-gray-100 text-gray-800';
+  };
+
+  const getBillTypeLabel = (type) => {
+    switch (type) {
+      case 'ADVANCE':
+        return 'Advance Payment';
+      case 'FINAL':
+        return 'Final Payment';
+      case 'PARTIAL_PAID':
+        return 'Commissioner Paid partially to the final amount';
+      case 'PARTIAL_PAYMENT_ADVANCE':
+        return 'Advance Payment Partially paid';
+      default:
+        return type;
+    }
   };
 
   return (
@@ -337,7 +424,7 @@ const BillSanction = () => {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto p-6">
-        {/* Search and Filter */}
+        {/* Search and Filter */} 
         <div className="bg-white p-6 rounded-lg shadow-md mb-6">
           <div className="flex flex-col md:flex-row gap-4 mb-4">
             <div className="flex-1">
@@ -392,10 +479,9 @@ const BillSanction = () => {
                 <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                   <tr>
                     <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase">Event Details</th>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase">Department</th>
-                    <th className="px-6 py-4 text-right text-sm font-bold text-gray-700 uppercase">Total Amount</th>
-                    <th className="px-6 py-4 text-right text-sm font-bold text-gray-700 uppercase">Sanctioned</th>
-                    <th className="px-6 py-4 text-right text-sm font-bold text-gray-700 uppercase">Remaining</th>
+                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase">RTO</th>
+                    <th className="px-6 py-4 text-right text-sm font-bold text-gray-700 uppercase">Financial Summary</th>
+                    {/* <th className="px-6 py-4 text-center text-sm font-bold text-gray-700 uppercase">Status</th> */}
                     <th className="px-6 py-4 text-center text-sm font-bold text-gray-700 uppercase">Bills</th>
                     <th className="px-6 py-4 text-center text-sm font-bold text-gray-700 uppercase">Actions</th>
                   </tr>
@@ -415,18 +501,44 @@ const BillSanction = () => {
                       <td className="px-6 py-5">
                         <div className="flex items-center gap-2">
                           <Building2 className="w-4 h-4 text-gray-400" />
-                          <span className="font-semibold text-gray-900">{item.requestingDepartment}</span>
+                          <span className="font-semibold text-gray-900">{item.rtoOfficeName}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-5 text-right font-bold text-gray-900 text-lg">
-                        ₹{item.totalCost?.toLocaleString('en-IN')}
+                      <td className="px-6 py-5 text-right">
+                        <div className="space-y-1 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Total Cost:</span>
+                            <span className="font-bold text-gray-900">₹{item.totalCost?.toLocaleString('en-IN')}</span>
+                          </div>
+                          {item.totalAdvanceRequested > 0 && (
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Advance Req:</span>
+                              <span className="font-bold text-blue-600">₹{item.totalAdvanceRequested.toLocaleString('en-IN')}</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Advance Amount Sanctioned:</span>
+                            <span className="font-bold text-emerald-600">₹{item.totalAdvanceSanctioned?.toLocaleString('en-IN')}</span>
+                          </div>
+
+                        </div>
                       </td>
-                      <td className="px-6 py-5 text-right font-bold text-emerald-600 text-lg">
-                        ₹{item.totalBilled.toLocaleString('en-IN')}
-                      </td>
-                      <td className="px-6 py-5 text-right font-bold text-blue-600 text-lg">
-                        ₹{item.remainingAmount.toLocaleString('en-IN')}
-                      </td>
+                      {/* <td className="px-6 py-5 text-center">
+                        <div className="flex flex-col items-center gap-1">
+                          {item.totalAdvanceRequested > 0 && (
+                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                              item.canSanctionFinal ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                            }`}>
+                              {item.canSanctionFinal ? 'Advance Complete' : 'Advance Pending'}
+                            </span>
+                          )}
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                            item.remainingAmount <= 0 ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
+                          }`}>
+                            {item.remainingAmount <= 0 ? 'Fully Sanctioned' : 'Partial'}
+                          </span>
+                        </div>
+                      </td> */}
                       <td className="px-6 py-5 text-center">
                         <span className="inline-flex items-center gap-1 bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-3 py-1.5 rounded-full text-sm font-bold shadow-md">
                           <Receipt className="w-3 h-3" />
@@ -440,16 +552,20 @@ const BillSanction = () => {
                             className="p-3 text-blue-600 hover:bg-blue-100 rounded-xl transition-all shadow-sm hover:shadow-md"
                             title="View Bills"
                           >
-                            <Eye className="w-5 h-5" />
+                            <Eye className="w-5 h-5  hover:cursor-pointer" />
                           </button>
-                          {item.remainingAmount > 0 && (
+                          {item.remainingAmount > 0 && item.canSanctionFinal && (
                             <button
                               onClick={() => openBillModal(item)}
-                              className="p-3 text-emerald-600 hover:bg-emerald-100 rounded-xl transition-all shadow-sm hover:shadow-md"
-                              title="Create Bill"
-                            >
-                              <Plus className="w-5 h-5" />
+                              className="p-3 text-emerald-600 bg-blue-600 gap-1 flex items-center justify-center hover:bg-emerald-800 hover:cursor-pointer rounded-xl transition-all shadow-sm hover:shadow-md"
+                              title="Create Final Bill"
+                            ><span className="text-xs text-gray-50 font-bold">Sanction Amount</span><IndianRupee className="h-4 w-4 text-white"/>
                             </button>
+                          )}
+                          {item.remainingAmount > 0 && !item.canSanctionFinal && (
+                            <div className="p-3 text-emerald-600 bg-blue-600 gap-1 flex items-center justify-center hover:bg-emerald-800  rounded-xl transition-all shadow-sm hover:shadow-md cursor-not-allowed" title="Complete advance payments first">
+                              <span className="text-xs text-gray-500">Sanction Amount</span><IndianRupee className="h-4 w-4 text-gray-500"/>
+                            </div>
                           )}
                         </div>
                       </td>
@@ -490,21 +606,29 @@ const BillSanction = () => {
             </div>
 
             <div className="p-6">
-              {/* Utilization Summary */}
+              {/* Financial Summary */}
               <div className="bg-blue-50 p-4 rounded-lg mb-6 border-l-4 border-blue-500">
-                <h3 className="font-semibold text-gray-800 mb-3">Utilization Summary</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <h3 className="font-semibold text-gray-800 mb-3">Financial Summary</h3>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
                   <div>
-                    <span className="font-medium text-gray-600">Department:</span>
-                    <p className="text-gray-800">{selectedUtilization?.requestingDepartment}</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-600">Total Amount:</span>
+                    <span className="font-medium text-gray-600">Total Cost:</span>
                     <p className="text-gray-800 font-bold">₹{selectedUtilization?.totalCost?.toLocaleString('en-IN')}</p>
                   </div>
                   <div>
-                    <span className="font-medium text-gray-600">Total Billed:</span>
+                    <span className="font-medium text-gray-600">Advance Requested:</span>
+                    <p className="text-blue-600 font-bold">₹{selectedUtilization?.totalAdvanceRequested?.toLocaleString('en-IN')}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-600">Total Sanctioned:</span>
                     <p className="text-green-600 font-bold">₹{selectedUtilization?.totalBilled?.toLocaleString('en-IN')}</p>
+                  </div>
+                     <div>
+                    <span className="font-medium text-gray-600">Total Sanctioned(For Advance):</span>
+                    <p className="text-green-600 font-bold">₹{selectedUtilization?.totalAdvanceSanctioned?.toLocaleString('en-IN')}</p>
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-600">Remaining:</span>
+                    <p className="text-purple-600 font-bold">₹{selectedUtilization?.remainingAmount?.toLocaleString('en-IN')}</p>
                   </div>
                 </div>
               </div>
@@ -526,26 +650,35 @@ const BillSanction = () => {
                         <div>
                           <h4 className="font-semibold text-gray-800 flex items-center gap-2">
                             Bill #{index + 1}
+                            <span className={`px-2 py-1 rounded text-xs ${getStatusBadge(bill.status)}`}>
+                              {bill.status}
+                            </span>
                           </h4>
+                          <p className="text-xs text-gray-800 font-bold mt-1">Type: {getBillTypeLabel(bill.type)}</p>
                         </div>
                         <div className="text-right">
                           <p className="text-lg font-bold text-green-600">
                             ₹{bill.amount?.toLocaleString('en-IN')}
                           </p>
+                          {bill.advancePaymentRequestId && (
+                            <p className="text-xs text-blue-600 capitalize border-[1px] border-blue-600 rounded-4xl bg-blue-50 p-1">
+                              Payment Regarding advance payment
+                            </p>
+                          )}
                         </div>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="font-medium text-gray-600">Created By:</span>
+                          <span className="font-medium text-gray-600">Created For:</span>
                           <p className="text-gray-800">{bill.cretedByRto}</p>
                         </div>
-                        <div>
+                        {/* <div>
                           <span className="font-medium text-gray-600">Created Date:</span>
                           <p className="text-gray-800">
                             {new Date(bill.createdAt).toLocaleDateString('en-IN')}
                           </p>
-                        </div>
+                        </div> */}
 
                         {bill.collectorApprovedByName && (
                           <>
