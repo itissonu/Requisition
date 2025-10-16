@@ -512,12 +512,12 @@ const BillSanction = () => {
                           </div>
                           {item.totalAdvanceRequested > 0 && (
                             <div className="flex justify-between">
-                              <span className="text-gray-600">Advance Req:</span>
+                              <span className="text-gray-600 text-xs">Advance Req:</span>
                               <span className="font-bold text-blue-600">₹{item.totalAdvanceRequested.toLocaleString('en-IN')}</span>
                             </div>
                           )}
                           <div className="flex justify-between">
-                            <span className="text-gray-600">Advance Amount Sanctioned:</span>
+                            <span className="text-gray-600 text-xs font-semibold">Advance Amount Sanctioned:</span>
                             <span className="font-bold text-emerald-600">₹{item.totalAdvanceSanctioned?.toLocaleString('en-IN')}</span>
                           </div>
 

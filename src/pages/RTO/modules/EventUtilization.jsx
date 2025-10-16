@@ -63,9 +63,9 @@ export default function EventUtilizationDashboard() {
       year: "numeric",
       month: "long",
       day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
+      // hour: "2-digit",
+      // minute: "2-digit",
+      // second: "2-digit",
     });
   }
 
@@ -347,16 +347,21 @@ export default function EventUtilizationDashboard() {
                         <td className="px-4 py-3 text-right">
                           <span className="font-bold text-green-700">₹{util.totalCost?.toLocaleString('en-IN') || '0'}</span>
                         </td>
-                        <td className="px-4 py-3 text-center">
-                          <button
-                            onClick={() => handleViewDetails(util)}
-                            className="p-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors shadow-sm"
-                            title="View Details"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          <span className="text-xs text-gray-600">{formatDateTime(util.createdAt)}</span>
+                        <td className="px-4 py-3">
+                          <div className="inline-flex items-center justify-center space-x-2">
+                            <button
+                              onClick={() => handleViewDetails(util)}
+                              className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors shadow"
+                              title="View Details"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            <span className="text-xs text-gray-600">
+                              {formatDateTime(util.createdAt)}
+                            </span>
+                          </div>
                         </td>
+
                       </tr>
                     ))}
                   </tbody>
@@ -393,7 +398,7 @@ export default function EventUtilizationDashboard() {
                   onClick={closeModal}
                   className="text-white hover:bg-blue-800 p-2 rounded-full transition-colors"
                 >
-                 <span> x</span>
+                  <span> x</span>
                 </button>
               </div>
             </div>
@@ -445,11 +450,11 @@ export default function EventUtilizationDashboard() {
                           <span className="font-semibold">Date:</span> {new Date(subEvent.subEventReportingDate).toLocaleDateString('en-GB')}
                         </span>
                       </div>
-                      {subEvent.subEventStartTime && (
+                      {/* {subEvent.subEventStartTime && (
                         <div className="mt-2 text-sm text-gray-700">
                           <span className="font-semibold">Time:</span> {subEvent.subEventStartTime} {subEvent.subEventEndTime && `- ${subEvent.subEventEndTime}`}
                         </div>
-                      )}
+                      )} */}
                     </div>
                     <div className="overflow-x-auto">
                       <table className="w-full border-collapse">

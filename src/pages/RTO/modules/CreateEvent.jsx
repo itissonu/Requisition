@@ -275,18 +275,22 @@ export default function CreateEvent() {
                 )}
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  <Building className="inline w-4 h-4 mr-1" />
-                  Reporting Department <span className="text-red-500">*</span>
-                </label>
-                <input
-                  {...register("reportingDepartment")}
-                  type="text"
-                  value={selectedRequest ? selectedRequest.requestingDepartment : ""}
-                  readOnly
-                  placeholder="Enter reporting department"
-                  className="w-full border-2 border-gray-300 rounded-lg px-3 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                />
+
+                {selectedRequest && (<>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <Building className="inline w-4 h-4 mr-1" />
+                    Reporting Department 
+                  </label><input
+                    {...register("reportingDepartment")}
+                    type="text"
+                    value={selectedRequest ? selectedRequest.requestingDepartment : ""}
+                    readOnly
+                    placeholder="Enter reporting department"
+                   className="w-full border-2 border-gray-300 rounded-lg px-3 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+
+                  />
+                </>)}
+
                 {errors.reportingDepartment && (
                   <p className="text-red-500 text-sm mt-1">{errors.reportingDepartment.message}</p>
                 )}

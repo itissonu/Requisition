@@ -137,11 +137,12 @@ export default function ShowAllEvents() {
     }, 0) || 0;
   };
 
-  const handleViewPdf = (event) => {
-    const pdfData = convertEventToPdfData(event);
-    setCurrentEventForPdf(pdfData);
+  const handleViewPdf = (eventId) => {
+    setCurrentEventForPdf(eventId);
     setPdfModalOpen(true);
   };
+
+
 
   const closePdfModal = () => {
     setPdfModalOpen(false);
@@ -280,15 +281,15 @@ export default function ShowAllEvents() {
                         </button>
                       </td>
                       <td className="p-4 border-r border-gray-200">
-                       
+
                         <div className="text-lg text-gray-900 font-bold">
-                          {event.id} 
+                          {event.id}
                         </div>
                       </td>
                       <td className="p-4 border-r border-gray-200">
                         <div className="font-semibold text-gray-900">{event.requestEventName}</div>
                         <div className="text-xs text-gray-500">Letter No: {event.requestEventLetterNo}</div>
-                       
+
                       </td>
                       <td className="p-4 border-r border-gray-200 font-medium text-gray-700">
                         {event?.requestingDepartment}
@@ -322,7 +323,7 @@ export default function ShowAllEvents() {
                           </button>
 
                           <button
-                            onClick={() => handleViewPdf(event)}
+                            onClick={() => handleViewPdf(event.id)}
                             className="bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 transition-colors"
                             title="View PDF"
                           >
@@ -592,12 +593,14 @@ export default function ShowAllEvents() {
         </div>
       )}
 
-      {/* PDF Viewer Modal */}
-      <EventUtilizationPDFViewer
-        eventData={currentEventForPdf}
-        isOpen={pdfModalOpen}
-        onClose={closePdfModal}
-      />
+
+<EventUtilizationPDFViewer
+  eventId={currentEventForPdf}  // Now it's eventId instead of eventData
+  isOpen={pdfModalOpen}
+  onClose={closePdfModal}
+/>
+
+
 
       {/* Footer */}
       <div className="bg-blue-900 text-white p-4 text-center text-sm mt-8">

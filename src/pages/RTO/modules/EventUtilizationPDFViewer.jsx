@@ -1,27 +1,69 @@
-import React, { useRef, useState } from "react";
-import html2pdf from "html2pdf.js";
+import React, { useRef, useState, useEffect } from "react";
 import { Download, X } from "lucide-react";
-import logo from '../../../assests/logo.png';
 
-const EventUtilizationPDFViewer = ({ eventData, isOpen, onClose }) => {
+import logo from '../../../assests/logo.png';
+import { eventAPI } from "../../../apis/apiService";
+
+const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
   const [isDownloading, setIsDownloading] = useState(false);
+  const [eventData, setEventData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const pdfContentRef = useRef(null);
 
+  // Fetch event data by ID
+  useEffect(() => {
+    if (isOpen && eventId) {
+      fetchEventData();
+    }
+  }, [isOpen, eventId]);
+
+  const fetchEventData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await eventAPI.details(eventId);
+      setEventData(response.data);
+    } catch (error) {
+      console.error("Error fetching event data:", error);
+      setError("Failed to load event data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDownloadPDF = async () => {
+    // Ensure the content is available before attempting to download
+    if (!pdfContentRef.current) {
+      alert("Cannot generate PDF, content not ready.");
+      return;
+    }
+
     setIsDownloading(true);
     try {
       const element = pdfContentRef.current;
+      const html2pdf = (await import('html2pdf.js')).default;
       const opt = {
-        margin: 10,
-        filename: `Event_Requisition_${eventData.id}.pdf`,
+        margin: [9, 9, 9, 9],
+        filename: `Vehicle_Requisition_Order_${eventId}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-          scale: 2, 
+        html2canvas: {
+          scale: 2, // You can try reducing this to 1.5 or 1 if quality is okay but alignment is still off
           useCORS: true,
           logging: false,
-          backgroundColor: '#ffffff'
+          backgroundColor: '#ffffff',
+          // --- FIX APPLIED ---
+          // Explicitly set the width for the canvas capture to match the element's rendered width.
+          // This is the key fix for preventing right-side content from being cut off.
+          width: element.offsetWidth,
+          x: 0,
+          y: 0,
         },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        jsPDF: {
+          unit: 'mm',
+          format: 'a4',
+          orientation: 'portrait'
+        }
       };
       await html2pdf().set(opt).from(element).save();
     } catch (error) {
@@ -32,18 +74,31 @@ const EventUtilizationPDFViewer = ({ eventData, isOpen, onClose }) => {
     }
   };
 
-  if (!isOpen || !eventData) return null;
+  if (!isOpen) return null;
+
+  const formatDate = (dateString) => {
+    if (!dateString) return new Date().toLocaleDateString('en-GB');
+    return new Date(dateString).toLocaleDateString('en-GB');
+  };
+
+  const getDistrictName = () => {
+    return eventData?.collectorDistrict || "GANJAM";
+  };
+
+  const getRequisitionNumber = () => {
+    return eventData?.requestEventLetterNo || `${eventId}/RQN`;
+  };
 
   return (
-    <div className="fixed inset-0 bg-black/60 bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg w-full max-w-5xl max-h-[95vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div style={{ backgroundColor: '#1e3a8a' }} className="text-white p-4 flex justify-between items-center">
-          <h2 className="text-xl font-bold">Vehicle Requisition Report</h2>
+          <h2 className="text-xl font-bold">Vehicle Requisition Order</h2>
           <div className="flex gap-2">
             <button
               onClick={handleDownloadPDF}
-              disabled={isDownloading}
+              disabled={isDownloading || loading || !eventData}
               style={{ backgroundColor: '#16a34a' }}
               className="flex items-center gap-2 hover:opacity-90 px-4 py-2 rounded transition-all disabled:opacity-50 text-white"
             >
@@ -70,219 +125,403 @@ const EventUtilizationPDFViewer = ({ eventData, isOpen, onClose }) => {
 
         {/* PDF Content */}
         <div className="flex-1 overflow-y-auto p-6" style={{ backgroundColor: '#f3f4f6' }}>
-          <div
-            ref={pdfContentRef}
-            style={{ 
-              width: '210mm', 
-              minHeight: '297mm',
-              backgroundColor: '#ffffff',
-              padding: '48px',
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-              margin: '0 auto'
-            }}
-          >
-            {/* Header with Logo */}
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'flex-start',
-              marginBottom: '24px',
-              borderBottom: '2px solid #1f2937',
-              paddingBottom: '16px'
-            }}>
-              <div style={{ fontSize: '12px' }}>
-                <p style={{ fontWeight: 'bold', margin: '2px 0' }}>OFFICE OF THE</p>
-                <p style={{ fontWeight: 'bold', margin: '2px 0' }}>COLLECTOR & DISTRICT MAGISTRATE</p>
-                <p style={{ fontWeight: 'bold', margin: '2px 0' }}>{eventData.district?.toUpperCase() || "GANJAM"}</p>
+          {loading && (
+            <div className="flex items-center justify-center h-64">
+              <div className="text-gray-600">Loading event data...</div>
+            </div>
+          )}
+
+          {error && (
+            <div className="flex items-center justify-center h-64">
+              <div className="text-red-600">{error}</div>
+            </div>
+          )}
+
+          {eventData && (
+            <div
+              ref={pdfContentRef}
+              style={{
+                width: '210mm',
+                minHeight: '297mm',
+                backgroundColor: '#ffffff',
+                // --- FIX APPLIED ---
+                // Reduced horizontal padding and added boxSizing to prevent overflow.
+                padding: '12mm 10mm',
+                boxSizing: 'border-box',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                margin: '0 auto',
+                fontFamily: 'Times New Roman, serif',
+                position: 'relative',
+                fontSize: '10.5pt',
+                lineHeight: '1.27',
+                color: '#000',
+              }}
+            >
+              {/* Logo Watermark */}
+              <div style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                zIndex: 1,
+                opacity: 0.05
+              }}>
+                <img
+                  src={logo}
+                  alt="Watermark"
+                  style={{
+                    width: '350px',
+                    height: '350px',
+                    objectFit: 'contain'
+                  }}
+                />
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <img src={logo} alt="Logo" style={{ width: '64px', height: '64px', objectFit: 'contain' }} />
-              </div>
-
-              <div style={{ textAlign: 'right', fontSize: '12px' }}>
-                <p style={{ margin: '2px 0' }}>Ph: {eventData.collectorPhone || "+91-XXXXXXXXXX"}</p>
-                <p style={{ margin: '2px 0' }}>Email: {eventData.collectorEmail || "collector@odisha.gov.in"}</p>
-              </div>
-            </div>
-
-            {/* Document Number and Date */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px', fontSize: '12px' }}>
-              <p style={{ margin: 0 }}>No. {eventData.requestEventLetterNo || `REQ/${eventData.id}/2025`}</p>
-              <p style={{ margin: 0 }}>Date: {new Date(eventData.createdAt || Date.now()).toLocaleDateString('en-GB')}</p>
-            </div>
-
-            {/* Title */}
-            <h1 style={{ 
-              textAlign: 'center', 
-              fontWeight: 'bold', 
-              fontSize: '16px', 
-              marginBottom: '24px',
-              textDecoration: 'underline',
-              margin: '0 0 24px 0'
-            }}>
-              VEHICLE REQUISITION ORDER
-            </h1>
-
-            {/* Event Details */}
-            <div style={{ marginBottom: '24px', fontSize: '12px', lineHeight: '1.6' }}>
-              <p style={{ textAlign: 'justify', marginBottom: '12px' }}>
-                <span style={{ fontWeight: '600' }}>Whereas</span>, it appears to me that vehicles are required for 
-                <span style={{ fontWeight: '600' }}> {eventData.eventName}</span> by 
-                <span style={{ fontWeight: '600' }}> {eventData.requestingDepartment}</span> from 
-                <span style={{ fontWeight: '600' }}> {new Date(eventData.dateOfReporting).toLocaleDateString('en-GB')}</span> to 
-                <span style={{ fontWeight: '600' }}> {new Date(eventData.dateOfRelease).toLocaleDateString('en-GB')}</span>.
-              </p>
-
-              <p style={{ textAlign: 'justify', marginBottom: '12px' }}>
-                <span style={{ fontWeight: '600' }}>Now, therefore</span>, in exercise of powers conferred on me under Section 3 of Omnibus Requisition Act, 1984, 
-                I, the Collector & District Magistrate, {eventData.district || "Ganjam"} do hereby requisition the vehicles specified in the Schedule below.
-              </p>
-
-              {eventData.remarks && (
-                <p style={{ textAlign: 'justify', marginBottom: '12px' }}>
-                  <span style={{ fontWeight: '600' }}>Remarks:</span> {eventData.remarks}
-                </p>
-              )}
-            </div>
-
-            {/* SCHEDULE */}
-            <h2 style={{ 
-              fontWeight: 'bold', 
-              fontSize: '14px', 
-              marginBottom: '12px',
-              marginTop: '24px',
-              textAlign: 'center'
-            }}>
-              SCHEDULE
-            </h2>
-
-            {eventData.subEventUtilizations?.map((subEvent, idx) => (
-              <div key={idx} style={{ marginBottom: '24px' }}>
-                <h3 style={{ 
-                  fontWeight: '600', 
-                  fontSize: '12px', 
-                  marginBottom: '12px',
-                  backgroundColor: '#f3f4f6',
-                  padding: '8px'
+              {/* Content */}
+              <div style={{ position: 'relative', zIndex: 2 }}>
+                {/* Header */}
+                <div style={{
+                  textAlign: 'center',
+                  marginBottom: '8px',
+                  fontWeight: 'bold',
+                  fontSize: '11pt',
+                  lineHeight: '1.2'
                 }}>
-                  {idx + 1}. {subEvent.subEventPlace} 
-                  ({new Date(subEvent.subEventReportingDate).toLocaleDateString('en-GB')} at {subEvent.subEventStartTime})
+                  OFFICE OF THE COLLECTOR & DISTRICT MAGISTRATE,<br />
+                  {getDistrictName().toUpperCase()} DISTRICT
+                </div>
+
+                {/* Document Number and Date */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  marginBottom: '10px',
+                  fontSize: '10.5pt'
+                }}>
+                  <div>No. {getRequisitionNumber()}/RQN</div>
+                  <div>Date: {formatDate()}</div>
+                </div>
+
+                {/* Title */}
+                <h2 style={{
+                  textAlign: 'center',
+                  fontSize: '11pt',
+                  fontWeight: 'bold',
+                  margin: '10px 0 12px 0',
+                  textDecoration: 'underline',
+                  textUnderlineOffset: '6px',
+                }}>
+                  VEHICLE REQUISITION ORDER
+                </h2>
+
+                {/* Legal Text */}
+                <div style={{ fontSize: '10.5pt', lineHeight: '1.35', marginBottom: '12px', textAlign: 'justify' }}>
+                  <p style={{ marginBottom: '8px', textIndent: '50px' }}>
+                    In exercise of the powers conferred under the provisions of the <strong>[Section 160 of the Representation of the People Act, 1951 / Section 65 of the Disaster Management Act, 2005 / Rule 3 of the Odisha Requisitioning of Omnibus Rules, 1976 / Rule 3 of the Odisha Requisitioning of Goods Vehicle Rules, 1980, etc.], and in the interest of public service / disaster management / election duty / essential government work / law & order duty,</strong> the undersigned hereby requisitions the following vehicle(s) for official use as per details below.
+                  </p>
+
+                  <p style={{ marginBottom: '8px', textAlign: 'justify' }}>
+                    Disobedience of this order shall entail action under the relevant section of law, including but not limited to Section 188 of the Indian Penal Code, 1860 (disobedience to order duly promulgated by a public servant), and/or the corresponding penal provisions of the respective Act/Rule under which this requisition has been issued.
+                  </p>
+                </div>
+
+                {/* Vehicle Details Header */}
+                <h3 style={{
+                  fontSize: '10.5pt',
+                  fontWeight: 'bold',
+                  margin: '10px 0 8px 0',
+                  textAlign: 'center'
+                }}>
+                  DETAILS OF VEHICLE REQUISITIONED
                 </h3>
 
-                <table style={{ 
-                  width: '100%', 
-                  fontSize: '11px',
+                {/* Table */}
+                <table style={{
+                  width: '100%',
                   borderCollapse: 'collapse',
-                  border: '2px solid #9ca3af',
-                  marginBottom: '16px'
+                  fontSize: '10.5pt',
+                  marginBottom: '15px'
                 }}>
-                  <thead>
-                    <tr style={{ backgroundColor: '#e5e7eb' }}>
-                      <th style={{ 
-                        border: '2px solid #9ca3af', 
-                        padding: '8px', 
-                        textAlign: 'left',
-                        fontWeight: 'bold'
-                      }}>S.No</th>
-                      <th style={{ 
-                        border: '2px solid #9ca3af', 
-                        padding: '8px', 
-                        textAlign: 'left',
-                        fontWeight: 'bold'
-                      }}>Vehicle Type</th>
-                      <th style={{ 
-                        border: '2px solid #9ca3af', 
-                        padding: '8px', 
-                        textAlign: 'center',
-                        fontWeight: 'bold'
-                      }}>Quantity Required</th>
-                      <th style={{ 
-                        border: '2px solid #9ca3af', 
-                        padding: '8px', 
-                        textAlign: 'right',
-                        fontWeight: 'bold'
-                      }}>Estimated Cost (₹)</th>
-                      <th style={{ 
-                        border: '2px solid #9ca3af', 
-                        padding: '8px', 
-                        textAlign: 'left',
-                        fontWeight: 'bold'
-                      }}>Purpose</th>
-                    </tr>
-                  </thead>
                   <tbody>
-                    {subEvent.vehicleUtilizations?.map((vehicle, vIdx) => (
-                      <tr key={vIdx} style={{ backgroundColor: vIdx % 2 === 0 ? '#f9fafb' : '#ffffff' }}>
-                        <td style={{ border: '2px solid #9ca3af', padding: '8px' }}>{vIdx + 1}</td>
-                        <td style={{ border: '2px solid #9ca3af', padding: '8px' }}>{vehicle.vehicleName}</td>
-                        <td style={{ border: '2px solid #9ca3af', padding: '8px', textAlign: 'center' }}>{vehicle.actualQuantity}</td>
-                        <td style={{ border: '2px solid #9ca3af', padding: '8px', textAlign: 'right' }}>
-                          {vehicle.totalCost?.toLocaleString('en-IN') || 'TBD'}
-                        </td>
-                        <td style={{ border: '2px solid #9ca3af', padding: '8px' }}>
-                          {vehicle.utilizationNotes || eventData.eventName}
-                        </td>
-                      </tr>
-                    ))}
+                    <tr>
+                      <td style={{
+                        border: '1px solid #000',
+                        padding: '6px 8px',
+                        fontWeight: 'bold',
+                        width: '50%',
+                        verticalAlign: 'top'
+                      }}>
+                        1. Vehicle Registration No.
+                      </td>
+                      <td style={{
+                        border: '1px solid #000',
+                        padding: '6px 8px',
+                        height: '24px',
+                        verticalAlign: 'top'
+                      }}>
+                        &nbsp;
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{
+                        border: '1px solid #000',
+                        padding: '6px 8px',
+                        fontWeight: 'bold',
+                        verticalAlign: 'top'
+                      }}>
+                        2. Type of Vehicle<br />
+                        (Bus/Truck/Car/Jeep etc.)
+                      </td>
+                      <td style={{
+                        border: '1px solid #000',
+                        padding: '6px 8px',
+                        height: '30px',
+                        verticalAlign: 'top'
+                      }}>
+                        &nbsp;
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{
+                        border: '1px solid #000',
+                        padding: '6px 8px',
+                        fontWeight: 'bold',
+                        verticalAlign: 'top'
+                      }}>
+                        3. Owner's Name & Address
+                      </td>
+                      <td style={{
+                        border: '1px solid #000',
+                        padding: '6px 8px',
+                        height: '30px',
+                        verticalAlign: 'top'
+                      }}>
+                        &nbsp;
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{
+                        border: '1px solid #000',
+                        padding: '6px 8px',
+                        fontWeight: 'bold',
+                        verticalAlign: 'top'
+                      }}>
+                        4. Owner's Mobile Number
+                      </td>
+                      <td style={{
+                        border: '1px solid #000',
+                        padding: '6px 8px',
+                        height: '24px',
+                        verticalAlign: 'top'
+                      }}>
+                        &nbsp;
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{
+                        border: '1px solid #000',
+                        padding: '6px 8px',
+                        fontWeight: 'bold',
+                        verticalAlign: 'top'
+                      }}>
+                        5. Driver's Name
+                      </td>
+                      <td style={{
+                        border: '1px solid #000',
+                        padding: '6px 8px',
+                        height: '24px',
+                        verticalAlign: 'top'
+                      }}>
+                        &nbsp;
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{
+                        border: '1px solid #000',
+                        padding: '6px 8px',
+                        fontWeight: 'bold',
+                        verticalAlign: 'top'
+                      }}>
+                        6. Driver's Mobile Number
+                      </td>
+                      <td style={{
+                        border: '1px solid #000',
+                        padding: '6px 8px',
+                        height: '24px',
+                        verticalAlign: 'top'
+                      }}>
+                        &nbsp;
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{
+                        border: '1px solid #000',
+                        padding: '6px 8px',
+                        fontWeight: 'bold',
+                        verticalAlign: 'top'
+                      }}>
+                        7. Date & Time of Reporting
+                      </td>
+                      <td style={{
+                        border: '1px solid #000',
+                        padding: '6px 8px',
+                        height: '24px',
+                        verticalAlign: 'top'
+                      }}>
+                        &nbsp;
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{
+                        border: '1px solid #000',
+                        padding: '6px 8px',
+                        fontWeight: 'bold',
+                        verticalAlign: 'top'
+                      }}>
+                        8. Place of Reporting
+                      </td>
+                      <td style={{
+                        border: '1px solid #000',
+                        padding: '6px 8px',
+                        height: '24px',
+                        verticalAlign: 'top'
+                      }}>
+                        &nbsp;
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={{
+                        border: '1px solid #000',
+                        padding: '6px 8px',
+                        fontWeight: 'bold',
+                        verticalAlign: 'top'
+                      }}>
+                        9. Officer / Office to Whom the Vehicle<br />
+                        Shall Report
+                      </td>
+                      <td style={{
+                        border: '1px solid #000',
+                        padding: '6px 8px',
+                        height: '30px',
+                        verticalAlign: 'top'
+                      }}>
+                        &nbsp;
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
-              </div>
-            ))}
 
-            {/* Summary */}
-            <div style={{ 
-              marginTop: '32px', 
-              borderTop: '2px solid #1f2937',
-              paddingTop: '16px'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
-                <div>
-                  <p style={{ fontWeight: '600', margin: '4px 0' }}>Total Estimated Cost:</p>
-                  <p style={{ fontSize: '16px', fontWeight: 'bold', color: '#16a34a', margin: '4px 0' }}>
-                    ₹{eventData.totalCost?.toLocaleString('en-IN') || '0'}
-                  </p>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <p style={{ fontWeight: '600', margin: '4px 0' }}>Status:</p>
-                  <p style={{
-                    padding: '4px 12px',
-                    borderRadius: '12px',
-                    fontSize: '11px',
-                    fontWeight: 'bold',
-                    backgroundColor: eventData.utilizationStatus === 'COMPLETED' ? '#dcfce7' :
-                      eventData.utilizationStatus === 'APPROVED' ? '#dbeafe' : '#fef9c3',
-                    color: eventData.utilizationStatus === 'COMPLETED' ? '#166534' :
-                      eventData.utilizationStatus === 'APPROVED' ? '#1e40af' : '#854d0e',
-                    margin: '4px 0',
-                    display: 'inline-block'
+                {/* Signature Section */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  marginBottom: '15px',
+                  marginTop: '10px'
+                }}>
+                  <div style={{
+                    textAlign: 'center',
+                    position: 'relative',
+                    width: '180px'
                   }}>
-                    {eventData.utilizationStatus?.replace(/_/g, ' ') || 'PENDING'}
+                    {/* Signature */}
+                    <div style={{ marginBottom: '5px', height: '35px', position: 'relative' }}>
+                      <img
+                        src="/signature.png"
+                        alt="Signature"
+                        style={{
+                          width: '110px',
+                          height: '50px',
+                          objectFit: 'contain',
+                          display: 'block',
+                          margin: '0 auto'
+                        }}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                        }}
+                      />
+                    </div>
+
+                    {/* Stamp */}
+                    <div style={{
+                      position: 'absolute',
+                      top: '-5px',
+                      left: '25px',
+                      opacity: 0.8,
+                      zIndex: 3
+                    }}>
+                      <img
+                        src="/stamp.png"
+                        alt="Official Stamp"
+                        style={{
+                          width: '95px',
+                          height: '95px',
+                          objectFit: 'contain'
+                        }}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                        }}
+                      />
+                    </div>
+
+                    {/* Text */}
+                    <div style={{
+                      fontSize: '10.5pt',
+                      fontWeight: 'normal',
+                      lineHeight: '1.3'
+                    }}>
+                      (Signature & Seal)<br />
+                      Collector & District Magistrate<br />
+                      {getDistrictName()} District
+                    </div>
+                  </div>
+                </div>
+
+                {/* Conditions */}
+                <div style={{
+                  fontSize: '10.5pt',
+                  lineHeight: '1.4',
+                  marginBottom: '12px'
+                }}>
+                  <h4 style={{ fontSize: '12pt',textUnderlineOffset: '6px', textDecoration: 'underline', fontWeight: 'bold', marginBottom: '4px', textAlign: 'center' }}>
+                    CONDITIONS OF REQUISITION:
+                  </h4>
+
+                  <div style={{ marginBottom: '5px' }}>
+                    <strong>1.</strong> The vehicle shall be a deemed to be under Government requisition from the date and time of reporting until formally released by the Requisitioning Authority.
+                  </div>
+                  <div style={{ marginBottom: '5px' }}>
+                    <strong>2.</strong> The vehicle owner/driver shall ensure the vehicle is in good running condition.
+                  </div>
+                  <div style={{ marginBottom: '5px' }}>
+                    <strong>3.</strong> The vehicle shall not be used for any private purpose during the period of requisition.
+                  </div>
+                  <div style={{ marginBottom: '5px' }}>
+                    <strong>4.</strong> The vehicle shall be released after completion of duty, and compensation (if any) shall be paid as per the prescribed rate of the Government.
+                  </div>
+                </div>
+
+                {/* Acknowledgement */}
+                <div style={{
+                  fontSize: '10.5pt',
+                  lineHeight: '1.4'
+                }}>
+                  <h4 style={{
+                    fontSize: '12pt', textUnderlineOffset: '6px',
+                    textDecoration: 'underline', fontWeight: 'bold', marginBottom: '4px', textAlign: 'center'
+                  }}>
+                    ACKNOWLEDGEMENT OF SERVICE:
+                  </h4>
+                  <p style={{ marginBottom: '12px' }}>
+                    I, Shri/Smt. __________________________ (Driver/Owner), hereby acknowledge that I have received a copy of this requisition order on this day __________ at __________ hrs.
                   </p>
+                  <div style={{ textAlign: 'right' }}>
+                    Signature of Owner/Driver: _____________________
+                  </div>
+
                 </div>
               </div>
             </div>
-
-            {/* Signature */}
-            <div style={{ marginTop: '48px', textAlign: 'right' }}>
-              <p style={{ fontWeight: 'bold', margin: '4px 0' }}>{eventData.collectorApprovedByName || "Collector"}</p>
-              <p style={{ fontSize: '12px', margin: '4px 0' }}>Collector & District Magistrate</p>
-              <p style={{ fontSize: '12px', margin: '4px 0' }}>{eventData.district || "Ganjam"}</p>
-            </div>
-
-            {/* Footer Note */}
-            <div style={{ 
-              marginTop: '32px',
-              fontSize: '10px',
-              textAlign: 'center',
-              color: '#6b7280',
-              borderTop: '1px solid #d1d5db',
-              paddingTop: '16px'
-            }}>
-              <p style={{ margin: '4px 0' }}>This is a computer-generated document issued under the Omnibus Requisition Act, 1984</p>
-              <p style={{ margin: '4px 0' }}>Government of Odisha - Commerce & Transport Department</p>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

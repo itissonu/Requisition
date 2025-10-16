@@ -30,6 +30,7 @@ export default function ShowPaymentBill() {
 
       setEvents(eventsRes.data);
       setRequests(requestsRes.data);
+      console.log(requestsRes.data, 'requestsResData');
       setBills(billsRes.data);
     } catch (error) {
       console.error("Failed to load data:", error);
@@ -65,17 +66,22 @@ export default function ShowPaymentBill() {
     const approvedRequests = eventRequests.filter(r =>
       r.status === 'APPROVED' || r.status === 'PAID' || r.status === 'PARTIAL_PAID'
     );
-    const totalAdvanceApproved = approvedRequests.reduce((sum, r) => sum + r.requestedAmount, 0);
+
+
+    const totalAdvanceApproved = approvedRequests
+      .flatMap(r => r.billSanctions || [])
+      .reduce((sum, bill) => sum + (bill.amount || 0), 0);
 
     const paidRequests = eventRequests.filter(r => r.status === 'PAID');
     const totalPaid = paidRequests.reduce((sum, r) => sum + r.requestedAmount, 0);
 
     const pendingRequests = eventRequests.filter(r => r.status === 'PENDING');
 
-    // Get bills sanctioned against approved advance requests
+   
     const eventBills = bills.filter(b => b.eventId === event.id);
     const totalBillsSanctioned = eventBills.reduce((sum, b) => sum + b.amount, 0);
 
+    //console.log(totalAdvanceApproved,"totalAdvanceRequested.............")
     return {
       ...event,
       advanceRequests: eventRequests,
@@ -138,7 +144,7 @@ export default function ShowPaymentBill() {
 
       <main className="max-w-7xl mx-auto py-8 px-6">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
           <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-600">
             <div className="flex items-center justify-between">
               <div>
@@ -152,17 +158,31 @@ export default function ShowPaymentBill() {
             </div>
           </div>
 
+          <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-600">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 font-semibold"> Advance Amount Requested</p>
+                <p className="text-2xl font-bold text-yellow-600 mt-1">
+                  ₹{stats.totalAdvanceApproved?.toLocaleString('en-IN')}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">Advance payments</p>
+              </div>
+              <div className="p-3 bg-purple-100 rounded-full">
+                <IndianRupee className="w-8 h-8 text-purple-600" />
+              </div>
+            </div>
+          </div>
           <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-600">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 font-semibold">Total Requested</p>
+                <p className="text-sm text-gray-600 font-semibold"> Advance Amount Requested</p>
                 <p className="text-2xl font-bold text-purple-600 mt-1">
                   ₹{stats.totalAdvanceRequested.toLocaleString('en-IN')}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">Advance payments</p>
               </div>
               <div className="p-3 bg-purple-100 rounded-full">
-                <DollarSign className="w-8 h-8 text-purple-600" />
+                <IndianRupee className="w-8 h-8 text-purple-600" />
               </div>
             </div>
           </div>
@@ -229,9 +249,9 @@ export default function ShowPaymentBill() {
                       <div className="text-xs text-gray-500 mt-1">
                         Event ID: {event.id}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      {/* <div className="text-xs text-gray-500">
                         {event.requestingDepartment}
-                      </div>
+                      </div> */}
                     </td>
                     {/* <td className="p-4 border border-gray-300">
                       <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${event.status === 'CREATED' ? 'bg-blue-100 text-blue-800' :
@@ -472,8 +492,8 @@ function EventDetailModal({ event, onClose }) {
             <button
               onClick={() => setActiveTab('overview')}
               className={`px-6 py-3 font-medium ${activeTab === 'overview'
-                  ? 'border-b-2 border-blue-600 text-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
+                ? 'border-b-2 border-blue-600 text-blue-600'
+                : 'text-gray-600 hover:text-gray-900'
                 }`}
             >
               Overview
@@ -481,8 +501,8 @@ function EventDetailModal({ event, onClose }) {
             <button
               onClick={() => setActiveTab('requests')}
               className={`px-6 py-3 font-medium ${activeTab === 'requests'
-                  ? 'border-b-2 border-blue-600 text-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
+                ? 'border-b-2 border-blue-600 text-blue-600'
+                : 'text-gray-600 hover:text-gray-900'
                 }`}
             >
               Advance Requests ({event.advanceRequests.length})
@@ -490,8 +510,8 @@ function EventDetailModal({ event, onClose }) {
             <button
               onClick={() => setActiveTab('bills')}
               className={`px-6 py-3 font-medium ${activeTab === 'bills'
-                  ? 'border-b-2 border-blue-600 text-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
+                ? 'border-b-2 border-blue-600 text-blue-600'
+                : 'text-gray-600 hover:text-gray-900'
                 }`}
             >
               Sanctioned Bills ({event.sanctionedBills.length})
@@ -564,10 +584,10 @@ function EventDetailModal({ event, onClose }) {
                         </p>
                       </div>
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${request.status === 'APPROVED' ? 'bg-green-100 text-green-800' :
-                          request.status === 'PAID' ? 'bg-blue-100 text-blue-800' :
-                            request.status === 'PARTIAL_PAID' ? 'bg-yellow-100 text-yellow-800' :
-                              request.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
-                                'bg-gray-100 text-gray-800'
+                        request.status === 'PAID' ? 'bg-blue-100 text-blue-800' :
+                          request.status === 'PARTIAL_PAID' ? 'bg-yellow-100 text-yellow-800' :
+                            request.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
+                              'bg-gray-100 text-gray-800'
                         }`}>
                         {request.status}
                       </span>
@@ -603,7 +623,7 @@ function EventDetailModal({ event, onClose }) {
             <div className="space-y-4">
               {event.sanctionedBills.length === 0 ? (
                 <div className="text-center py-12 text-gray-500">
-                  <DollarSign className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                  <IndianRupee className="w-16 h-16 mx-auto mb-4 opacity-50" />
                   <p>No bills sanctioned yet for this event</p>
                   <p className="text-sm text-gray-400 mt-2">Bills are sanctioned after advance payment approval</p>
                 </div>
@@ -618,10 +638,10 @@ function EventDetailModal({ event, onClose }) {
                         <p className="text-sm text-gray-600 mt-1">Bill ID: {bill.id}</p>
                       </div>
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${bill.status === 'COMMISSIONER_APPROVED' ? 'bg-green-100 text-green-800' :
-                          bill.status === 'COLLECTOR_APPROVED' ? 'bg-blue-100 text-blue-800' :
-                            bill.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-                              bill.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
-                                'bg-gray-100 text-gray-800'
+                        bill.status === 'COLLECTOR_APPROVED' ? 'bg-blue-100 text-blue-800' :
+                          bill.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                            bill.status === 'REJECTED' ? 'bg-red-100 text-red-800' :
+                              'bg-gray-100 text-gray-800'
                         }`}>
                         {bill.status}
                       </span>

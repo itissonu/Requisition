@@ -59,7 +59,7 @@ const menuItems = [
 
 export default function Sidebar({ activePage, setActivePage }) {
   return (
-    <div className="w-64 bg-blue-900 text-white min-h-screen">
+    <div className="w-74 bg-blue-900 text-white min-h-screen">
       <div className="p-6">
         <div className="flex items-center mb-8">
           <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center mr-3">

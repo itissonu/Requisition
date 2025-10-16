@@ -81,6 +81,13 @@ export const eventAPI = {
         ...getAuthHeader()
       }
     }),
+  delete: id => api.delete(API_ENDPOINTS.events.delete(id), {
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
+
   details: id => api.get(API_ENDPOINTS.events.details(id),
     {
       headers: {
@@ -188,7 +195,7 @@ export const advancePaymentAPI = {
     }
   }),
 
-  
+
   list: () => api.get('/api/advance-payments', {
     headers: {
       "Content-Type": "application/json",
@@ -196,7 +203,7 @@ export const advancePaymentAPI = {
     }
   }),
 
-  
+
   getById: id => api.get(`/api/advance-payments/${id}`, {
     headers: {
       "Content-Type": "application/json",
@@ -204,7 +211,7 @@ export const advancePaymentAPI = {
     }
   }),
 
-  
+
   getByStatus: status => api.get(`/api/advance-payments/status/${status}`, {
     headers: {
       "Content-Type": "application/json",
@@ -212,7 +219,7 @@ export const advancePaymentAPI = {
     }
   }),
 
-  
+
   getByEvent: eventId => api.get(`/api/advance-payments/event/${eventId}`, {
     headers: {
       "Content-Type": "application/json",
@@ -220,7 +227,7 @@ export const advancePaymentAPI = {
     }
   }),
 
-  
+
   approve: (id, remarks) => api.put(`/api/advance-payments/${id}/approve`, null, {
     params: { remarks },
     headers: {
@@ -229,7 +236,7 @@ export const advancePaymentAPI = {
     }
   }),
 
-  
+
   reject: (id, remarks) => api.put(`/api/advance-payments/${id}/reject`, null, {
     params: { remarks },
     headers: {
@@ -238,7 +245,7 @@ export const advancePaymentAPI = {
     }
   }),
 
-  
+
   markAsPaid: (id, remarks) => api.put(`/api/advance-payments/${id}/mark-paid`, null, {
     params: { remarks },
     headers: {
@@ -304,18 +311,18 @@ export const utilizationAPI = {
   reject: (id, remarks) => api.put(API_ENDPOINTS.utilizations.reject(id), null, {
     params: { remarks }
   }),
-commissionerApprove: (id, commissionerId, remarks) =>
-  api.patch(
-    `/api/utilizations/${id}/commissioner-approve`,
-    null,
-    {
-      params: { commissionerApprovedBy: commissionerId, remarks },
-      headers: {
-        "Content-Type": "application/json",
-        ...getAuthHeader()
+  commissionerApprove: (id, commissionerId, remarks) =>
+    api.patch(
+      `/api/utilizations/${id}/commissioner-approve`,
+      null,
+      {
+        params: { commissionerApprovedBy: commissionerId, remarks },
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader()
+        }
       }
-    }
-  ),
+    ),
 
   commissionerReject: (id, remarks) => api.patch(`/api/utilizations/${id}/commissioner-reject`, null, {
     params: { remarks }

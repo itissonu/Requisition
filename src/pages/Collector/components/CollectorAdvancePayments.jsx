@@ -356,13 +356,13 @@ const DetailModal = ({ request, onClose }) => (
                         <p>{new Date(sub.reportingDate).toLocaleDateString('en-IN')}</p>
                       </div>
                     </div>
-                    <div className="flex items-center text-sm text-gray-700">
+                    {/* <div className="flex items-center text-sm text-gray-700">
                       <Clock className="w-5 h-5 text-gray-400 mr-2" />
                       <div>
                         <p className="font-semibold">Start Time</p>
                         <p>{sub.startTime}</p>
                       </div>
-                    </div>
+                    </div> */}
                     {sub.endTime && (
                       <div className="flex items-center text-sm text-gray-700">
                         <Clock className="w-5 h-5 text-gray-400 mr-2" />

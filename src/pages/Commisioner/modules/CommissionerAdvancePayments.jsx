@@ -42,7 +42,7 @@ const CommissionerAdvancePayments = () => {
           remaining: request?.requestedAmount - totalSanctioned
         };
       });
-      // console.log(processedRequests, "processdataarequests")
+       console.log(processedRequests, "processdataarequests")
       setRequests(processedRequests);
     } catch (error) {
       console.error("Failed to fetch data:", error);
@@ -521,8 +521,8 @@ const CommissionerAdvancePayments = () => {
                   <h3 className="text-xl font-bold">Request Details</h3>
                   <p className="text-sm text-blue-100 mt-1">Event Name - {selectedRequest.eventName}</p>
                   <div className="mt-2 flex items-center space-x-4">
-                    <span className="text-xs">RTO: {selectedRequest.cretedByRto}</span>
-                    <span className="text-xs">Department: {selectedRequest.requestingDepartment}</span>
+                    <span className="text-xs">RTO: {selectedRequest.rtoOfficeName}</span>
+                    <span className="text-xs">Requested Department: {selectedRequest.requestingDepartment}</span>
                   </div>
                 </div>
                 <button
