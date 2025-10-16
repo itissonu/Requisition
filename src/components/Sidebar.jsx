@@ -26,7 +26,7 @@ const menuItems = [
   // }, 
   {
     key: "CreateEvent",
-    label: "Create Event",
+    label: "Requisition Schedule",
     icon: CalendarPlus,
     description: "Plan New Activities"
   },
@@ -50,9 +50,9 @@ const menuItems = [
   },
   {
     key: "UploadLetterToCollector",
-    label: "Download Letter",
+    label: "Pending Requisition",
     icon: Mail,
-    description: "Send to Collector"
+    description: "View Collector Request"
   },
  
 ];

@@ -11,7 +11,7 @@ import EventUtilizationPDFViewer from "./EventUtilizationPDFViewer";
 const subEventSchema = z.object({
   place: z.string().min(2, "Place is required"),
   reportingDate: z.string().min(1, "Reporting date is required"),
-  startTime: z.string().min(1, "Start time is required"),
+  // startTime: z.string().min(1, "Start time is required"),
   vehicles: z.array(z.object({
     vehicleId: z.number(),
     quantity: z.number().min(0, "Quantity must be 0 or more")
@@ -34,10 +34,11 @@ export default function CreateEvent() {
   const [pdfOpen, setPdfOpen] = useState(false);
   const [createdEvent, setCreatedEvent] = useState(null);
 
-
-  const { register, handleSubmit, control, formState: { errors }, reset } = useForm({
+  const { register, handleSubmit, control, watch, formState: { errors }, reset } = useForm({
     resolver: zodResolver(eventSchema),
   });
+  const selectedRequestId = watch("requestEventId");
+  const selectedRequest = requests.find(req => req.id === parseInt(selectedRequestId));
 
   const {
     register: registerSubEvent,
@@ -90,7 +91,7 @@ export default function CreateEvent() {
       const subEvent = subEvents[index];
       setValueSubEvent('place', subEvent.place);
       setValueSubEvent('reportingDate', subEvent.reportingDate);
-      setValueSubEvent('startTime', subEvent.startTime);
+      // setValueSubEvent('startTime', subEvent.startTime);
       // setValueSubEvent('vehicles', subEvent.vehicles);
       const mappedVehicles = vehicles.map(vehicle => {
         const existingVehicle = subEvent.vehicles.find(v => v.vehicleId === vehicle.id);
@@ -99,7 +100,6 @@ export default function CreateEvent() {
           quantity: existingVehicle ? existingVehicle.quantity : 0
         };
       });
-      console.log("Mapped Vehicles for Modal:", mappedVehicles);
       setValueSubEvent('vehicles', mappedVehicles);
 
 
@@ -110,7 +110,7 @@ export default function CreateEvent() {
       resetSubEvent({
         place: "",
         reportingDate: "",
-        startTime: "",
+        // startTime: "",
         vehicles: vehicles.map(vehicle => ({
           vehicleId: vehicle.id,
           quantity: 0
@@ -282,6 +282,8 @@ export default function CreateEvent() {
                 <input
                   {...register("reportingDepartment")}
                   type="text"
+                  value={selectedRequest ? selectedRequest.requestingDepartment : ""}
+                  readOnly
                   placeholder="Enter reporting department"
                   className="w-full border-2 border-gray-300 rounded-lg px-3 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 />
@@ -361,11 +363,11 @@ export default function CreateEvent() {
                           <span className="font-semibold">Date:</span>
                           <span className="ml-2">{subEvent.reportingDate}</span>
                         </div>
-                        <div className="flex items-center text-gray-700">
+                        {/* <div className="flex items-center text-gray-700">
                           <Clock className="w-4 h-4 mr-2 text-blue-600" />
                           <span className="font-semibold">Time:</span>
                           <span className="ml-2">{subEvent.startTime}</span>
-                        </div>
+                        </div> */}
                         <div className="flex items-center text-gray-700">
                           <Car className="w-4 h-4 mr-2 text-blue-600" />
                           <span className="font-semibold">Total Vehicles:</span>
@@ -433,11 +435,11 @@ export default function CreateEvent() {
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                       <MapPin className="inline w-4 h-4 mr-1" />
-                      Place <span className="text-red-500">*</span>
+                      Place/Officer <span className="text-red-500">*</span>
                     </label>
                     <input
                       {...registerSubEvent('place')}
-                      placeholder="Enter place/location"
+                      placeholder="Enter place/officer"
                       className="w-full border-2 border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
                     />
                     {errorsSubEvent.place && (
@@ -530,11 +532,11 @@ export default function CreateEvent() {
                                   <input
                                     type="text"
                                     inputMode="numeric"
-                                    value={field.value || ''}  
+                                    value={field.value || ''}
                                     onChange={(e) => {
                                       const value = e.target.value.replace(/[^0-9]/g, '');
                                       const numValue = value === '' ? '' : parseInt(value, 10);
-                                      field.onChange(numValue);  
+                                      field.onChange(numValue);
                                       updateVehicleQuantity(vehicle.id, numValue);
                                     }}
                                     className="w-24 text-center border-2 border-gray-300 p-2 rounded focus:ring-2 focus:ring-green-500 focus:border-green-500 font-semibold transition-all"

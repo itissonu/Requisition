@@ -223,7 +223,7 @@ export default function ShowAllEvents() {
               <table className="w-full border-collapse border-2 border-gray-300">
                 <thead>
                   <tr className="bg-blue-900 text-white">
-                    <th className="p-4 border border-gray-400 text-left font-bold">ID</th>
+                    <th className="p-4 border border-gray-400 text-left font-bold">Event ID</th>
                     <th className="p-4 border border-gray-400 text-left font-bold">Event Details</th>
                     <th className="p-4 border border-gray-400 text-left font-bold">Department</th>
                     
@@ -237,7 +237,7 @@ export default function ShowAllEvents() {
                   {filteredEvents.map((event, index) => (
                     <tr key={event.id} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
                       <td className="p-4 border border-gray-300">
-                        <div className="font-bold text-blue-900">#{event.id}</div>
+                        <div className="font-bold text-blue-900">{event.id}</div>
                         <div className="text-xs text-gray-500">
                           {new Date(event.createdAt).toLocaleDateString('en-IN')}
                         </div>
@@ -365,7 +365,7 @@ export default function ShowAllEvents() {
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
                     <label className="font-semibold text-gray-700 block mb-1">Created:</label>
                     <p className="text-gray-900">{new Date(selectedEvent.createdAt).toLocaleString('en-IN')}</p>
-                    <p className="text-sm text-gray-600 mt-1">By: {selectedEvent.createdByName}</p>
+                    <p className="text-sm text-gray-600 mt-1">By: {selectedEvent.createdByOfficeName}</p>
                   </div>
                 </div>
               </div>
@@ -380,7 +380,7 @@ export default function ShowAllEvents() {
                         <div>
                           <h4 className="font-semibold text-gray-900">Place: {subEvent.place}</h4>
                           <p className="text-sm text-gray-600 mt-1">
-                            Date: {subEvent.reportingDate} | Time: {subEvent.startTime}
+                            Date: {subEvent.reportingDate}
                           </p>
                         </div>
                       </div>
