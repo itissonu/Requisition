@@ -361,7 +361,7 @@
 // export default UploadLetterToCollector;
 
 import React, { useState, useEffect } from "react";
-import { FileText, Download, Eye, Calendar, Hash, User, CheckCircle, Clock, XCircle, Filter } from "lucide-react";
+import { FileText, Download, Eye, Calendar, Hash, User, CheckCircle, Clock, XCircle, Filter, Tag, Building, House, Landmark } from "lucide-react";
 import { requestEventAPI } from "../../../apis/apiService";
 
 export default function ViewCollectorRequests() {
@@ -435,7 +435,7 @@ export default function ViewCollectorRequests() {
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      CREATED: { bg: "bg-blue-100", text: "text-blue-700", icon: Clock, label: "Pending" },
+      CREATED: { bg: "bg-blue-100", text: "text-blue-700", icon: Clock, label: "Under Process" },
       APPROVED: { bg: "bg-green-100", text: "text-green-700", icon: CheckCircle, label: "Event Created" },
       REJECTED: { bg: "bg-red-100", text: "text-red-700", icon: XCircle, label: "Rejected" },
     };
@@ -541,9 +541,9 @@ export default function ViewCollectorRequests() {
                       <h3 className="font-bold text-lg mb-1 line-clamp-2">
                         {request.letterName}
                       </h3>
-                      <p className="text-blue-100 text-sm">
+                      {/* <p className="text-blue-100 text-sm">
                         {formatDate(request.createdAt)}
-                      </p>
+                      </p> */}
                     </div>
                     {(getStatusBadge(request.status))}
                   </div>
@@ -552,7 +552,7 @@ export default function ViewCollectorRequests() {
                 {/* Card Body */}
                 <div className="p-5 space-y-3">
                   <div className="flex items-center text-sm">
-                    <Hash className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
+                    <Tag className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
                     <span className="text-gray-600 mr-2">Letter No:</span>
                     <span className="font-semibold text-gray-900">{request.letterNo}</span>
                   </div>
@@ -562,6 +562,14 @@ export default function ViewCollectorRequests() {
                     <span className="text-gray-600 mr-2">RTO:</span>
                     <span className="font-semibold text-gray-900 truncate">
                       {request.rtoUserName || "N/A"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center text-sm">
+                    <Landmark className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
+                    <span className="text-gray-600 mr-2">Department:</span>
+                    <span className="font-semibold text-gray-900 truncate">
+                      {request.requestingDepartment || "N/A"}
                     </span>
                   </div>
                   {/* 
@@ -610,7 +618,7 @@ export default function ViewCollectorRequests() {
                       className="w-full mt-2 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-all"
                     >
                       <CheckCircle className="w-4 h-4" />
-                     Mark this event completed
+                      Mark this event completed
                     </button>
                   )}
                 </div>
