@@ -22,6 +22,7 @@ export default function CollectorMainDashboard() {
 
   const [recentRequests, setRecentRequests] = useState([]);
 
+  console.log("Rendering CollectorMainDashboard",recentRequests);
   useEffect(() => {
     async function fetchDashboardData() {
       try {
@@ -180,30 +181,30 @@ export default function CollectorMainDashboard() {
         <div className="space-y-3">
           {recentRequests.map(request => (
             <div
-              key={request.id}
+              key={request?.id}
               className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50"
             >
-              {/* <div className="flex justify-between items-start mb-2">
+              <div className="flex justify-between items-start mb-2">
                 <h4 className="font-medium text-gray-900 text-sm">
-                  {request.name}
+                  Event Name:-{' '}{request?.name}
                 </h4>
-                <span
+                {/* <span
                   className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(
                     request.status
                   )}`}
                 >
-                  {request.status.replace(
+                  {request?.status.replace(
                     "PENDING_COLLECTOR_APPROVAL",
                     "PENDING"
                   )}
-                </span>
-              </div> */}
-              {/* <div className="flex justify-between items-center text-sm text-gray-600">
-                <span>{request.requestingDepartmentName}</span>
-                <span className={`font-medium ${getPriorityColor(request.priority)}`}>
+                </span> */}
+              </div>
+              <div className="flex justify-between items-center text-sm text-gray-600">
+                <span className="font-semibold">Department Name:-{request?.requestingDepartmentName}</span>
+                <span className={`font-medium ${getPriorityColor(request?.priority)} `}>
                   {request.priority}
                 </span>
-              </div> */}
+              </div>
               <div className="text-xs text-gray-500 mt-1">
                 {new Date(request.createdAt).toLocaleString()}
               </div>

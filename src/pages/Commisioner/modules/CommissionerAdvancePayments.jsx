@@ -120,7 +120,7 @@ const CommissionerAdvancePayments = () => {
       alert("Bill amount cannot exceed remaining amount");
       return;
     }
-    let type;
+    let type='ADVANCE';
     if (parseFloat(billAmount) !== selectedRequest.requestedAmount) {
       type = "PARTIAL_PAYMENT_ADVANCE";
     }
@@ -519,10 +519,10 @@ const CommissionerAdvancePayments = () => {
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="text-xl font-bold">Request Details</h3>
-                  <p className="text-sm text-blue-100 mt-1">Event Name - {selectedRequest.eventName}</p>
+                  <p className="text-sm text-blue-100 mt-1">Event Name - {selectedRequest?.eventName}</p>
                   <div className="mt-2 flex items-center space-x-4">
-                    <span className="text-xs">RTO: {selectedRequest.rtoOfficeName}</span>
-                    <span className="text-xs">Requested Department: {selectedRequest.requestingDepartment}</span>
+                    <span className="text-xs">RTO: {selectedRequest?.rtoOfficeName}</span>
+                    <span className="text-xs">Requested Department: {selectedRequest?.requestingDepartment}</span>
                   </div>
                 </div>
                 <button
@@ -566,17 +566,17 @@ const CommissionerAdvancePayments = () => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
                       <p className="text-xs text-gray-600 mb-1">Total Requested</p>
-                      <p className="text-2xl font-bold text-blue-600">₹{selectedRequest.requestedAmount?.toLocaleString('en-IN')}</p>
+                      <p className="text-2xl font-bold text-blue-600">₹{selectedRequest?.requestedAmount?.toLocaleString('en-IN')}</p>
                       <p className="text-xs text-gray-500 mt-1">Initial request amount</p>
                     </div>
                     <div className="bg-green-50 rounded-lg p-4 border border-green-200">
                       <p className="text-xs text-gray-600 mb-1">Total Sanctioned</p>
-                      <p className="text-2xl font-bold text-green-600">₹{selectedRequest.totalSanctioned?.toLocaleString('en-IN')}</p>
-                      <p className="text-xs text-gray-500 mt-1">{selectedRequest.bills.length} bill(s) created</p>
+                      <p className="text-2xl font-bold text-green-600">₹{selectedRequest?.totalSanctioned?.toLocaleString('en-IN')}</p>
+                      <p className="text-xs text-gray-500 mt-1">{selectedRequest?.bills?.length} bill(s) created</p>
                     </div>
                     <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
                       <p className="text-xs text-gray-600 mb-1">Remaining Amount</p>
-                      <p className="text-2xl font-bold text-purple-600">₹{selectedRequest.remaining?.toLocaleString('en-IN')}</p>
+                      <p className="text-2xl font-bold text-purple-600">₹{selectedRequest?.remaining?.toLocaleString('en-IN')}</p>
                       <p className="text-xs text-gray-500 mt-1">
                         {selectedRequest.remaining > 0 ? 'Available for billing' : 'Fully sanctioned'}
                       </p>
@@ -617,7 +617,7 @@ const CommissionerAdvancePayments = () => {
 
                             {bill.remarks && (
                               <div className="mt-3 pt-3 border-t border-gray-100">
-                                <p className="text-xs text-gray-600"><strong>Remarks:</strong> {bill.remarks}</p>
+                                <p className="text-xs text-gray-600"><strong>Remarks:</strong> {bill?.remarks}</p>
                               </div>
                             )}
 

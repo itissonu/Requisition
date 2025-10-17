@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
@@ -11,7 +10,6 @@ import DepartmentDashboard from "./pages/Department/DepartmentDashboard";
 import EventUtilizationForm from "./pages/RTO/modules/EventUtilizationDetail";
 import CommisionerDashboard from "./pages/Commisioner/CommisionerDashboard";
 
-
 const LoadingScreen = () => (
   <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
     <div className="text-center">
@@ -21,13 +19,11 @@ const LoadingScreen = () => (
   </div>
 );
 
-
 const ProtectedRoute = ({ children, requiredRole = null, requiredPermission = null }) => {
   const { user, hasPermission, hasRole } = useAuth();
   const location = useLocation();
 
   if (!user) {
-
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
@@ -42,13 +38,10 @@ const ProtectedRoute = ({ children, requiredRole = null, requiredPermission = nu
   return children;
 };
 
-
 const DashboardRouter = () => {
   const { user } = useAuth();
 
-
   const getDashboardPath = (role) => {
-
     console.log("User role:", role);
     const dashboardPaths = {
       'RTO': '/rto/dashboard',
@@ -57,7 +50,6 @@ const DashboardRouter = () => {
     };
     return dashboardPaths[role] || '/login';
   };
-
 
   if (user) {
     console.log("Redirecting to dashboard for role:", user.role);
@@ -75,7 +67,7 @@ const UnauthorizedPage = () => {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full text-center">
         <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <span className="text-2xl"></span>
+          <span className="text-2xl">🚫</span>
         </div>
         <h2 className="text-xl font-bold text-gray-900 mb-2">Access Denied</h2>
         <p className="text-gray-600 mb-4">
@@ -91,7 +83,6 @@ const UnauthorizedPage = () => {
     </div>
   );
 };
-
 
 export default function App() {
   const { user, isLoading, error, login, logout, setError } = useAuth();
@@ -111,7 +102,6 @@ export default function App() {
       console.error('Login error:', err);
     }
   };
-
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -133,13 +123,14 @@ export default function App() {
 
         {/* Protected Dashboard Routes */}
         <Route
-          path="/rto/dashboard"
+          path="/rto/dashboard/*"
           element={
             <ProtectedRoute requiredRole="RTO">
               <RTODashboard user={user} onLogout={logout} />
             </ProtectedRoute>
           }
         />
+        
         <Route
           path="/utilization/:eventId"
           element={
@@ -149,17 +140,17 @@ export default function App() {
           }
         />
 
-
         <Route
-          path="/collector/dashboard"
+          path="/collector/dashboard/*"
           element={
             <ProtectedRoute requiredRole="Collector">
               <CollectorDashboard user={user} onLogout={logout} />
             </ProtectedRoute>
           }
         />
+        
         <Route
-          path="/commissioner/dashboard"  
+          path="/commissioner/dashboard/*"  
           element={
             <ProtectedRoute requiredRole="Commissioner">  
               <CommisionerDashboard user={user} onLogout={logout} />
@@ -168,15 +159,7 @@ export default function App() {
         />
 
         <Route
-          path="/commissioner/*"  
-          element={
-            <ProtectedRoute requiredRole="Commissioner">  
-              <CommisionerDashboard user={user} onLogout={logout} />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/designated-officer/dashboard"
+          path="/designated-officer/dashboard/*"
           element={
             <ProtectedRoute requiredRole="Designated-Officer">
               <DesignatedDashboard user={user} onLogout={logout} />
@@ -185,44 +168,7 @@ export default function App() {
         />
 
         <Route
-          path="/department/dashboard"
-          element={
-            <ProtectedRoute requiredRole="Department">
-              <DepartmentDashboard user={user} onLogout={logout} />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Additional Protected Routes */}
-        <Route
-          path="/rto/*"
-          element={
-            <ProtectedRoute requiredRole="RTO">
-              <RTODashboard user={user} onLogout={logout} />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/collector/*"
-          element={
-            <ProtectedRoute requiredRole="Collector">
-              <CollectorDashboard user={user} onLogout={logout} />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/designated-officer/*"
-          element={
-            <ProtectedRoute requiredRole="Designated-Officer">
-              <DesignatedDashboard user={user} onLogout={logout} />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/department/*"
+          path="/department/dashboard/*"
           element={
             <ProtectedRoute requiredRole="Department">
               <DepartmentDashboard user={user} onLogout={logout} />

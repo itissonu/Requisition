@@ -490,8 +490,9 @@ export default function ShowAllEvents() {
 
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
                     <label className="font-semibold text-gray-700 block mb-1">Created By:</label>
-                    <p className="text-gray-900">{selectedEvent.createdByName}</p>
-                    <p className="text-sm text-gray-600">{selectedEvent.createdByRole}</p>
+                    {/* <p className="text-gray-900">{selectedEvent?.createdByOfficeName}</p> */}
+                    <p className="text-gray-900">{selectedEvent?.createdByName}</p>
+                    <p className="text-sm text-gray-600">{selectedEvent?.createdByRole}</p>
                   </div>
 
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
@@ -594,11 +595,11 @@ export default function ShowAllEvents() {
       )}
 
 
-<EventUtilizationPDFViewer
-  eventId={currentEventForPdf}  // Now it's eventId instead of eventData
-  isOpen={pdfModalOpen}
-  onClose={closePdfModal}
-/>
+      <EventUtilizationPDFViewer
+        eventId={currentEventForPdf}  // Now it's eventId instead of eventData
+        isOpen={pdfModalOpen}
+        onClose={closePdfModal}
+      />
 
 
 

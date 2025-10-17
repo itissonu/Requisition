@@ -260,7 +260,7 @@ export default function EventUtilizationForm() {
       } catch (error) {
         console.error('Error fetching data:', error);
         alert('Failed to load event data. Please try again.');
-        navigate('/rto/event-utilization');
+        navigate('/rto/dashboard');
       } finally {
         setLoading(false);
       }
@@ -389,7 +389,7 @@ export default function EventUtilizationForm() {
       await utilizationAPI.create(payload);
 
       alert("Utilization created successfully!");
-      navigate("/rto/event-utilization");
+      navigate("/rto/dashboard");
 
     } catch (error) {
       console.error('Error submitting utilization:', error);
@@ -408,7 +408,7 @@ export default function EventUtilizationForm() {
     try {
       await eventAPI.delete(eventId);
       alert('Event deleted successfully!');
-      navigate('/rto/event-utilization');
+      navigate('/rto/dashboard');
     } catch (error) {
       console.error('Error deleting event:', error);
       alert('Failed to delete event. Please try again.');
@@ -442,7 +442,7 @@ export default function EventUtilizationForm() {
         <div className="text-center py-8">
           <p className="text-red-600">Event not found or failed to load.</p>
           <button
-            onClick={() => navigate('/rto/event-utilization')}
+            onClick={() => navigate('/rto/dashboard')}
             className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
             Back to Dashboard
@@ -471,7 +471,7 @@ export default function EventUtilizationForm() {
         {/* Breadcrumb */}
         <div className="mb-4 flex items-center gap-2 text-sm">
           <button
-            onClick={() => navigate('/rto/event-utilization')}
+            onClick={() => navigate('/rto/dashboard')}
             className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -792,7 +792,7 @@ export default function EventUtilizationForm() {
             </button>
 
             <button
-              onClick={() => navigate("/rto/event-utilization")}
+             // onClick={() => navigate("/rto/event-utilization")}
               disabled={submitting}
               className="flex items-center gap-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white px-8 py-4 rounded-lg hover:from-gray-700 hover:to-gray-800 font-bold text-lg shadow-lg transform transition-all hover:scale-105 disabled:opacity-50"
             >

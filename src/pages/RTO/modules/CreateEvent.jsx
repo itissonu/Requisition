@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Car, File, Plus, Trash2, MapPin, Calendar, Clock, ChevronDown, Building, Edit2, X, CloudCog } from "lucide-react";
+import { Car, File, Plus, Trash2, MapPin, Calendar, Clock, ChevronDown, Building, Edit2, X, Download, DollarSign, FileText, CheckCircle, IndianRupee } from "lucide-react";
 
 import logo from '../../../assests/logo.png';
 import { eventAPI, requestEventAPI, vehicleAPI } from "../../../apis/apiService";
@@ -11,7 +11,6 @@ import EventUtilizationPDFViewer from "./EventUtilizationPDFViewer";
 const subEventSchema = z.object({
   place: z.string().min(2, "Place is required"),
   reportingDate: z.string().min(1, "Reporting date is required"),
-  // startTime: z.string().min(1, "Start time is required"),
   vehicles: z.array(z.object({
     vehicleId: z.number(),
     quantity: z.number().min(0, "Quantity must be 0 or more")
@@ -23,7 +22,7 @@ const eventSchema = z.object({
   reportingDepartment: z.string().min(1, "Reporting department is required"),
 });
 
-export default function CreateEvent() {
+export default function CreateEvent({ onNavigateToPayment = null }) {
   const [loading, setLoading] = useState(false);
   const [vehicles, setVehicles] = useState([]);
   const [requests, setRequests] = useState([]);
@@ -33,6 +32,7 @@ export default function CreateEvent() {
   const [currentSubEvent, setCurrentSubEvent] = useState(null);
   const [pdfOpen, setPdfOpen] = useState(false);
   const [createdEvent, setCreatedEvent] = useState(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const { register, handleSubmit, control, watch, formState: { errors }, reset } = useForm({
     resolver: zodResolver(eventSchema),
@@ -63,7 +63,6 @@ export default function CreateEvent() {
       const response = await requestEventAPI.list();
       const filtereddata = response.data.filter(request => request.status !== "APPROVED");
       setRequests(filtereddata);
-
       console.log("Fetched requests:", filtereddata);
     } catch (error) {
       console.error("Failed to fetch requests:", error);
@@ -86,13 +85,10 @@ export default function CreateEvent() {
 
   const openModal = (index = null) => {
     if (index !== null) {
-
       setEditingIndex(index);
       const subEvent = subEvents[index];
       setValueSubEvent('place', subEvent.place);
       setValueSubEvent('reportingDate', subEvent.reportingDate);
-      // setValueSubEvent('startTime', subEvent.startTime);
-      // setValueSubEvent('vehicles', subEvent.vehicles);
       const mappedVehicles = vehicles.map(vehicle => {
         const existingVehicle = subEvent.vehicles.find(v => v.vehicleId === vehicle.id);
         return {
@@ -101,16 +97,12 @@ export default function CreateEvent() {
         };
       });
       setValueSubEvent('vehicles', mappedVehicles);
-
-
       setCurrentSubEvent(subEvent);
     } else {
-      // Creating new sub-event
       setEditingIndex(null);
       resetSubEvent({
         place: "",
         reportingDate: "",
-        // startTime: "",
         vehicles: vehicles.map(vehicle => ({
           vehicleId: vehicle.id,
           quantity: 0
@@ -130,12 +122,10 @@ export default function CreateEvent() {
 
   const onSubmitSubEvent = (data) => {
     if (editingIndex !== null) {
-      // Update existing sub-event
       const updatedSubEvents = [...subEvents];
       updatedSubEvents[editingIndex] = data;
       setSubEvents(updatedSubEvents);
     } else {
-      // Add new sub-event
       setSubEvents([...subEvents, data]);
     }
     closeModal();
@@ -191,18 +181,13 @@ export default function CreateEvent() {
       const response = await eventAPI.create(eventData);
 
       console.log('Event created successfully:', response.data);
-      alert('Event created successfully!');
-      resetForm();
-
-      console.log(response.data, "response.data");
+      
       setCreatedEvent(response.data);
-      setPdfOpen(true);
-
+      setShowSuccessModal(true);
+      resetForm();
 
     } catch (error) {
       console.error('Error creating event:', error);
-      console.error('Error response:', error.response);
-      console.error('Error message:', error.message);
       const errorMessage = error.response?.data?.message || error.response?.data || 'Failed to create event. Please try again.';
       alert(errorMessage);
     } finally {
@@ -213,6 +198,22 @@ export default function CreateEvent() {
   const resetForm = () => {
     reset();
     setSubEvents([]);
+  };
+
+  const handleDownloadPDF = () => {
+    setPdfOpen(true);
+  };
+
+  const handleCreateAdvancePayment = () => {
+    setShowSuccessModal(false);
+    if (onNavigateToPayment) {
+      onNavigateToPayment(createdEvent);
+    }
+  };
+
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
+    setCreatedEvent(null);
   };
 
   return (
@@ -275,7 +276,6 @@ export default function CreateEvent() {
                 )}
               </div>
               <div>
-
                 {selectedRequest && (<>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     <Building className="inline w-4 h-4 mr-1" />
@@ -287,7 +287,6 @@ export default function CreateEvent() {
                     readOnly
                     placeholder="Enter reporting department"
                    className="w-full border-2 border-gray-300 rounded-lg px-3 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-
                   />
                 </>)}
 
@@ -367,11 +366,6 @@ export default function CreateEvent() {
                           <span className="font-semibold">Date:</span>
                           <span className="ml-2">{subEvent.reportingDate}</span>
                         </div>
-                        {/* <div className="flex items-center text-gray-700">
-                          <Clock className="w-4 h-4 mr-2 text-blue-600" />
-                          <span className="font-semibold">Time:</span>
-                          <span className="ml-2">{subEvent.startTime}</span>
-                        </div> */}
                         <div className="flex items-center text-gray-700">
                           <Car className="w-4 h-4 mr-2 text-blue-600" />
                           <span className="font-semibold">Total Vehicles:</span>
@@ -465,21 +459,6 @@ export default function CreateEvent() {
                       <p className="text-red-500 text-sm mt-1">{errorsSubEvent.reportingDate.message}</p>
                     )}
                   </div>
-
-                  {/* <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      <Clock className="inline w-4 h-4 mr-1" />
-                      Event Time <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="time"
-                      {...registerSubEvent('startTime')}
-                      className="w-full border-2 border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
-                    />
-                    {errorsSubEvent.startTime && (
-                      <p className="text-red-500 text-sm mt-1">{errorsSubEvent.startTime.message}</p>
-                    )}
-                  </div> */}
                 </div>
 
                 {/* Vehicle Requirements - Excel Style */}
@@ -510,25 +489,6 @@ export default function CreateEvent() {
                               <div className="font-medium">{vehicle.name}</div>
                             </td>
                             <td className="p-2 text-center">
-                              {/* <Controller
-                                name={`vehicles.${vehicleIndex}.quantity`}
-                                control={controlSubEvent}
-                                render={({ field }) => (
-                                 
-                                  <input
-                                    type="text"
-                                    inputMode="numeric"
-                                    {...field}
-                                    value={vehicle?.quantity}
-                                    onChange={(e) => {
-                                      const value = e.target.value.replace(/[^0-9]/g, '');
-                                      updateVehicleQuantity(vehicle.id, value);
-                                    }}
-                                    className="w-24 text-center border-2 border-gray-300 p-2 rounded focus:ring-2 focus:ring-green-500 focus:border-green-500 font-semibold transition-all"
-                                  />
-                                )}
-                              /> */}
-
                               <Controller
                                 name={`vehicles.${vehicleIndex}.quantity`}
                                 control={controlSubEvent}
@@ -547,7 +507,6 @@ export default function CreateEvent() {
                                   />
                                 )}
                               />
-
                             </td>
                           </tr>
                         ))}
@@ -579,12 +538,57 @@ export default function CreateEvent() {
         </div>
       )}
 
+      {/* Success Modal */}
+      {showSuccessModal && createdEvent && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
+            <div className="bg-gradient-to-r from-green-600 to-green-700 text-white p-6 rounded-t-xl text-center">
+              <CheckCircle className="w-16 h-16 mx-auto mb-3" />
+              <h3 className="text-xl font-bold">Event Created Successfully!</h3>
+            </div>
+
+            <div className="p-6 text-center">
+              <p className="text-gray-600 mb-6">
+                Your vehicle requisition event has been created successfully. 
+                What would you like to do next?
+              </p>
+
+              <div className="space-y-3">
+                <button
+                  onClick={handleDownloadPDF}
+                  className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2 transition-all"
+                >
+                  <Download className="w-5 h-5" />
+                  Download Requisition PDF
+                </button>
+
+                <button
+                  onClick={handleCreateAdvancePayment}
+                  className="w-full bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 flex items-center justify-center gap-2 transition-all"
+                >
+                  <IndianRupee className="w-5 h-5" />
+                  Create Advance Payment Request
+                </button>
+
+                <button
+                  onClick={handleCloseSuccessModal}
+                  className="w-full bg-gray-500 text-white px-4 py-3 rounded-lg hover:bg-gray-600 flex items-center justify-center gap-2 transition-all"
+                >
+                  <X className="w-5 h-5" />
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PDF Viewer */}
       <EventUtilizationPDFViewer
-        eventData={createdEvent}
+        eventId={createdEvent?.id}
         isOpen={pdfOpen}
         onClose={() => setPdfOpen(false)}
       />
-
 
       {/* Footer */}
       <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-4 mt-12 shadow-lg">
@@ -592,7 +596,7 @@ export default function CreateEvent() {
           © Government of Odisha - Commerce & Transport Department | Vehicle Requisition System
         </p>
         <p className="text-center text-xs opacity-75 mt-1">
-          For assistance, contact: transport@odisha.gov.in
+          For assistance, contact: [transport@odisha.gov.in](mailto:transport@odisha.gov.in)
         </p>
       </div>
     </div>

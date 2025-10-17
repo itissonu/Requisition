@@ -168,7 +168,7 @@ export default function ShowAllEvents() {
       </div>
 
       <div className="max-w-7xl mx-auto p-6">
-                  <div className="bg-white rounded-xl shadow-lg border border-gray-100">
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100">
           <div className="bg-blue-100 border-b border-blue-200 p-4 rounded-t-lg">
             <div className="flex items-center justify-between">
               <div>
@@ -226,7 +226,7 @@ export default function ShowAllEvents() {
                     <th className="p-4 border border-gray-400 text-left font-bold">Event ID</th>
                     <th className="p-4 border border-gray-400 text-left font-bold">Event Details</th>
                     <th className="p-4 border border-gray-400 text-left font-bold">Department</th>
-                    
+
                     <th className="p-4 border border-gray-400 text-center font-bold">Status</th>
                     <th className="p-4 border border-gray-400 text-center font-bold">Sub Events</th>
                     <th className="p-4 border border-gray-400 text-left font-bold">Vehicles</th>
@@ -245,12 +245,12 @@ export default function ShowAllEvents() {
                       <td className="p-4 border border-gray-300">
                         <div className="font-semibold text-gray-900">{event.requestEventName}</div>
                         <div className="text-sm text-gray-600">Letter: {event.requestEventLetterNo}</div>
-                     
+
                       </td>
                       <td className="p-4 border border-gray-300 font-medium text-gray-700">
                         {event.requestingDepartment}
                       </td>
-                    
+
                       <td className="p-4 border border-gray-300 text-center">
                         <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold border ${getStatusColor(event.status)}`}>
                           {getStatusIcon(event.status)}
@@ -265,8 +265,16 @@ export default function ShowAllEvents() {
                       <td className="p-4 border border-gray-300">
                         <div className="text-sm space-y-1">
                           {event.subEvents && event.subEvents[0]?.vehicles?.slice(0, 2).map((v, idx) => (
-                            <div key={idx} className="flex justify-between  px-2 py-1 rounded">
-                              <span className="truncate text-xs">{v.vehicleName}</span>
+                            <div
+                              key={idx}
+                              className="flex justify-between items-center px-2 py-1 rounded"
+                            >
+                              <span
+                                className="truncate text-xs max-w-[100px] block"
+                                title={v.vehicleName} // shows full name on hover
+                              >
+                                {v.vehicleName}
+                              </span>
                               <span className="font-semibold text-xs">×{v.quantity}</span>
                             </div>
                           ))}
@@ -277,6 +285,7 @@ export default function ShowAllEvents() {
                           )}
                         </div>
                       </td>
+
                       <td className="p-4 border border-gray-300">
                         <div className="flex gap-2 justify-center flex-wrap">
                           <button
@@ -352,7 +361,7 @@ export default function ShowAllEvents() {
                 </div>
 
                 <div className="space-y-4">
-                  
+
 
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
                     <label className="font-semibold text-gray-700 block mb-1">Status:</label>
@@ -384,7 +393,7 @@ export default function ShowAllEvents() {
                           </p>
                         </div>
                       </div>
-                      
+
                       <div className="mt-3">
                         <div className="font-semibold text-gray-700 mb-2">Vehicles Required:</div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">

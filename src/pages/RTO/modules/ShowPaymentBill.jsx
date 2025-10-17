@@ -245,7 +245,7 @@ export default function ShowPaymentBill() {
                 {processedEvents.map((event, index) => (
                   <tr key={event.id} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
                     <td className="p-4 border border-gray-300">
-                      <div className="font-semibold text-gray-900">{event.name}</div>
+                      <div className="font-semibold text-gray-900">{event?.requestEventName}</div>
                       <div className="text-xs text-gray-500 mt-1">
                         Event ID: {event.id}
                       </div>
@@ -468,7 +468,7 @@ function EventDetailModal({ event, onClose }) {
                   <span className="text-blue-200">Event ID:</span> {event.id}
                 </div>
                 <div>
-                  <span className="text-blue-200">Department:</span> {event.requestingDepartment}
+                  <span className="text-blue-200">Requesting Department:</span> {event.requestingDepartment}
                 </div>
                 <div>
                   <span className="text-blue-200">Status:</span> {event.status}
