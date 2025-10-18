@@ -247,7 +247,7 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                       <td style={{
                         border: '1px solid #000',
                         padding: '6px 8px',
-                        fontWeight: 'bold',
+                        // fontWeight: 'bold',
                         width: '50%',
                         verticalAlign: 'top'
                       }}>
@@ -256,7 +256,8 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                       <td style={{
                         border: '1px solid #000',
                         padding: '6px 8px',
-                        height: '24px',
+                       
+                         height: '35px', 
                         verticalAlign: 'top'
                       }}>
                         &nbsp;
@@ -266,11 +267,15 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                       <td style={{
                         border: '1px solid #000',
                         padding: '6px 8px',
-                        fontWeight: 'bold',
-                        verticalAlign: 'top'
+                        // fontWeight: 'bold',
+                        height: '40px',                 // give the cell a fixed height
+                        // display: 'flex',                // use flexbox
+                        //justifyContent: 'center',       // center horizontally
+                        alignItems: 'center',
+                        verticalAlign: 'center'
                       }}>
                         2. Type of Vehicle<br />
-                        (Bus/Truck/Car/Jeep etc.)
+                       
                       </td>
                       <td style={{
                         border: '1px solid #000',
@@ -285,7 +290,8 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                       <td style={{
                         border: '1px solid #000',
                         padding: '6px 8px',
-                        fontWeight: 'bold',
+                        // fontWeight: 'bold',
+                         height: '40px', 
                         verticalAlign: 'top'
                       }}>
                         3. Owner's Name & Address
@@ -303,7 +309,8 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                       <td style={{
                         border: '1px solid #000',
                         padding: '6px 8px',
-                        fontWeight: 'bold',
+                        // fontWeight: 'bold',
+                         height: '40px', 
                         verticalAlign: 'top'
                       }}>
                         4. Owner's Mobile Number
@@ -321,7 +328,8 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                       <td style={{
                         border: '1px solid #000',
                         padding: '6px 8px',
-                        fontWeight: 'bold',
+                        // fontWeight: 'bold',
+                         height: '40px', 
                         verticalAlign: 'top'
                       }}>
                         5. Driver's Name
@@ -339,7 +347,8 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                       <td style={{
                         border: '1px solid #000',
                         padding: '6px 8px',
-                        fontWeight: 'bold',
+                        // fontWeight: 'bold',
+                         height: '40px', 
                         verticalAlign: 'top'
                       }}>
                         6. Driver's Mobile Number
@@ -357,7 +366,8 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                       <td style={{
                         border: '1px solid #000',
                         padding: '6px 8px',
-                        fontWeight: 'bold',
+                        // fontWeight: 'bold',
+                         height: '40px', 
                         verticalAlign: 'top'
                       }}>
                         7. Date & Time of Reporting
@@ -375,8 +385,10 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                       <td style={{
                         border: '1px solid #000',
                         padding: '6px 8px',
-                        fontWeight: 'bold',
-                        verticalAlign: 'top'
+                         height: '40px', 
+                        // fontWeight: 'bold',
+                        //   textAlign: 'center',       // centers horizontally
+                        verticalAlign: 'middle'
                       }}>
                         8. Place of Reporting
                       </td>
@@ -393,8 +405,12 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                       <td style={{
                         border: '1px solid #000',
                         padding: '6px 8px',
-                        fontWeight: 'bold',
-                        verticalAlign: 'top'
+                        paddingBottom: '8px',
+                         height: '40px', 
+                        // fontWeight: 'bold',
+                        // textAlign: 'center',       // centers horizontally
+                        verticalAlign: 'middle'
+                        // verticalAlign: 'top'
                       }}>
                         9. Officer / Office to Whom the Vehicle<br />
                         Shall Report
@@ -482,7 +498,7 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                   lineHeight: '1.4',
                   marginBottom: '12px'
                 }}>
-                  <h4 style={{ fontSize: '12pt',textUnderlineOffset: '6px', textDecoration: 'underline', fontWeight: 'bold', marginBottom: '4px', textAlign: 'center' }}>
+                  <h4 style={{ fontSize: '12pt', textUnderlineOffset: '6px', textDecoration: 'underline', fontWeight: 'bold', marginBottom: '4px', textAlign: 'center' }}>
                     CONDITIONS OF REQUISITION:
                   </h4>
 

@@ -13,7 +13,9 @@ import {
   X,
   Building2,
   MapPin,
-  Users
+  Users,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { eventAPI } from "../../../apis/apiService";
 import logo from '../../../assests/logo.png';
@@ -29,12 +31,17 @@ export default function ShowAllEvents() {
   const [pdfUrl, setPdfUrl] = useState(null);
   const [currentEventForPdf, setCurrentEventForPdf] = useState(null);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         const response = await eventAPI.list();
         setEvents(response?.data);
         setFilteredEvents(response?.data);
+        console.log(response?.data, "fetched events");
       } catch (error) {
         console.error('Error fetching events:', error);
         alert('Failed to load events. Please try again.');
@@ -49,20 +56,84 @@ export default function ShowAllEvents() {
   useEffect(() => {
     let filtered = events;
 
+    // Search filter - by event ID or event name
     if (searchTerm) {
       filtered = filtered.filter(event =>
         event.requestEventName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        event.requestingDepartment?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        event.collectorName?.toLowerCase().includes(searchTerm.toLowerCase())
+        event.id.toString().includes(searchTerm)
       );
     }
 
+    // Status filter
     if (statusFilter !== "ALL") {
       filtered = filtered.filter(event => event.status === statusFilter);
     }
 
     setFilteredEvents(filtered);
+    setCurrentPage(1); // Reset to first page when filters change
   }, [searchTerm, statusFilter, events]);
+
+  // Pagination calculations
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentEvents = filteredEvents.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
+
+  // Pagination handlers
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxPagesToShow = 5;
+    
+    if (totalPages <= maxPagesToShow) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+        pages.push('...');
+        pages.push(currentPage - 1);
+        pages.push(currentPage);
+        pages.push(currentPage + 1);
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -133,6 +204,13 @@ export default function ShowAllEvents() {
     setCurrentEventForPdf(null);
   };
 
+  // Clear all filters
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    setStatusFilter("ALL");
+    setCurrentPage(1);
+  };
+
   if (loading) {
     return (
       <div className="bg-white p-6 rounded shadow">
@@ -189,7 +267,7 @@ export default function ShowAllEvents() {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <input
                     type="text"
-                    placeholder="Search events by name, department or collector..."
+                    placeholder="Search by event ID or event name..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -214,7 +292,20 @@ export default function ShowAllEvents() {
                   </select>
                 </div>
               </div>
+              {(searchTerm || statusFilter !== "ALL") && (
+                <button
+                  onClick={handleClearFilters}
+                  className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors whitespace-nowrap"
+                >
+                  Clear Filters
+                </button>
+              )}
             </div>
+            {(searchTerm || statusFilter !== "ALL") && (
+              <p className="text-sm text-gray-600 mt-2">
+                Found {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''}
+              </p>
+            )}
           </div>
 
           {/* Events Table */}
@@ -226,7 +317,6 @@ export default function ShowAllEvents() {
                     <th className="p-4 border border-gray-400 text-left font-bold">Event ID</th>
                     <th className="p-4 border border-gray-400 text-left font-bold">Event Details</th>
                     <th className="p-4 border border-gray-400 text-left font-bold">Department</th>
-
                     <th className="p-4 border border-gray-400 text-center font-bold">Status</th>
                     <th className="p-4 border border-gray-400 text-center font-bold">Sub Events</th>
                     <th className="p-4 border border-gray-400 text-left font-bold">Vehicles</th>
@@ -234,93 +324,157 @@ export default function ShowAllEvents() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {filteredEvents.map((event, index) => (
-                    <tr key={event.id} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
-                      <td className="p-4 border border-gray-300">
-                        <div className="font-bold text-blue-900">{event.id}</div>
-                        <div className="text-xs text-gray-500">
-                          {new Date(event.createdAt).toLocaleDateString('en-IN')}
-                        </div>
-                      </td>
-                      <td className="p-4 border border-gray-300">
-                        <div className="font-semibold text-gray-900">{event.requestEventName}</div>
-                        <div className="text-sm text-gray-600">Letter: {event.requestEventLetterNo}</div>
-
-                      </td>
-                      <td className="p-4 border border-gray-300 font-medium text-gray-700">
-                        {event.requestingDepartment}
-                      </td>
-
-                      <td className="p-4 border border-gray-300 text-center">
-                        <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold border ${getStatusColor(event.status)}`}>
-                          {getStatusIcon(event.status)}
-                          {getStatusDisplayName(event.status)}
-                        </span>
-                      </td>
-                      <td className="p-4 border border-gray-300 text-center">
-                        <span className="bg-purple-100 text-purple-800 px-1 py-1 rounded-full text-[10px] font-bold border border-purple-300">
-                          {event.subEvents?.length || 0} Events
-                        </span>
-                      </td>
-                      <td className="p-4 border border-gray-300">
-                        <div className="text-sm space-y-1">
-                          {event.subEvents && event.subEvents[0]?.vehicles?.slice(0, 2).map((v, idx) => (
-                            <div
-                              key={idx}
-                              className="flex justify-between items-center px-2 py-1 rounded"
-                            >
-                              <span
-                                className="truncate text-xs max-w-[100px] block"
-                                title={v.vehicleName} // shows full name on hover
-                              >
-                                {v.vehicleName}
-                              </span>
-                              <span className="font-semibold text-xs">×{v.quantity}</span>
-                            </div>
-                          ))}
-                          {event.subEvents && event.subEvents[0]?.vehicles?.length > 2 && (
-                            <div className="text-xs text-blue-600 font-medium">
-                              +{event.subEvents[0].vehicles.length - 2} more
-                            </div>
-                          )}
-                        </div>
-                      </td>
-
-                      <td className="p-4 border border-gray-300">
-                        <div className="flex gap-2 justify-center flex-wrap">
-                          <button
-                            onClick={() => handleViewDetails(event)}
-                            className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-colors"
-                            title="View Details"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-
-                          <button
-                            onClick={() => handleViewPdf(event)}
-                            className="bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 transition-colors"
-                            title="View PDF"
-                          >
-                            <FileText className="w-4 h-4" />
-                          </button>
+                  {currentEvents.length === 0 ? (
+                    <tr>
+                      <td colSpan="7" className="p-12 text-center">
+                        <div className="text-gray-500">
+                          <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                          <h3 className="text-lg font-medium mb-2">No events found</h3>
+                          <p>No events match your search criteria.</p>
                         </div>
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    currentEvents.map((event, index) => (
+                      <tr key={event.id} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
+                        <td className="p-4 border border-gray-300">
+                          <div className="font-bold text-blue-900">{event.id}</div>
+                          <div className="text-xs text-gray-500">
+                            {new Date(event.createdAt).toLocaleDateString('en-IN')}
+                          </div>
+                        </td>
+                        <td className="p-4 border border-gray-300">
+                          <div className="font-semibold text-gray-900">{event.requestEventName}</div>
+                          <div className="text-sm text-gray-600">Letter: {event.requestEventLetterNo}</div>
+                        </td>
+                        <td className="p-4 border border-gray-300 font-medium text-gray-700">
+                          {event.requestingDepartment}
+                        </td>
+                        <td className="p-4 border border-gray-300 text-center">
+                          <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold border ${getStatusColor(event.status)}`}>
+                            {getStatusIcon(event.status)}
+                            {getStatusDisplayName(event.status)}
+                          </span>
+                        </td>
+                        <td className="p-4 border border-gray-300 text-center">
+                          <span className="bg-purple-100 text-purple-800 px-1 py-1 rounded-full text-[10px] font-bold border border-purple-300">
+                            {event.subEvents?.length || 0} Events
+                          </span>
+                        </td>
+                        <td className="p-4 border border-gray-300">
+                          <div className="text-sm space-y-1">
+                            {event.subEvents && event.subEvents[0]?.vehicles?.slice(0, 2).map((v, idx) => (
+                              <div
+                                key={idx}
+                                className="flex justify-between items-center px-2 py-1 rounded"
+                              >
+                                <span
+                                  className="truncate text-xs max-w-[100px] block"
+                                  title={v.vehicleName}
+                                >
+                                  {v.vehicleName}
+                                </span>
+                                <span className="font-semibold text-xs">×{v.quantity}</span>
+                              </div>
+                            ))}
+                            {event.subEvents && event.subEvents[0]?.vehicles?.length > 2 && (
+                              <div className="text-xs text-blue-600 font-medium">
+                                +{event.subEvents[0].vehicles.length - 2} more
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                        <td className="p-4 border border-gray-300">
+                          <div className="flex gap-2 justify-center flex-wrap">
+                            <button
+                              onClick={() => handleViewDetails(event)}
+                              className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-colors"
+                              title="View Details"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleViewPdf(event)}
+                              className="bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 transition-colors"
+                              title="View PDF"
+                            >
+                              <FileText className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
-
-              {filteredEvents.length === 0 && (
-                <div className="text-center py-12 bg-gray-50">
-                  <div className="text-gray-500">
-                    <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                    <h3 className="text-lg font-medium mb-2">No events found</h3>
-                    <p>No events match your current search criteria.</p>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
+
+          {/* Pagination Section */}
+          {filteredEvents.length > 0 && (
+            <div className="bg-gray-50 border-t border-gray-200 p-4">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                {/* Results Info */}
+                <div className="text-sm text-gray-600">
+                  Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredEvents.length)} of {filteredEvents.length} events
+                </div>
+
+                {/* Pagination Controls */}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handlePrevPage}
+                    disabled={currentPage === 1}
+                    className={`p-2 rounded-lg ${
+                      currentPage === 1
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                    }`}
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+
+                  {getPageNumbers().map((pageNum, index) => (
+                    <button
+                      key={index}
+                      onClick={() => pageNum !== '...' && handlePageChange(pageNum)}
+                      disabled={pageNum === '...'}
+                      className={`px-4 py-2 rounded-lg font-semibold ${
+                        pageNum === currentPage
+                          ? 'bg-blue-600 text-white'
+                          : pageNum === '...'
+                          ? 'bg-transparent text-gray-400 cursor-default'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                    className={`p-2 rounded-lg ${
+                      currentPage === totalPages
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                    }`}
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Status Summary */}
+                <div className="flex gap-3 text-sm">
+                  <span className="text-yellow-700">
+                    Created: {events.filter(e => e.status === 'CREATED').length}
+                  </span>
+                  <span className="text-purple-700">
+                    Completed: {events.filter(e => e.status === 'COMPLETED').length}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -361,8 +515,6 @@ export default function ShowAllEvents() {
                 </div>
 
                 <div className="space-y-4">
-
-
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
                     <label className="font-semibold text-gray-700 block mb-1">Status:</label>
                     <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold border ${getStatusColor(selectedEvent.status)}`}>
@@ -374,7 +526,7 @@ export default function ShowAllEvents() {
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
                     <label className="font-semibold text-gray-700 block mb-1">Created:</label>
                     <p className="text-gray-900">{new Date(selectedEvent.createdAt).toLocaleString('en-IN')}</p>
-                    <p className="text-sm text-gray-600 mt-1">By: {selectedEvent.createdByOfficeName}</p>
+                    <p className="text-sm text-gray-600 mt-1">By: {selectedEvent.createdByName}</p>
                   </div>
                 </div>
               </div>

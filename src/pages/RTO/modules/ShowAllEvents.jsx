@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Search, Filter, Eye, Edit, FileText, CheckCircle, XCircle, Clock, Download, X, ChevronDown, ChevronRight, MapPin, Calendar, Car } from "lucide-react";
+import { Search, Filter, Eye, Edit, FileText, CheckCircle, XCircle, Clock, Download, X, ChevronDown, ChevronRight, MapPin, Calendar, Car, ChevronLeft, ChevronRight as ChevronRightIcon } from "lucide-react";
 import { eventAPI } from "../../../apis/apiService";
 import EventUtilizationPDFViewer from "./EventUtilizationPDFViewer";
 import logo from '../../../assests/logo.png';
@@ -13,6 +13,10 @@ export default function ShowAllEvents() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expandedEventId, setExpandedEventId] = useState(null);
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(2);
 
   // PDF Modal states
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
@@ -43,11 +47,14 @@ export default function ShowAllEvents() {
   useEffect(() => {
     let filtered = events;
 
+   
     if (searchTerm) {
       filtered = filtered.filter(event =>
         event.requestEventName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.id.toString().includes(searchTerm) ||
         event.requestingDepartment.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (event.collectorName && event.collectorName.toLowerCase().includes(searchTerm.toLowerCase()))
+        (event.collectorName && event.collectorName.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        event.requestEventLetterNo.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -56,7 +63,70 @@ export default function ShowAllEvents() {
     }
 
     setFilteredEvents(filtered);
+    setCurrentPage(1); 
   }, [searchTerm, statusFilter, events]);
+
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentEvents = filteredEvents.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
+
+ 
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxPagesToShow = 5;
+    
+    if (totalPages <= maxPagesToShow) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+        pages.push('...');
+        pages.push(currentPage - 1);
+        pages.push(currentPage);
+        pages.push(currentPage + 1);
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -88,69 +158,14 @@ export default function ShowAllEvents() {
     setSelectedEvent(event);
   };
 
-  // Convert event data to PDF format
-  const convertEventToPdfData = (event) => {
-    return {
-      id: event.id,
-      eventId: event.id,
-      eventName: event.requestEventName,
-      requestingDepartment: event.requestingDepartment,
-      totalCost: getTotalCost(event),
-      remarks: event.remarks || "Event requisition request",
-      utilizationStatus: event.status,
-      collectorApprovedByName: event.collectorName || "Pending Approval",
-      createdAt: event.createdAt,
-      dateOfReporting: event.subEvents?.[0]?.reportingDate || event.createdAt,
-      dateOfRelease: event.subEvents?.[event.subEvents?.length - 1]?.reportingDate || event.createdAt,
-      district: event.collectorDistrict || "Ganjam",
-      collectorPhone: "+91-9876543210",
-      collectorEmail: "collector@odisha.gov.in",
-      createdByName: event.createdByName || "RTO Officer",
-      createdByRole: event.createdByRole || "RTO",
-      requestEventLetterNo: event.requestEventLetterNo,
-      subEventUtilizations: event.subEvents?.map((subEvent, idx) => ({
-        id: subEvent.id,
-        subEventId: subEvent.id,
-        subEventPlace: subEvent.place,
-        subEventReportingDate: subEvent.reportingDate,
-        subEventStartTime: subEvent.startTime,
-        vehicleUtilizations: subEvent.vehicles?.map((vehicle, vIdx) => ({
-          id: `${subEvent.id}_${vIdx}`,
-          vehicleId: vIdx + 1,
-          vehicleName: vehicle.vehicleName,
-          actualQuantity: vehicle.quantity,
-          totalCost: vehicle.estimatedCost || 0,
-          utilizationNotes: `Requisition for ${event.requestEventName}`,
-          fuelConsumed: Math.round(vehicle.quantity * 15), // Demo calculation
-          kilometersRun: Math.round(vehicle.quantity * 50), // Demo calculation
-          driverDetails: `Driver: Demo Driver ${vIdx + 1}, Ph: 987654321${vIdx}`
-        })) || []
-      })) || []
-    };
-  };
-
-  const getTotalCost = (event) => {
-    return event.subEvents?.reduce((total, subEvent) => {
-      return total + (subEvent.vehicles?.reduce((subTotal, vehicle) => {
-        return subTotal + (vehicle.estimatedCost || vehicle.quantity * 500); // Demo cost calculation
-      }, 0) || 0);
-    }, 0) || 0;
-  };
-
   const handleViewPdf = (eventId) => {
     setCurrentEventForPdf(eventId);
     setPdfModalOpen(true);
   };
 
-
-
   const closePdfModal = () => {
     setPdfModalOpen(false);
     setCurrentEventForPdf(null);
-  };
-
-  const canEdit = (event) => {
-    return event.status !== "COMPLETED" && event.status !== "REJECTED";
   };
 
   const getStatusDisplayName = (status) => {
@@ -165,6 +180,13 @@ export default function ShowAllEvents() {
     return event.subEvents?.reduce((total, subEvent) => {
       return total + subEvent.vehicles.reduce((sum, v) => sum + v.quantity, 0);
     }, 0) || 0;
+  };
+
+  // Clear all filters
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    setStatusFilter("ALL");
+    setCurrentPage(1);
   };
 
   if (loading) {
@@ -199,7 +221,7 @@ export default function ShowAllEvents() {
               </div>
             </div>
             <div className="mt-3 pt-3 border-t border-blue-700">
-              <h3 className="text-lg font-semibold tracking-wide"> EVENT MANAGEMENT SYSTEM</h3>
+              <h3 className="text-lg font-semibold tracking-wide">EVENT MANAGEMENT SYSTEM</h3>
             </div>
           </div>
         </div>
@@ -220,7 +242,7 @@ export default function ShowAllEvents() {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <input
                     type="text"
-                    placeholder="Search events by name, department, or collector..."
+                    placeholder="Search by event ID, name, letter no, department, or collector..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -245,6 +267,14 @@ export default function ShowAllEvents() {
                   </select>
                 </div>
               </div>
+              {(searchTerm || statusFilter !== "ALL") && (
+                <button
+                  onClick={handleClearFilters}
+                  className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                >
+                  Clear Filters
+                </button>
+              )}
             </div>
           </div>
 
@@ -264,7 +294,7 @@ export default function ShowAllEvents() {
                 </tr>
               </thead>
               <tbody>
-                {filteredEvents.map((event, index) => (
+                {currentEvents.map((event, index) => (
                   <React.Fragment key={event.id}>
                     {/* Main Event Row */}
                     <tr className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-blue-50 transition-colors border-b border-gray-200`}>
@@ -281,15 +311,13 @@ export default function ShowAllEvents() {
                         </button>
                       </td>
                       <td className="p-4 border-r border-gray-200">
-
-                        <div className="text-lg text-gray-900 font-bold">
+                        <div className="text-lg text-gray-900 font-semibold">
                           {event.id}
                         </div>
                       </td>
                       <td className="p-4 border-r border-gray-200">
                         <div className="font-semibold text-gray-900">{event.requestEventName}</div>
                         <div className="text-xs text-gray-500">Letter No: {event.requestEventLetterNo}</div>
-
                       </td>
                       <td className="p-4 border-r border-gray-200 font-medium text-gray-700">
                         {event?.requestingDepartment}
@@ -336,7 +364,7 @@ export default function ShowAllEvents() {
                     {/* Expanded Sub-Events Row */}
                     {expandedEventId === event.id && (
                       <tr>
-                        <td colSpan="7" className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6">
+                        <td colSpan="8" className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6">
                           <div className="space-y-4">
                             <h4 className="text-lg font-bold text-blue-900 mb-4 flex items-center">
                               <Calendar className="w-5 h-5 mr-2" />
@@ -366,11 +394,6 @@ export default function ShowAllEvents() {
                                       <span className="font-semibold text-gray-700 mr-2">Date:</span>
                                       <span className="text-gray-900">{new Date(subEvent.reportingDate).toLocaleDateString('en-GB')}</span>
                                     </div>
-                                    {/* <div className="flex items-center text-sm">
-                                      <Clock className="w-4 h-4 mr-2 text-blue-600" />
-                                      <span className="font-semibold text-gray-700 mr-2">Time:</span>
-                                      <span className="text-gray-900">{subEvent.startTime}</span>
-                                    </div> */}
                                   </div>
 
                                   <div className="border-t border-gray-200 pt-3">
@@ -404,7 +427,7 @@ export default function ShowAllEvents() {
               </tbody>
             </table>
 
-            {filteredEvents.length === 0 && (
+            {currentEvents.length === 0 && (
               <div className="text-center py-12 bg-gray-50">
                 <div className="text-gray-500">
                   <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
@@ -415,25 +438,71 @@ export default function ShowAllEvents() {
             )}
           </div>
 
-          {/* Summary Footer */}
-          <div className="bg-blue-50 border-t border-blue-200 p-4">
-            <div className="flex justify-between items-center text-sm">
-              <div className="text-blue-700">
-                Showing {filteredEvents.length} of {events.length} events
-              </div>
-              <div className="flex gap-4">
-                <span className="text-blue-700">
-                  Created: {events.filter(e => e.status === 'CREATED').length}
-                </span>
-                <span className="text-green-700">
-                  Approved: {events.filter(e => e.status === 'APPROVED').length}
-                </span>
-                <span className="text-red-700">
-                  Rejected: {events.filter(e => e.status === 'REJECTED').length}
-                </span>
+          {/* Pagination Section */}
+          {filteredEvents.length > 0 && (
+            <div className="bg-gray-50 border-t border-gray-200 p-4">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                {/* Results Info */}
+                <div className="text-sm text-gray-600">
+                  Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredEvents.length)} of {filteredEvents.length} events
+                </div>
+
+                {/* Pagination Controls */}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handlePrevPage}
+                    disabled={currentPage === 1}
+                    className={`p-2 rounded-lg ${
+                      currentPage === 1
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                    }`}
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+
+                  {getPageNumbers().map((pageNum, index) => (
+                    <button
+                      key={index}
+                      onClick={() => pageNum !== '...' && handlePageChange(pageNum)}
+                      disabled={pageNum === '...'}
+                      className={`px-4 py-2 rounded-lg font-semibold ${
+                        pageNum === currentPage
+                          ? 'bg-blue-600 text-white'
+                          : pageNum === '...'
+                          ? 'bg-transparent text-gray-400 cursor-default'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                    className={`p-2 rounded-lg ${
+                      currentPage === totalPages
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                    }`}
+                  >
+                    <ChevronRightIcon className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Status Summary */}
+                <div className="flex gap-4 text-sm">
+                  <span className="text-yellow-700">
+                    Created: {events.filter(e => e.status === 'CREATED').length}
+                  </span>
+                  <span className="text-green-700">
+                    Completed: {events.filter(e => e.status === 'COMPLETED').length}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
@@ -443,7 +512,7 @@ export default function ShowAllEvents() {
           <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="bg-blue-900 text-white p-6 rounded-t-lg">
               <div className="flex justify-between items-center">
-                <h3 className="text-xl font-semibold">Event Details - EV{String(selectedEvent.id).padStart(3, '0')}</h3>
+                <h3 className="text-xl font-semibold">Event Details - ID #{selectedEvent.id}</h3>
                 <button
                   onClick={() => setSelectedEvent(null)}
                   className="text-white hover:text-gray-300 p-1"
@@ -490,7 +559,6 @@ export default function ShowAllEvents() {
 
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
                     <label className="font-semibold text-gray-700 block mb-1">Created By:</label>
-                    {/* <p className="text-gray-900">{selectedEvent?.createdByOfficeName}</p> */}
                     <p className="text-gray-900">{selectedEvent?.createdByName}</p>
                     <p className="text-sm text-gray-600">{selectedEvent?.createdByRole}</p>
                   </div>
@@ -531,11 +599,6 @@ export default function ShowAllEvents() {
                           <span className="font-semibold mr-1">Date:</span>
                           <span>{new Date(subEvent.reportingDate).toLocaleDateString('en-GB')}</span>
                         </div>
-                        {/* <div className="flex items-center text-sm">
-                          <Clock className="w-4 h-4 mr-2 text-purple-600" />
-                          <span className="font-semibold mr-1">Time:</span>
-                          <span>{subEvent.startTime}</span>
-                        </div> */}
                       </div>
 
                       <div className="border-t border-gray-200 pt-3">
@@ -564,25 +627,6 @@ export default function ShowAllEvents() {
             <div className="bg-gray-100 p-4 rounded-b-lg">
               <div className="flex justify-end gap-3">
                 <button
-                  onClick={() => handleViewPdf(selectedEvent)}
-                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
-                >
-                  <FileText className="w-4 h-4" />
-                  View PDF
-                </button>
-                {canEdit(selectedEvent) && (
-                  <button
-                    onClick={() => {
-                      console.log('Edit event', selectedEvent.id);
-                      setSelectedEvent(null);
-                    }}
-                    className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors flex items-center gap-2"
-                  >
-                    <Edit className="w-4 h-4" />
-                    Edit Event
-                  </button>
-                )}
-                <button
                   onClick={() => setSelectedEvent(null)}
                   className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
                 >
@@ -594,14 +638,11 @@ export default function ShowAllEvents() {
         </div>
       )}
 
-
       <EventUtilizationPDFViewer
-        eventId={currentEventForPdf}  // Now it's eventId instead of eventData
+        eventId={currentEventForPdf}
         isOpen={pdfModalOpen}
         onClose={closePdfModal}
       />
-
-
 
       {/* Footer */}
       <div className="bg-blue-900 text-white p-4 text-center text-sm mt-8">

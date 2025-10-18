@@ -367,7 +367,7 @@ import { requestEventAPI } from "../../../apis/apiService";
 export default function ViewCollectorRequests() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filterStatus, setFilterStatus] = useState("ALL");
+  const [filterStatus, setFilterStatus] = useState("CREATED");
   const [viewingPdf, setViewingPdf] = useState(null);
 
   useEffect(() => {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Search, Eye, CheckCircle, XCircle, IndianRupee, FileText, Calendar, Plus, Wallet, CreditCard, Building2, Receipt, DollarSign, AlertCircle, CloudCog } from "lucide-react";
+import { Search, Eye, CheckCircle, XCircle, IndianRupee, FileText, Calendar, Plus, Wallet, CreditCard, Building2, Receipt, DollarSign, AlertCircle, CloudCog, ChevronLeft, ChevronRight } from "lucide-react";
 import { billSanctionAPI, utilizationAPI, advancePaymentAPI } from "../../../apis/apiService";
 import logo from '../../../assests/logo.png';
 
@@ -215,8 +215,10 @@ const BillSanction = () => {
   const [selectedBills, setSelectedBills] = useState([]);
   const [userRole, setUserRole] = useState('COMMISSIONER');
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
-  console.log(selectedUtilization,"selectedUtilization")
   useEffect(() => {
     fetchData();
     getUserRole();
@@ -240,9 +242,6 @@ const BillSanction = () => {
         billSanctionAPI.list(),
         advancePaymentAPI.list()
       ]);
-
-      //  console.log("Bills:", billsResponse.data);
-      //  console.log("Advance Requests:", advanceRequestsResponse.data);
 
       setUtilizations(utilizationsResponse.data);
       setBills(billsResponse.data);
@@ -271,30 +270,22 @@ const BillSanction = () => {
     }, {});
 
     let combinedData = utilizations.map(util => {
-      // Find all advance requests for this event
-      // console.log(util,'utilsss')
       const eventAdvanceRequests = advanceRequestsByEvent[util.eventId] || [];
       const totalAdvanceRequested = eventAdvanceRequests
         .filter(ar => ar.status === 'APPROVED')
         .reduce((sum, ar) => sum + ar.requestedAmount, 0);
 
-
-        console.log(bills,'billsssss')
-      // Find all bills for advance requests of this event
       const advanceBills = bills.filter(b =>
         eventAdvanceRequests.some(ar => ar.id === b.advancePaymentRequestId) &&
-        ( b.type === 'PARTIAL_PAYMENT_ADVANCE' || b.type === 'ADVANCE' || b.type === 'FINAL' )
+        (b.type === 'PARTIAL_PAYMENT_ADVANCE' || b.type === 'ADVANCE' || b.type === 'FINAL')
       );
-      console.log(advanceBills,'advanceBills')
       const totalAdvanceSanctioned = advanceBills.reduce((sum, b) => sum + b.amount, 0);
-
 
       const eventBills = billsByEvent[util.eventId] || [];
       const utilizationBills = eventBills.filter(b => !b.advancePaymentRequestId);
       const totalUtilizationBilled = utilizationBills.reduce((sum, b) => sum + b.amount, 0);
 
       const remainingAmount = util.totalCost - totalAdvanceRequested - totalUtilizationBilled;
-
 
       const canSanctionFinal = totalAdvanceRequested === 0 || totalAdvanceRequested === totalAdvanceSanctioned;
 
@@ -311,11 +302,16 @@ const BillSanction = () => {
       };
     });
 
+    // Enhanced search filter - search by event name, RTO name, RTO office name, and ID
     if (searchTerm) {
       combinedData = combinedData.filter(
         (item) =>
           item.eventName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.requestingDepartment?.toLowerCase().includes(searchTerm.toLowerCase())
+          item.requestingDepartment?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.rtoName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.rtoOfficeName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.id?.toString().includes(searchTerm) ||
+          item.eventId?.toString().includes(searchTerm)
       );
     }
 
@@ -327,8 +323,71 @@ const BillSanction = () => {
         return true;
       });
     }
-    console.log(combinedData, "filtred datata")
+
     setFilteredData(combinedData);
+    setCurrentPage(1); 
+  };
+
+  // Pagination calculations
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+  // Pagination handlers
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxPagesToShow = 5;
+    
+    if (totalPages <= maxPagesToShow) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+        pages.push('...');
+        pages.push(currentPage - 1);
+        pages.push(currentPage);
+        pages.push(currentPage + 1);
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
   };
 
   const handleCreateBill = async (billData) => {
@@ -374,8 +433,6 @@ const BillSanction = () => {
     setSelectedUtilization(null);
     setSelectedBills([]);
   };
-
-  console.log(selectedBills,"seleectedbils")
 
   const getStatusBadge = (status) => {
     const statusStyles = {
@@ -424,7 +481,7 @@ const BillSanction = () => {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto p-6">
-        {/* Search and Filter */} 
+        {/* Search and Filter */}
         <div className="bg-white p-6 rounded-lg shadow-md mb-6">
           <div className="flex flex-col md:flex-row gap-4 mb-4">
             <div className="flex-1">
@@ -432,7 +489,7 @@ const BillSanction = () => {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
                   type="text"
-                  placeholder="Search by event name or department..."
+                  placeholder="Search by event name, RTO name, ID, or department..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
@@ -452,6 +509,11 @@ const BillSanction = () => {
               </select>
             </div>
           </div>
+          {searchTerm && (
+            <p className="text-sm text-gray-600 mt-2">
+              Found {filteredData.length} utilization{filteredData.length !== 1 ? 's' : ''}
+            </p>
+          )}
         </div>
 
         {/* Main Table */}
@@ -469,9 +531,11 @@ const BillSanction = () => {
             <div className="text-center py-8">
               <p className="text-gray-500">Loading data...</p>
             </div>
-          ) : filteredData.length === 0 ? (
+          ) : currentItems.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-500">No utilizations found</p>
+              <p className="text-gray-500">
+                {searchTerm || statusFilter !== "all" ? "No utilizations match your search criteria" : "No utilizations found"}
+              </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -481,13 +545,13 @@ const BillSanction = () => {
                     <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase">Event Details</th>
                     <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase">RTO</th>
                     <th className="px-6 py-4 text-right text-sm font-bold text-gray-700 uppercase">Financial Summary</th>
-                    {/* <th className="px-6 py-4 text-center text-sm font-bold text-gray-700 uppercase">Status</th> */}
                     <th className="px-6 py-4 text-center text-sm font-bold text-gray-700 uppercase">Bills</th>
                     <th className="px-6 py-4 text-center text-sm font-bold text-gray-700 uppercase">Actions</th>
+                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-700 uppercase">Remark</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {filteredData.map((item, index) => (
+                  {currentItems.map((item, index) => (
                     <tr key={item.id} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
                       <td className="px-6 py-5">
                         <div>
@@ -496,12 +560,16 @@ const BillSanction = () => {
                             <Calendar className="w-3 h-3" />
                             {new Date(item.createdAt).toLocaleDateString()}
                           </div>
+                          <div className="text-xs text-gray-400 mt-1">ID: {item.id}</div>
                         </div>
                       </td>
                       <td className="px-6 py-5">
                         <div className="flex items-center gap-2">
                           <Building2 className="w-4 h-4 text-gray-400" />
-                          <span className="font-semibold text-gray-900">{item.rtoOfficeName}</span>
+                          <div>
+                            <span className="font-semibold text-gray-900 block">{item.rtoOfficeName}</span>
+                            <span className="text-xs text-gray-500">{item.rtoName}</span>
+                          </div>
                         </div>
                       </td>
                       <td className="px-6 py-5 text-right">
@@ -509,6 +577,10 @@ const BillSanction = () => {
                           <div className="flex justify-between">
                             <span className="text-gray-600">Total Cost:</span>
                             <span className="font-bold text-gray-900">₹{item.totalCost?.toLocaleString('en-IN')}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600 text-xs">Total Amount Sanctioned:</span>
+                            <span className="font-bold text-green-600">₹{item?.totalBilled?.toLocaleString('en-IN')}</span>
                           </div>
                           {item.totalAdvanceRequested > 0 && (
                             <div className="flex justify-between">
@@ -520,25 +592,8 @@ const BillSanction = () => {
                             <span className="text-gray-600 text-xs font-semibold">Advance Amount Sanctioned:</span>
                             <span className="font-bold text-emerald-600">₹{item.totalAdvanceSanctioned?.toLocaleString('en-IN')}</span>
                           </div>
-
                         </div>
                       </td>
-                      {/* <td className="px-6 py-5 text-center">
-                        <div className="flex flex-col items-center gap-1">
-                          {item.totalAdvanceRequested > 0 && (
-                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                              item.canSanctionFinal ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                            }`}>
-                              {item.canSanctionFinal ? 'Advance Complete' : 'Advance Pending'}
-                            </span>
-                          )}
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            item.remainingAmount <= 0 ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
-                          }`}>
-                            {item.remainingAmount <= 0 ? 'Fully Sanctioned' : 'Partial'}
-                          </span>
-                        </div>
-                      </td> */}
                       <td className="px-6 py-5 text-center">
                         <span className="inline-flex items-center gap-1 bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-3 py-1.5 rounded-full text-sm font-bold shadow-md">
                           <Receipt className="w-3 h-3" />
@@ -559,20 +614,89 @@ const BillSanction = () => {
                               onClick={() => openBillModal(item)}
                               className="p-3 text-emerald-600 bg-blue-600 gap-1 flex items-center justify-center hover:bg-emerald-800 hover:cursor-pointer rounded-xl transition-all shadow-sm hover:shadow-md"
                               title="Create Final Bill"
-                            ><span className="text-xs text-gray-50 font-bold">Sanction Amount</span><IndianRupee className="h-4 w-4 text-white"/>
+                            ><span className="text-xs text-gray-50 font-bold">Sanction Amount</span><IndianRupee className="h-4 w-4 text-white" />
                             </button>
                           )}
                           {item.remainingAmount > 0 && !item.canSanctionFinal && (
                             <div className="p-3 text-emerald-600 bg-blue-600 gap-1 flex items-center justify-center hover:bg-emerald-800  rounded-xl transition-all shadow-sm hover:shadow-md cursor-not-allowed" title="Complete advance payments first">
-                              <span className="text-xs text-gray-500">Sanction Amount</span><IndianRupee className="h-4 w-4 text-gray-500"/>
+                              <span className="text-xs text-gray-500">Sanction Amount</span><IndianRupee className="h-4 w-4 text-gray-500" />
                             </div>
                           )}
                         </div>
+                      </td>
+                      <td className="px-4 py-4 text-center border-r border-gray-200">
+                        {item?.totalCost === item?.totalBilled ? (
+                          <span className="inline-flex items-center bg-green-100 text-green-800 px-3 py-1 rounded text-xs font-bold border border-green-300">
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            FULLY SANCTIONED
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center bg-yellow-100 text-yellow-800 px-3 py-1 rounded text-xs font-bold border border-yellow-300">
+                            <AlertCircle className="w-3 h-3 mr-1" />
+                            PARTIALLY SANCTIONED
+                          </span>
+                        )}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+
+          {/* Pagination Section */}
+          {filteredData.length > 0 && (
+            <div className="bg-gray-50 border-t border-gray-200 p-4">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                {/* Results Info */}
+                <div className="text-sm text-gray-600">
+                  Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredData.length)} of {filteredData.length} utilizations
+                </div>
+
+                {/* Pagination Controls */}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handlePrevPage}
+                    disabled={currentPage === 1}
+                    className={`p-2 rounded-lg ${
+                      currentPage === 1
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                    }`}
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+
+                  {getPageNumbers().map((pageNum, index) => (
+                    <button
+                      key={index}
+                      onClick={() => pageNum !== '...' && handlePageChange(pageNum)}
+                      disabled={pageNum === '...'}
+                      className={`px-4 py-2 rounded-lg font-semibold ${
+                        pageNum === currentPage
+                          ? 'bg-blue-600 text-white'
+                          : pageNum === '...'
+                          ? 'bg-transparent text-gray-400 cursor-default'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                    className={`p-2 rounded-lg ${
+                      currentPage === totalPages
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                    }`}
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -622,7 +746,7 @@ const BillSanction = () => {
                     <span className="font-medium text-gray-600">Total Sanctioned:</span>
                     <p className="text-green-600 font-bold">₹{selectedUtilization?.totalBilled?.toLocaleString('en-IN')}</p>
                   </div>
-                     <div>
+                  <div>
                     <span className="font-medium text-gray-600">Total Sanctioned(For Advance):</span>
                     <p className="text-green-600 font-bold">₹{selectedUtilization?.totalAdvanceSanctioned?.toLocaleString('en-IN')}</p>
                   </div>
@@ -673,12 +797,6 @@ const BillSanction = () => {
                           <span className="font-medium text-gray-600">Created For:</span>
                           <p className="text-gray-800">{bill.cretedByRto}</p>
                         </div>
-                        {/* <div>
-                          <span className="font-medium text-gray-600">Created Date:</span>
-                          <p className="text-gray-800">
-                            {new Date(bill.createdAt).toLocaleDateString('en-IN')}
-                          </p>
-                        </div> */}
 
                         {bill.collectorApprovedByName && (
                           <>

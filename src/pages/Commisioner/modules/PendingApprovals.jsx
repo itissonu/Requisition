@@ -317,10 +317,10 @@ export default function CommissionerApproveUtilizations() {
                       <p className="text-sm text-green-700 mb-1 font-semibold">Department</p>
                       <p className="font-bold text-gray-900">{selected.requestingDepartment}</p>
                     </div>
-                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border-l-4 border-purple-500">
+                    {/* <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border-l-4 border-purple-500">
                       <p className="text-sm text-purple-700 mb-1 font-semibold">Approved By</p>
                       <p className="font-bold text-gray-900">{selected.collectorApprovedByName}</p>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 
@@ -354,10 +354,10 @@ export default function CommissionerApproveUtilizations() {
                                   <Calendar className="w-4 h-4" />
                                   <span>{subEvent.subEventReportingDate}</span>
                                 </div>
-                                <div className="flex items-center gap-1">
+                                {/* <div className="flex items-center gap-1">
                                   <Clock className="w-4 h-4" />
                                   <span>{subEvent.subEventStartTime} {subEvent.subEventEndTime && `- ${subEvent.subEventEndTime}`}</span>
-                                </div>
+                                </div> */}
                               </div>
                             </div>
                             <div className="bg-yellow-400 text-purple-900 px-4 py-2 rounded-lg font-bold text-lg">

@@ -56,7 +56,7 @@ const [stats, setStats] = useState({
 
       // Total amount that needs to be sanctioned (approved utilizations - bills created)
       const approvedUtilizations = utilizations.filter(u =>
-        u.utilizationStatus === 'COMMISSIONER_APPROVED'
+        u.utilizationStatus === 'COMMISSIONER_APPROVED' || u.utilizationStatus === 'COMPLETED'
       );
 
       const totalUtilizationAmount = approvedUtilizations.reduce((sum, u) =>
@@ -70,7 +70,7 @@ const [stats, setStats] = useState({
       ).length;
 
       const pendingBills = bills.filter(b =>
-        b.status === 'CREATED' || b.status === 'COLLECTOR_APPROVED'
+        b.status === 'CREATED' || b.status === 'COLLECTOR_APPROVED' || b.status === 'COMPLETED'
       ).length;
 
       const advancePaymentsRequested = advancePayments.filter(ap =>

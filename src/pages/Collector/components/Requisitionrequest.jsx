@@ -44,12 +44,15 @@ export default function UploadLetterToRTO() {
 
   const file = watch("letterFile");
 
+
+  
   useEffect(() => {
     const fetchRtos = async () => {
       try {
         setFetchingRtos(true);
         const response = await userAPI.getRtosInMyDistrict();
         const districtRtos = response.data;
+        console.log(districtRtos,'districtRtos');
         setRtos(districtRtos);
 
         if (districtRtos.length === 1) {
@@ -224,7 +227,7 @@ export default function UploadLetterToRTO() {
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   <User className="w-4 h-4 inline mr-2 text-blue-900" />
-                  Select Regional Transport Officer
+                  Select RTO
                   <span className="text-red-600 ml-1">*</span>
                 </label>
                 <select
@@ -234,7 +237,7 @@ export default function UploadLetterToRTO() {
                   <option value="">-- Please Select --</option>
                   {rtos.map((rto) => (
                     <option key={rto.id} value={rto.id}>
-                      {rto.fullName} - {rto.district || "N/A"}
+                      {rto.fullName} - {rto?.rtoofficeName || "N/A"}
                     </option>
                   ))}
                 </select>
