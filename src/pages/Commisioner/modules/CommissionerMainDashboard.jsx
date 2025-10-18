@@ -28,7 +28,8 @@ const [stats, setStats] = useState({
       const [utilizationsResponse, billsResponse, advancePaymentsResponse] = await Promise.all([
         utilizationAPI.list(),
         billSanctionAPI.list(),
-        advancePaymentAPI.list()
+        advancePaymentAPI.list(),
+        
       ]);
 
       const utilizations = utilizationsResponse.data || [];
@@ -175,13 +176,13 @@ const [stats, setStats] = useState({
       color: "green",
       description: "Bills sanctioned amount"
     },
-    {
-      title: "Amount to Sanction",
-      value: `₹${stats.totalAmountNeedToSanction.toLocaleString('en-IN')}`,
-      icon: IndianRupee,
-      color: "blue",
-      description: "Pending bill sanctions"
-    },
+    // {
+    //   title: "Amount to Sanction",
+    //   value: `₹${stats.totalAmountNeedToSanction.toLocaleString('en-IN')}`,
+    //   icon: IndianRupee,
+    //   color: "blue",
+    //   description: "Pending bill sanctions"
+    // },
     {
       title: " Bills Created",
       value: stats.pendingBills,

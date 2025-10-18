@@ -393,13 +393,13 @@ export default function ShowAllEvents() {
                             >
                               <Eye className="w-4 h-4" />
                             </button>
-                            <button
+                            {/* <button
                               onClick={() => handleViewPdf(event)}
                               className="bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 transition-colors"
                               title="View PDF"
                             >
                               <FileText className="w-4 h-4" />
-                            </button>
+                            </button> */}
                           </div>
                         </td>
                       </tr>
@@ -499,24 +499,24 @@ export default function ShowAllEvents() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
-                    <label className="font-semibold text-gray-700 block mb-1">Event Name:</label>
+                    <label className="font-bold text-gray-700 block mb-1">Event Name:</label>
                     <p className="text-gray-900">{selectedEvent.requestEventName}</p>
                   </div>
 
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
-                    <label className="font-semibold text-gray-700 block mb-1">Letter Number:</label>
+                    <label className="font-bold text-gray-700 block mb-1">Letter Number:</label>
                     <p className="text-gray-900">{selectedEvent.requestEventLetterNo}</p>
                   </div>
 
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
-                    <label className="font-semibold text-gray-700 block mb-1">Department:</label>
+                    <label className="font-bold text-gray-700 block mb-1">Department:</label>
                     <p className="text-gray-900">{selectedEvent.requestingDepartment}</p>
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
-                    <label className="font-semibold text-gray-700 block mb-1">Status:</label>
+                    <label className="font-bold text-gray-700 block mb-1">Status:</label>
                     <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold border ${getStatusColor(selectedEvent.status)}`}>
                       {getStatusIcon(selectedEvent.status)}
                       {getStatusDisplayName(selectedEvent.status)}
@@ -524,7 +524,7 @@ export default function ShowAllEvents() {
                   </div>
 
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
-                    <label className="font-semibold text-gray-700 block mb-1">Created:</label>
+                    <label className="font-bold text-gray-700 block mb-1">Created:</label>
                     <p className="text-gray-900">{new Date(selectedEvent.createdAt).toLocaleString('en-IN')}</p>
                     <p className="text-sm text-gray-600 mt-1">By: {selectedEvent.createdByName}</p>
                   </div>
@@ -539,7 +539,7 @@ export default function ShowAllEvents() {
                     <div key={subEvent.id} className="bg-white p-4 rounded border border-gray-200">
                       <div className="flex items-start justify-between mb-3">
                         <div>
-                          <h4 className="font-semibold text-gray-900">Place: {subEvent.place}</h4>
+                          <h4 className="font-bold text-gray-900">Place: {subEvent.place}</h4>
                           <p className="text-sm text-gray-600 mt-1">
                             Date: {subEvent.reportingDate}
                           </p>
@@ -547,7 +547,7 @@ export default function ShowAllEvents() {
                       </div>
 
                       <div className="mt-3">
-                        <div className="font-semibold text-gray-700 mb-2">Vehicles Required:</div>
+                        <div className="font-bold text-gray-700 mb-2">Vehicles Required:</div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                           {subEvent.vehicles && subEvent.vehicles.map((vehicle) => (
                             <div key={vehicle.id} className="flex justify-between items-center bg-gray-50 p-3 rounded border">
@@ -570,13 +570,13 @@ export default function ShowAllEvents() {
 
             {/* Modal Footer */}
             <div className="bg-gray-100 p-4 rounded-b-lg flex justify-end gap-3">
-              <button
+              {/* <button
                 onClick={() => handleViewPdf(selectedEvent)}
                 className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
               >
                 <FileText className="w-4 h-4" />
                 View PDF
-              </button>
+              </button> */}
               <button
                 onClick={() => setSelectedEvent(null)}
                 className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"

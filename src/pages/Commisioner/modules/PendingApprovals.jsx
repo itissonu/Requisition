@@ -289,7 +289,7 @@ export default function CommissionerApproveUtilizations() {
         {showDetailsModal && selected && (
           <div className="fixed inset-0 bg-black/60 bg-opacity-60 flex items-center justify-center p-4 z-50 overflow-y-auto">
             <div className="bg-white rounded-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl my-8">
-              <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-xl sticky top-0 z-10">
+              <div className="bg-gradient-to-r from-blue-400 to-blue-500 text-white p-6 rounded-t-xl sticky top-0 z-10">
                 <div className="flex justify-between items-center">
                   <div>
                     <h3 className="text-2xl font-bold">Utilization Details</h3>
@@ -297,7 +297,7 @@ export default function CommissionerApproveUtilizations() {
                   </div>
                   <button
                     onClick={() => setShowDetailsModal(false)}
-                    className="text-white hover:bg-blue-700 p-2 rounded-lg transition-colors"
+                    className="text-white hover:bg-blue-600 p-2 rounded-lg transition-colors"
                   >
                     <X className="w-6 h-6" />
                   </button>
@@ -310,7 +310,7 @@ export default function CommissionerApproveUtilizations() {
                   <h4 className="text-lg font-bold text-gray-900 mb-3 border-b-2 border-blue-600 pb-2">Event Information</h4>
                   <div className="grid grid-cols-3 gap-4">
                     <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border-l-4 border-blue-500">
-                      <p className="text-sm text-blue-700 mb-1 font-semibold">Event Name</p>
+                      <p className="text-sm text-blue-500 mb-1 font-semibold">Event Name</p>
                       <p className="font-bold text-gray-900">{selected.eventName}</p>
                     </div>
                     <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border-l-4 border-green-500">
@@ -336,7 +336,7 @@ export default function CommissionerApproveUtilizations() {
                     return (
                       <div key={subEvent.id} className="mb-6 bg-gradient-to-br from-purple-50 to-white rounded-lg border-2 border-purple-200 overflow-hidden">
                         {/* Sub-Event Header */}
-                        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4">
+                        <div className="bg-gradient-to-r from-blue-400 to-blue-500 text-white p-4">
                           <div className="flex justify-between items-center">
                             <div>
                               <div className="flex items-center gap-2">

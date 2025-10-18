@@ -13,12 +13,8 @@ export default function ShowAllEvents() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expandedEventId, setExpandedEventId] = useState(null);
-
-  // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(2);
-
-  // PDF Modal states
+  const [itemsPerPage] = useState(10);
   const [pdfModalOpen, setPdfModalOpen] = useState(false);
   const [currentEventForPdf, setCurrentEventForPdf] = useState(null);
 
@@ -43,7 +39,7 @@ export default function ShowAllEvents() {
     fetchEvents();
   }, []);
 
-  // Filter events based on search and status
+ 
   useEffect(() => {
     let filtered = events;
 
@@ -92,7 +88,7 @@ export default function ShowAllEvents() {
     }
   };
 
-  // Generate page numbers for pagination
+
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;

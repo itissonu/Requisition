@@ -51,7 +51,9 @@ export default function RTOMainDashboard() {
     const pendingEvents = events.filter(e => e.status === "CREATED").length;
     const utilizationSubmited = events.filter(e => e.status === "UTILIZATION_SUBMITTED").length;
     const approvedEvents = events.filter(e => e.status === "COLLECTOR_APPROVED").length;
-    const totalUtilizations = utilizations.length;
+    const commisionerApproved = events.filter(e => e.status === "COOMMISIONER_APPROVED").length;
+    const completedEvents = events.filter(e => e.status === "COMPLETED").length;
+    const totalUtilizations = utilizationSubmited;
     const totalBills = bills.length;
 
     // Bar chart: count events per month
@@ -66,11 +68,12 @@ export default function RTOMainDashboard() {
     // Pie: distribution of event statuses
     const statusData = [
         { name: "Pending", value: pendingEvents },
-        { name: "Commissioner Approved", value: approvedEvents },
-        // { name: "Other", value: totalEvents - pendingEvents - approvedEvents },
-        { name: "Utilization Submitted", value: utilizationSubmited }
+        { name: "Collector Approved", value: approvedEvents },
+         { name: "Commissioner Approved", value:commisionerApproved },
+        { name: "Utilization Submitted", value: utilizationSubmited },
+        { name: "Event Completed", value: completedEvents }
     ];
-    const COLORS = ["#fbbf24", "#16a34a", "#1e40af", "#6b21a8"];
+    const COLORS = ["#fbbf24", "#16a34a", "#1e40af", "#6b21a8","#F54927"];
 
     return (
         <div className="space-y-6">
@@ -92,10 +95,10 @@ export default function RTOMainDashboard() {
           <h4 className="text-sm text-gray-500">Approved Events</h4>
           <p className="text-2xl font-bold text-green-600">{approvedEvents}</p>
         </div> */}
-                <div className="bg-white p-4 shadow rounded">
+                {/* <div className="bg-white p-4 shadow rounded">
                     <h4 className="text-sm text-gray-500">Utilizations Created</h4>
                     <p className="text-2xl font-bold text-blue-600">{totalUtilizations}</p>
-                </div>
+                </div> */}
                 <div className="bg-white p-4 shadow rounded">
                     <h4 className="text-sm text-gray-500">Payment Bills</h4>
                     <p className="text-2xl font-bold text-indigo-600">{totalBills}</p>

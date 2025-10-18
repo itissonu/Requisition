@@ -291,7 +291,7 @@
 //                           ₹{event?.totalBillsSanctioned
 //                             .toLocaleString('en-IN')}
 //                         </div>
-                       
+
 //                       </div>
 //                     </td>
 //                     <td className="p-4 border border-gray-300">
@@ -390,7 +390,7 @@ export default function ShowPaymentBill() {
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [selectedEventForRequest, setSelectedEventForRequest] = useState(null);
   const [utilizations, setUtilizations] = useState([]);
-  
+
   // Search and Pagination States
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -516,11 +516,11 @@ export default function ShowPaymentBill() {
     }
   };
 
- 
+
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
-    
+
     if (totalPages <= maxPagesToShow) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -548,7 +548,7 @@ export default function ShowPaymentBill() {
         pages.push(totalPages);
       }
     }
-    
+
     return pages;
   };
 
@@ -557,7 +557,7 @@ export default function ShowPaymentBill() {
     setCurrentPage(1);
   }, [searchTerm]);
 
-  
+
   const stats = {
     totalEvents: filteredEvents.length,
     eventsWithRequests: filteredEvents.filter(e => e.hasRequests).length,
@@ -602,7 +602,7 @@ export default function ShowPaymentBill() {
       </div>
 
       <main className="max-w-7xl mx-auto py-8 px-6">
-       
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
           <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-600">
             <div className="flex items-center justify-between">
@@ -799,7 +799,7 @@ export default function ShowPaymentBill() {
           {filteredEvents.length > 0 && (
             <div className="bg-gray-50 border-t border-gray-200 p-4">
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-              
+
                 <div className="text-sm text-gray-600">
                   Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredEvents.length)} of {filteredEvents.length} events
                 </div>
@@ -808,11 +808,10 @@ export default function ShowPaymentBill() {
                   <button
                     onClick={handlePrevPage}
                     disabled={currentPage === 1}
-                    className={`p-2 rounded-lg ${
-                      currentPage === 1
-                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        : 'bg-blue-600 text-white hover:bg-blue-700'
-                    }`}
+                    className={`p-2 rounded-lg ${currentPage === 1
+                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      : 'bg-blue-600 text-white hover:bg-blue-700'
+                      }`}
                   >
                     <ChevronLeft className="w-5 h-5" />
                   </button>
@@ -822,13 +821,12 @@ export default function ShowPaymentBill() {
                       key={index}
                       onClick={() => pageNum !== '...' && handlePageChange(pageNum)}
                       disabled={pageNum === '...'}
-                      className={`px-4 py-2 rounded-lg font-semibold ${
-                        pageNum === currentPage
-                          ? 'bg-blue-600 text-white'
-                          : pageNum === '...'
+                      className={`px-4 py-2 rounded-lg font-semibold ${pageNum === currentPage
+                        ? 'bg-blue-600 text-white'
+                        : pageNum === '...'
                           ? 'bg-transparent text-gray-400 cursor-default'
                           : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      }`}
+                        }`}
                     >
                       {pageNum}
                     </button>
@@ -837,11 +835,10 @@ export default function ShowPaymentBill() {
                   <button
                     onClick={handleNextPage}
                     disabled={currentPage === totalPages}
-                    className={`p-2 rounded-lg ${
-                      currentPage === totalPages
-                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        : 'bg-blue-600 text-white hover:bg-blue-700'
-                    }`}
+                    className={`p-2 rounded-lg ${currentPage === totalPages
+                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      : 'bg-blue-600 text-white hover:bg-blue-700'
+                      }`}
                   >
                     <ChevronRight className="w-5 h-5" />
                   </button>
@@ -1047,7 +1044,7 @@ function EventDetailModal({ event, onClose }) {
                   <p className="text-2xl font-bold text-purple-600">₹{event.totalAdvanceRequested.toLocaleString('en-IN')}</p>
                   <p className="text-xs text-gray-600 mt-1">{event.advanceRequests.length} request(s)</p>
                 </div>
-                 <div className="bg-green-50 rounded-lg p-4 border-l-4 border-green-600">
+                <div className="bg-green-50 rounded-lg p-4 border-l-4 border-green-600">
                   <h4 className="text-sm font-semibold text-gray-700 mb-2">Advance Payment Approved </h4>
                   <p className="text-2xl font-bold text-green-600">₹{event?.totalAdvanceApproved?.toLocaleString('en-IN')}</p>
                   {/* <p className="text-xs text-gray-600 mt-1">{event.approvedRequestsCount} approved</p> */}
@@ -1057,7 +1054,7 @@ function EventDetailModal({ event, onClose }) {
                   <p className="text-2xl font-bold text-green-600">₹{event?.totalAmountWillGet?.toLocaleString('en-IN')}</p>
                   {/* <p className="text-xs text-gray-600 mt-1">{event.approvedRequestsCount} approved</p> */}
                 </div>
-                 {/* <div className="bg-green-50 rounded-lg p-4 border-l-4 border-green-600">
+                {/* <div className="bg-green-50 rounded-lg p-4 border-l-4 border-green-600">
                   <h4 className="text-sm font-semibold text-gray-700 mb-2">Commissioner Approved Amount</h4>
                   <p className="text-2xl font-bold text-green-600">₹{event.totalAdvanceApproved.toLocaleString('en-IN')}</p>
                   <p className="text-xs text-gray-600 mt-1">{event.approvedRequestsCount} approved</p>
@@ -1158,13 +1155,21 @@ function EventDetailModal({ event, onClose }) {
               ) : (
                 event.sanctionedBills.map((bill, index) => (
                   <div key={bill.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow bg-white">
-                    <div className="flex justify-between items-start mb-3">
+                    <div className="flex gap-9 items-start mb-3">
                       <div>
                         <h4 className="font-bold text-gray-900">
                           {bill.type === 'ADVANCE' ? 'Advance Bill' : 'Final Settlement Bill'} #{index + 1}
                         </h4>
                         <p className="text-sm text-gray-600 mt-1">Bill ID: {bill.id}</p>
                       </div>
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${bill.status === 'COMMISSIONER_APPROVED' ? 'bg-green-100 text-green-800' :
+                        bill.status === 'COLLECTOR_APPROVED' ? 'bg-blue-500 text-blue-800' :
+                          bill.status === 'PENDING' ? 'bg-yellow-400 text-yellow-800' :
+                            bill.status === 'REJECTED' ? 'bg-red-200 text-red-800' :
+                              'bg-red-200 text-gray-800'
+                        }`}>
+                        {bill.advancePaymentRequestId === null ? 'Sanctioned Amount' : 'From Advance Paymrnt Request'}
+                      </span>
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${bill.status === 'COMMISSIONER_APPROVED' ? 'bg-green-100 text-green-800' :
                         bill.status === 'COLLECTOR_APPROVED' ? 'bg-blue-100 text-blue-800' :
                           bill.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
@@ -1197,7 +1202,7 @@ function EventDetailModal({ event, onClose }) {
                     </div>
 
                     {/* Approval Timeline */}
-                  
+
 
                     {bill.remarks && (
                       <div className="bg-blue-50 rounded p-3">
