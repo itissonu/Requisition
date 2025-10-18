@@ -41,12 +41,12 @@ const [stats, setStats] = useState({
       const currentYear = new Date().getFullYear();
 
       const pendingUtilizations = utilizations.filter(u =>
-        u.utilizationStatus === 'COLLECTOR_APPROVED'
+        u.utilizationStatus === 'COLLECTOR_APPROVED' 
       ).length;
 
       const approvedThisMonth = utilizations.filter(u => {
         const approvalDate = new Date(u.updatedAt);
-        return u.utilizationStatus === 'COMMISSIONER_APPROVED' &&
+        return (u.utilizationStatus === 'COMMISSIONER_APPROVED'|| u.utilizationStatus==='COMPLETED') &&
           approvalDate.getMonth() === currentMonth &&
           approvalDate.getFullYear() === currentYear;
       }).length;

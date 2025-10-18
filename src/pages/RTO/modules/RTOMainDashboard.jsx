@@ -4,6 +4,7 @@ import {
     PieChart, Pie, Cell, Legend, Sector
 } from "recharts";
 import { eventAPI, utilizationAPI, billSanctionAPI } from "../../../apis/apiService";
+import { CalendarDays, FileText, Hourglass } from "lucide-react";
 
 const renderActiveShape = (props) => {
     const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props;
@@ -69,11 +70,11 @@ export default function RTOMainDashboard() {
     const statusData = [
         { name: "Pending", value: pendingEvents },
         { name: "Collector Approved", value: approvedEvents },
-         { name: "Commissioner Approved", value:commisionerApproved },
+        { name: "Commissioner Approved", value: commisionerApproved },
         { name: "Utilization Submitted", value: utilizationSubmited },
         { name: "Event Completed", value: completedEvents }
     ];
-    const COLORS = ["#fbbf24", "#16a34a", "#1e40af", "#6b21a8","#F54927"];
+    const COLORS = ["#fbbf24", "#16a34a", "#1e40af", "#6b21a8", "#F54927"];
 
     return (
         <div className="space-y-6">
@@ -82,14 +83,22 @@ export default function RTOMainDashboard() {
                 <p className="text-gray-600">Overview & Statistics</p>
             </div>
             {/* Stat Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-white p-4 shadow rounded">
-                    <h4 className="text-sm text-gray-500">Total Events</h4>
-                    <p className="text-2xl font-bold">{totalEvents}</p>
+                    <div className="flex justify-between p-2 ">
+                        <h4 className="text-sm font-bold text-gray-500">Total Events</h4>
+                        <CalendarDays />
+                    </div>
+
+                    <p className="text-2xl p-2 font-bold">{totalEvents}</p>
                 </div>
                 <div className="bg-white p-4 shadow rounded">
-                    <h4 className="text-sm text-gray-500">Pending Events</h4>
-                    <p className="text-2xl font-bold text-yellow-600">{pendingEvents}</p>
+                    <div className="flex justify-between p-2 ">
+                        <h4 className="text-sm text-gray-500 font-bold">Pending Events</h4>
+                        <Hourglass />
+                    </div>
+
+                    <p className="text-2xl font-bold p-2 text-yellow-600">{pendingEvents}</p>
                 </div>
                 {/* <div className="bg-white p-4 shadow rounded">
           <h4 className="text-sm text-gray-500">Approved Events</h4>
@@ -100,8 +109,12 @@ export default function RTOMainDashboard() {
                     <p className="text-2xl font-bold text-blue-600">{totalUtilizations}</p>
                 </div> */}
                 <div className="bg-white p-4 shadow rounded">
-                    <h4 className="text-sm text-gray-500">Payment Bills</h4>
-                    <p className="text-2xl font-bold text-indigo-600">{totalBills}</p>
+                    <div className="flex justify-between p-2 ">
+                        <h4 className="text-sm text-gray-500 font-bold">Payment Bills</h4>
+                        <FileText />
+                    </div>
+
+                    <p className="text-2xl p-2 font-bold text-indigo-600">{totalBills}</p>
                 </div>
             </div>
 

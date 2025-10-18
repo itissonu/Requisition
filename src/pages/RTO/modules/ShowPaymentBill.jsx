@@ -1166,7 +1166,7 @@ function EventDetailModal({ event, onClose }) {
                         bill.status === 'COLLECTOR_APPROVED' ? 'bg-blue-500 text-blue-800' :
                           bill.status === 'PENDING' ? 'bg-yellow-400 text-yellow-800' :
                             bill.status === 'REJECTED' ? 'bg-red-200 text-red-800' :
-                              'bg-red-200 text-gray-800'
+                              'bg-blue-300 text-white'
                         }`}>
                         {bill.advancePaymentRequestId === null ? 'Sanctioned Amount' : 'From Advance Paymrnt Request'}
                       </span>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Search, Eye, CheckCircle, XCircle, IndianRupee, FileText, Calendar, Plus, Wallet, CreditCard, Building2, Receipt, DollarSign, AlertCircle, CloudCog, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Eye, CheckCircle, XCircle, IndianRupee, FileText, Calendar, Plus, Wallet, CreditCard, Building2, Receipt, DollarSign, AlertCircle, CloudCog, ChevronLeft, ChevronRight, File } from "lucide-react";
 import { billSanctionAPI, utilizationAPI, advancePaymentAPI } from "../../../apis/apiService";
 import logo from '../../../assests/logo.png';
 
@@ -315,6 +315,7 @@ const BillSanction = () => {
       );
     }
 
+
     if (statusFilter !== "all") {
       combinedData = combinedData.filter((item) => {
         if (statusFilter === "pending") return item.totalBilled === 0;
@@ -325,7 +326,7 @@ const BillSanction = () => {
     }
 
     setFilteredData(combinedData);
-    setCurrentPage(1); 
+    setCurrentPage(1);
   };
 
   // Pagination calculations
@@ -358,7 +359,7 @@ const BillSanction = () => {
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
-    
+
     if (totalPages <= maxPagesToShow) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -386,7 +387,7 @@ const BillSanction = () => {
         pages.push(totalPages);
       }
     }
-    
+
     return pages;
   };
 
@@ -532,10 +533,15 @@ const BillSanction = () => {
               <p className="text-gray-500">Loading data...</p>
             </div>
           ) : currentItems.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-gray-500">
-                {searchTerm || statusFilter !== "all" ? "No utilizations match your search criteria" : "No utilizations found"}
+            <div className="flex py-8 h-80 justify-center items-center">
+              <div className="flex flex-col ">
+              <File className="w-12 h-12 mx-auto text-gray-400 mb-3" />
+              <p className="text-gray-500  font-bold text-sm">
+                {searchTerm || statusFilter !== "all"
+                  ? "No utilizations match your search criteria"
+                  : "No utilizations found"}
               </p>
+              </div>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -560,7 +566,7 @@ const BillSanction = () => {
                             <Calendar className="w-3 h-3" />
                             {new Date(item.createdAt).toLocaleDateString()}
                           </div>
-                          <div className="text-xs text-gray-400 mt-1">ID: {item.id}</div>
+                          <div className="text-xs text-gray-400 mt-1">ID: {item.eventId}</div>
                         </div>
                       </td>
                       <td className="px-6 py-5">
@@ -658,11 +664,10 @@ const BillSanction = () => {
                   <button
                     onClick={handlePrevPage}
                     disabled={currentPage === 1}
-                    className={`p-2 rounded-lg ${
-                      currentPage === 1
+                    className={`p-2 rounded-lg ${currentPage === 1
                         ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                         : 'bg-blue-600 text-white hover:bg-blue-700'
-                    }`}
+                      }`}
                   >
                     <ChevronLeft className="w-5 h-5" />
                   </button>
@@ -672,13 +677,12 @@ const BillSanction = () => {
                       key={index}
                       onClick={() => pageNum !== '...' && handlePageChange(pageNum)}
                       disabled={pageNum === '...'}
-                      className={`px-4 py-2 rounded-lg font-semibold ${
-                        pageNum === currentPage
+                      className={`px-4 py-2 rounded-lg font-semibold ${pageNum === currentPage
                           ? 'bg-blue-600 text-white'
                           : pageNum === '...'
-                          ? 'bg-transparent text-gray-400 cursor-default'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      }`}
+                            ? 'bg-transparent text-gray-400 cursor-default'
+                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        }`}
                     >
                       {pageNum}
                     </button>
@@ -687,11 +691,10 @@ const BillSanction = () => {
                   <button
                     onClick={handleNextPage}
                     disabled={currentPage === totalPages}
-                    className={`p-2 rounded-lg ${
-                      currentPage === totalPages
+                    className={`p-2 rounded-lg ${currentPage === totalPages
                         ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                         : 'bg-blue-600 text-white hover:bg-blue-700'
-                    }`}
+                      }`}
                   >
                     <ChevronRight className="w-5 h-5" />
                   </button>

@@ -2,7 +2,7 @@ import axios from "axios";
 import { API_ENDPOINTS } from "./endpoint.js";
 
 const api = axios.create({
-  baseURL: "http://localhost:8091/Requisition",
+  baseURL: "https://vehicle-backend-d3l9.onrender.com/Requisition",
   withCredentials: true,
 });
 
