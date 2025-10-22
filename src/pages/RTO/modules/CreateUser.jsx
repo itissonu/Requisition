@@ -135,15 +135,15 @@ export default function CreateUser() {
                   }
               }
           }
-          return true; // Keep non-empty values or values that were considered required and are empty
-        }).map(([key, value]) => [key, value === "" ? null : value]) // Convert remaining empty strings to null for the API
+          return true;
+        }).map(([key, value]) => [key, value === "" ? null : value]) 
       );
       
-      console.log("Submitting user data:", cleanedData);
+      
 
       let result;
 
-      if (cleanedData.role === "RTO") { // Use cleanedData.role as it's guaranteed to be present if form is valid
+      if (cleanedData.role === "RTO") { 
         result = await userAPI.registerRto(cleanedData);
       } else if (cleanedData.role === "COLLECTOR") {
         result = await userAPI.registerCollector(cleanedData);
@@ -153,10 +153,9 @@ export default function CreateUser() {
         throw new Error("Invalid role selected");
       }
 
-      console.log("User created successfully:", result.data);
       
       alert(`${cleanedData.role} user created successfully!\n\nUser: ${result.data.fullName}\nMobile: ${result.data.mobile}`);
-      reset({ state: "Odisha", role: "" }); // Reset role as well
+      reset({ state: "Odisha", role: "" }); 
       setCurrentStep(1);
       
     } catch (err) {

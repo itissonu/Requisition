@@ -9,6 +9,7 @@ export default function EventUtilizationDashboard() {
   const [loading, setLoading] = useState(true);
   const [selectedUtil, setSelectedUtil] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [utilizationActive, setUtilizationActive] = useState(0);
   const closeModal = () => {
     setShowModal(false);
     setSelectedUtil(null);
@@ -21,7 +22,6 @@ export default function EventUtilizationDashboard() {
   const fetchData = async () => {
     try {
       const eventsResponse = await eventAPI.list();
-      console.log(eventsResponse.data, 'fetched events');
 
       const approvedEvts = eventsResponse.data.filter(e =>
         e.status === "CREATED"
@@ -30,8 +30,9 @@ export default function EventUtilizationDashboard() {
 
       const utilizationsResponse = await utilizationAPI.list();
       setUtilizations(utilizationsResponse.data);
+      const utilizationInActive = utilizationsResponse?.data?.filter(u => u?.utilizationStatus !== "COMPLETED")
+      setUtilizationActive(utilizationInActive?.length)
 
-      console.log(utilizationsResponse.data, 'utilizationsResponse.data');
     } catch (error) {
       console.error('Error fetching data:', error);
       alert('Failed to load data. Please try again.');
@@ -245,7 +246,7 @@ export default function EventUtilizationDashboard() {
                               </button> */}
                               <button
                                 onClick={() => handleCreateUtilization(event.id)}
-                                className="flex items-center gap-1 bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 transition-colors font-semibold text-sm"
+                                className="flex items-center hover:cursor-pointer gap-1 bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 transition-colors font-semibold text-sm"
                                 title="Create Utilization"
                               >
                                 <Plus className="w-4 h-4" />
@@ -288,7 +289,7 @@ export default function EventUtilizationDashboard() {
                 <p className="text-sm text-blue-700 mt-1">Track the status of created utilizations</p>
               </div>
               <div className="bg-blue-600 text-white px-4 py-2 rounded-full font-bold">
-                {utilizations.length} Active
+                {utilizationActive} Active
               </div>
             </div>
           </div>
@@ -351,7 +352,7 @@ export default function EventUtilizationDashboard() {
                           <div className="inline-flex items-center justify-center space-x-2">
                             <button
                               onClick={() => handleViewDetails(util)}
-                              className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors shadow"
+                              className="p-2 bg-blue-600 hover:cursor-pointer text-white rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors shadow"
                               title="View Details"
                             >
                               <Eye className="w-4 h-4" />
@@ -396,7 +397,7 @@ export default function EventUtilizationDashboard() {
                 </div>
                 <button
                   onClick={closeModal}
-                  className="text-white hover:bg-blue-800 p-2 rounded-full transition-colors"
+                  className="text-white hover:cursor-pointer hover:bg-blue-800 p-4 rounded-full transition-colors"
                 >
                   <span> x</span>
                 </button>
@@ -498,7 +499,7 @@ export default function EventUtilizationDashboard() {
               </button> */}
               <button
                 onClick={closeModal}
-                className="bg-gray-600 text-white px-6 py-3 rounded hover:bg-gray-700 transition-colors font-bold shadow-md"
+                className="bg-gray-600 hover:cursor-pointer text-white px-6 py-3 rounded hover:bg-gray-700 transition-colors font-bold shadow-md"
               >
                 Close
               </button>

@@ -72,7 +72,7 @@ export default function CollectorSidebar({ activePage, setActivePage }) {
               <button
                 key={item.key}
                 onClick={() => setActivePage(item.key)}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-all ${isActive
+                className={`w-full flex items-center hover:cursor-pointer px-4 py-3 text-left rounded-lg transition-all ${isActive
                     ? "bg-blue-800 border-r-4 border-white shadow-md"
                     : "hover:bg-blue-800"
                   }`}

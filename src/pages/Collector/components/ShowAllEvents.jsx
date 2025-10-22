@@ -41,7 +41,6 @@ export default function ShowAllEvents() {
         const response = await eventAPI.list();
         setEvents(response?.data);
         setFilteredEvents(response?.data);
-        console.log(response?.data, "fetched events");
       } catch (error) {
         console.error('Error fetching events:', error);
         alert('Failed to load events. Please try again.');
@@ -53,33 +52,29 @@ export default function ShowAllEvents() {
     fetchEvents();
   }, []);
 
+
   useEffect(() => {
     let filtered = events;
-
-    // Search filter - by event ID or event name
     if (searchTerm) {
       filtered = filtered.filter(event =>
         event.requestEventName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         event.id.toString().includes(searchTerm)
       );
     }
-
-    // Status filter
     if (statusFilter !== "ALL") {
       filtered = filtered.filter(event => event.status === statusFilter);
     }
-
     setFilteredEvents(filtered);
-    setCurrentPage(1); // Reset to first page when filters change
+    setCurrentPage(1); 
   }, [searchTerm, statusFilter, events]);
 
-  // Pagination calculations
+  
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentEvents = filteredEvents.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
 
-  // Pagination handlers
+ 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -280,7 +275,7 @@ export default function ShowAllEvents() {
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full pl-10 pr-4 py-3 border-2 hover:cursor-pointer border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="ALL">All Status</option>
                     <option value="CREATED">Created</option>
@@ -388,7 +383,7 @@ export default function ShowAllEvents() {
                           <div className="flex gap-2 justify-center flex-wrap">
                             <button
                               onClick={() => handleViewDetails(event)}
-                              className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-colors"
+                              className="bg-blue-600 text-white hover:cursor-pointer p-2 rounded-lg hover:bg-blue-700 transition-colors"
                               title="View Details"
                             >
                               <Eye className="w-4 h-4" />
@@ -456,14 +451,14 @@ export default function ShowAllEvents() {
                     className={`p-2 rounded-lg ${
                       currentPage === totalPages
                         ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                        : 'bg-blue-600 text-white hover:cursor-pointer hover:bg-blue-700'
                     }`}
                   >
                     <ChevronRight className="w-5 h-5" />
                   </button>
                 </div>
 
-                {/* Status Summary */}
+              
                 <div className="flex gap-3 text-sm">
                   <span className="text-yellow-700">
                     Created: {events.filter(e => e.status === 'CREATED').length}
@@ -484,10 +479,10 @@ export default function ShowAllEvents() {
           <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="bg-blue-900 text-white p-6 rounded-t-lg">
               <div className="flex justify-between items-center">
-                <h3 className="text-xl font-semibold">Event Details - #{selectedEvent.id}</h3>
+                <h3 className="text-xl font-semibold">Event Details  (EVENT ID :- {selectedEvent.id})</h3>
                 <button
                   onClick={() => setSelectedEvent(null)}
-                  className="text-white hover:text-gray-300 p-1"
+                  className="text-white hover:cursor-pointer hover:text-gray-300 p-1"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -495,52 +490,52 @@ export default function ShowAllEvents() {
             </div>
 
             <div className="p-6 space-y-6">
-              {/* Basic Information */}
+           
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
-                    <label className="font-bold text-gray-700 block mb-1">Event Name:</label>
-                    <p className="text-gray-900">{selectedEvent.requestEventName}</p>
+                    <label className="font-bold text-lg text-gray-700 block mb-1">Event Name:</label>
+                    <p className="text-gray-900 text-xs font-semibold">{selectedEvent.requestEventName}</p>
                   </div>
 
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
-                    <label className="font-bold text-gray-700 block mb-1">Letter Number:</label>
-                    <p className="text-gray-900">{selectedEvent.requestEventLetterNo}</p>
+                    <label className="font-bold text-lg text-gray-700 block mb-1">Letter Number:</label>
+                    <p className="text-gray-900 text-xs font-semibold">{selectedEvent.requestEventLetterNo}</p>
                   </div>
 
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
-                    <label className="font-bold text-gray-700 block mb-1">Department:</label>
-                    <p className="text-gray-900">{selectedEvent.requestingDepartment}</p>
+                    <label className="font-bold text-lg text-gray-700 block mb-1">Department:</label>
+                    <p className="text-gray-900 text-xs font-semibold">{selectedEvent.requestingDepartment}</p>
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
-                    <label className="font-bold text-gray-700 block mb-1">Status:</label>
-                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold border ${getStatusColor(selectedEvent.status)}`}>
+                    <label className="font-bold text-lg text-gray-700 block mb-1">Status:</label>
+                    <span className={`inline-flex  items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(selectedEvent.status)}`}>
                       {getStatusIcon(selectedEvent.status)}
                       {getStatusDisplayName(selectedEvent.status)}
                     </span>
                   </div>
 
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
-                    <label className="font-bold text-gray-700 block mb-1">Created:</label>
-                    <p className="text-gray-900">{new Date(selectedEvent.createdAt).toLocaleString('en-IN')}</p>
-                    <p className="text-sm text-gray-600 mt-1">By: {selectedEvent.createdByName}</p>
+                    <label className="font-bold text-gray-700 text-lg block mb-1">Created:</label>
+                    <p className="text-gray-900 text-xs">{new Date(selectedEvent?.createdAt).toLocaleString('en-IN')}</p>
+                    <p className="text-xs font-semibold text-gray-600 mt-1">By: {selectedEvent?.createdByOfficeName}</p>
                   </div>
                 </div>
               </div>
 
               {/* Sub Events */}
               <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-purple-500">
-                <label className="font-semibold text-gray-700 block mb-3">Sub Events ({selectedEvent.subEvents?.length || 0}):</label>
+                <label className="font-semibold text-gray-700 block mb-3">Sub Events ({selectedEvent?.subEvents?.length || 0}):</label>
                 <div className="space-y-4">
                   {selectedEvent.subEvents && selectedEvent.subEvents.map((subEvent, index) => (
                     <div key={subEvent.id} className="bg-white p-4 rounded border border-gray-200">
                       <div className="flex items-start justify-between mb-3">
                         <div>
                           <h4 className="font-bold text-gray-900">Place: {subEvent.place}</h4>
-                          <p className="text-sm text-gray-600 mt-1">
+                          <p className="text-xs text-gray-600 mt-1">
                             Date: {subEvent.reportingDate}
                           </p>
                         </div>
@@ -592,7 +587,6 @@ export default function ShowAllEvents() {
       {pdfModalOpen && (
         <div className="fixed inset-0 bg-black/60 bg-opacity-75 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-6xl w-full max-h-[95vh] overflow-hidden shadow-2xl">
-            {/* PDF Modal Header */}
             <div className="bg-blue-900 text-white p-4 flex justify-between items-center">
               <div>
                 <h3 className="text-lg font-semibold">
@@ -620,7 +614,7 @@ export default function ShowAllEvents() {
               </div>
             </div>
 
-            {/* PDF Content - Native iframe */}
+  
             <div className="h-[calc(95vh-120px)] bg-gray-100">
               {pdfUrl ? (
                 <iframe

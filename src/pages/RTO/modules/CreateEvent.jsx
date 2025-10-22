@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Car, File, Plus, Trash2, MapPin, Calendar, Clock, ChevronDown, Building, Edit2, X, Download, DollarSign, FileText, CheckCircle, IndianRupee } from "lucide-react";
+import { Car, File, Plus, Trash2, MapPin, Calendar, Clock, ChevronDown, Building, Edit2, X, Download, DollarSign, FileText, CheckCircle, IndianRupee, RefreshCcw } from "lucide-react";
 
 import logo from '../../../assests/logo.png';
 import { eventAPI, requestEventAPI, vehicleAPI } from "../../../apis/apiService";
@@ -63,7 +63,6 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
       const response = await requestEventAPI.list();
       const filtereddata = response.data.filter(request => request.status !== "APPROVED");
       setRequests(filtereddata);
-      console.log("Fetched requests:", filtereddata);
     } catch (error) {
       console.error("Failed to fetch requests:", error);
       alert("Failed to load requests. Please try again.");
@@ -147,8 +146,6 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
   };
 
   const onSubmit = async (data) => {
-    console.log("Form submitted! Raw data:", data);
-
     if (subEvents.length === 0) {
       alert('Please add at least one sub-event.');
       return;
@@ -162,8 +159,6 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
         vehicles: subEvent.vehicles.filter(v => v.quantity > 0)
       })).filter(subEvent => subEvent.vehicles.length > 0);
 
-      console.log("Filtered sub-events:", filteredSubEvents);
-
       if (filteredSubEvents.length === 0) {
         alert('Please select at least one vehicle for at least one sub-event.');
         setLoading(false);
@@ -176,11 +171,7 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
         subEvents: filteredSubEvents
       };
 
-      console.log("Event data to be sent:", eventData);
-
       const response = await eventAPI.create(eventData);
-
-      console.log('Event created successfully:', response.data);
       
       setCreatedEvent(response.data);
       setShowSuccessModal(true);
@@ -260,7 +251,7 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
                   render={({ field }) => (
                     <select
                       {...field}
-                      className="w-full border-2 border-gray-300 rounded-lg px-3 py-3  focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                      className="w-full border-2 hover:cursor-pointer border-gray-300 rounded-lg px-3 py-3  focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                     >
                       <option value="">Select a requesting event</option>
                       {requests.map(request => (
@@ -309,7 +300,7 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
               <button
                 type="button"
                 onClick={() => openModal()}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2 transition-all"
+                className="bg-green-600 text-white hover:cursor-pointer px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2 transition-all"
               >
                 <Plus className="w-4 h-4" />
                 Add Sub-Event
@@ -339,7 +330,7 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
                           <button
                             type="button"
                             onClick={() => openModal(index)}
-                            className="p-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-all"
+                            className="p-1.5 hover:cursor-pointer bg-blue-600 text-white rounded hover:bg-blue-700 transition-all"
                             title="Edit"
                           >
                             <Edit2 className="w-4 h-4" />
@@ -347,7 +338,7 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
                           <button
                             type="button"
                             onClick={() => deleteSubEvent(index)}
-                            className="p-1.5 bg-red-600 text-white rounded hover:bg-red-700 transition-all"
+                            className="p-1.5 hover:cursor-pointer bg-red-600 text-white rounded hover:bg-red-700 transition-all"
                             title="Delete"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -386,7 +377,7 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
                 type="button"
                 onClick={handleSubmit(onSubmit)}
                 disabled={loading}
-                className="bg-gradient-to-r from-blue-700 to-blue-800 text-white px-10 py-4 rounded-lg hover:from-blue-800 hover:to-blue-900 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-base shadow-lg transform transition-all hover:scale-105 active:scale-95"
+                className="bg-gradient-to-r from-blue-700 to-blue-800 hover:cursor-pointer text-white px-10 py-4 rounded-lg hover:from-blue-800 hover:to-blue-900 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-base shadow-lg transform transition-all hover:scale-105 active:scale-95"
               >
                 {loading ? " SUBMITTING..." : "SUBMIT REQUISITION"}
               </button>
@@ -395,9 +386,9 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
                 type="button"
                 onClick={resetForm}
                 disabled={loading}
-                className="bg-gradient-to-r from-gray-600 to-gray-700 text-white px-10 py-4 rounded-lg hover:from-gray-700 hover:to-gray-800 font-bold text-base shadow-lg transform transition-all hover:scale-105 active:scale-95"
+                className="bg-gradient-to-r flex justify-center items-center  gap-1.5 from-gray-600 hover:cursor-pointer to-gray-700 text-white px-10 py-4 rounded-lg hover:from-gray-700 hover:to-gray-800 font-bold text-base shadow-lg transform transition-all hover:scale-105 active:scale-95"
               >
-                ↺ RESET FORM
+                <RefreshCcw/> <span>Reset Form</span>
               </button>
             </div>
           </div>
@@ -419,7 +410,7 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
               <button
                 type="button"
                 onClick={closeModal}
-                className="p-2 hover:bg-green-800 rounded-lg transition-all"
+                className="p-2 hover:bg-green-800 hover:cursor-pointer rounded-lg transition-all"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -453,7 +444,7 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
                     <input
                       type="date"
                       {...registerSubEvent('reportingDate')}
-                      className="w-full border-2 border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                      className="w-full border-2 border-gray-300 p-3 hover:cursor-pointer rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
                     />
                     {errorsSubEvent.reportingDate && (
                       <p className="text-red-500 text-sm mt-1">{errorsSubEvent.reportingDate.message}</p>
@@ -522,14 +513,14 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
               <button
                 type="button"
                 onClick={closeModal}
-                className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-semibold transition-all"
+                className="px-6 py-3 hover:cursor-pointer bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-semibold transition-all"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleSubmitSubEvent(onSubmitSubEvent)}
-                className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 font-semibold transition-all"
+                className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:cursor-pointer text-white rounded-lg hover:from-green-700 hover:to-green-800 font-semibold transition-all"
               >
                 {editingIndex !== null ? 'Update Sub-Event' : 'Add Sub-Event'}
               </button>

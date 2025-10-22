@@ -396,8 +396,6 @@ export default function ShowPaymentBill() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
-  console.log(selectedEvent, "selected event");
-
   useEffect(() => {
     fetchData();
   }, []);
@@ -414,7 +412,6 @@ export default function ShowPaymentBill() {
 
       setEvents(eventsRes.data);
       setRequests(requestsRes.data);
-      console.log(requestsRes.data, 'requestsResData');
       setBills(billsRes.data);
       setUtilizations(utilizationsRes.data);
     } catch (error) {
@@ -482,9 +479,7 @@ export default function ShowPaymentBill() {
     };
   });
 
-  console.log(processedEvents, 'proceedevents');
 
-  // Search and Filter Logic
   const filteredEvents = processedEvents.filter(event =>
     event.requestEventName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     event.id.toString().includes(searchTerm)
@@ -770,7 +765,7 @@ export default function ShowPaymentBill() {
                         <div className="flex gap-2 justify-center">
                           <button
                             onClick={() => openDetailModal(event)}
-                            className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center gap-2"
+                            className="bg-blue-600 hover:cursor-pointer text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center gap-2"
                             title="View Details"
                           >
                             <Eye className="w-4 h-4" />
@@ -779,7 +774,7 @@ export default function ShowPaymentBill() {
                           {event.status === 'CREATED' && (
                             <button
                               onClick={() => openRequestModal(event)}
-                              className="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors inline-flex items-center gap-2"
+                              className="bg-green-600 hover:cursor-pointer text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors inline-flex items-center gap-2"
                               title="Request Advance Payment"
                             >
                               <Plus className="w-4 h-4" />
@@ -867,8 +862,6 @@ function AdvanceRequestModal({ event, onClose, onSuccess }) {
   const [amount, setAmount] = useState('');
   const [remarks, setRemarks] = useState('');
   const [loading, setLoading] = useState(false);
-
-  console.log(event, "event in advance request modal");
 
   const handleSubmit = async (e) => {
     e.preventDefault();

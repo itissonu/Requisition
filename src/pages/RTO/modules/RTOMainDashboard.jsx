@@ -45,9 +45,7 @@ export default function RTOMainDashboard() {
         fetchData();
     }, []);
 
-    // Stats
-
-    console.log(events, "events");
+    
     const totalEvents = events.length;
     const pendingEvents = events.filter(e => e.status === "CREATED").length;
     const utilizationSubmited = events.filter(e => e.status === "UTILIZATION_SUBMITTED").length;

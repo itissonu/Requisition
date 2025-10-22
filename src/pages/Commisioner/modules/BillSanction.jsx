@@ -501,7 +501,7 @@ const BillSanction = () => {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full hover:cursor-pointer p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="all">All Status</option>
                 <option value="pending">No Bills Created</option>
@@ -574,7 +574,7 @@ const BillSanction = () => {
                           <Building2 className="w-4 h-4 text-gray-400" />
                           <div>
                             <span className="font-semibold text-gray-900 block">{item.rtoOfficeName}</span>
-                            <span className="text-xs text-gray-500">{item.rtoName}</span>
+                            {/* <span className="text-xs text-gray-500">{item.rtoName}</span> */}
                           </div>
                         </div>
                       </td>
@@ -610,7 +610,7 @@ const BillSanction = () => {
                         <div className="flex items-center justify-center gap-2">
                           <button
                             onClick={() => openBillsViewer(item)}
-                            className="p-3 text-blue-600 hover:bg-blue-100 rounded-xl transition-all shadow-sm hover:shadow-md"
+                            className="p-3 hover:cursor-pointer text-blue-600 hover:bg-blue-100 rounded-xl transition-all shadow-sm hover:shadow-md"
                             title="View Bills"
                           >
                             <Eye className="w-5 h-5  hover:cursor-pointer" />
@@ -618,7 +618,7 @@ const BillSanction = () => {
                           {item.remainingAmount > 0 && item.canSanctionFinal && (
                             <button
                               onClick={() => openBillModal(item)}
-                              className="p-3 text-emerald-600 bg-blue-600 gap-1 flex items-center justify-center hover:bg-emerald-800 hover:cursor-pointer rounded-xl transition-all shadow-sm hover:shadow-md"
+                              className="p-3 text-emerald-600  bg-blue-600 gap-1 flex items-center justify-center hover:bg-emerald-800 hover:cursor-pointer rounded-xl transition-all shadow-sm hover:shadow-md"
                               title="Create Final Bill"
                             ><span className="text-xs text-gray-50 font-bold">Sanction Amount</span><IndianRupee className="h-4 w-4 text-white" />
                             </button>
@@ -753,10 +753,10 @@ const BillSanction = () => {
                     <span className="font-medium text-gray-600">Total Sanctioned(For Advance):</span>
                     <p className="text-green-600 font-bold">₹{selectedUtilization?.totalAdvanceSanctioned?.toLocaleString('en-IN')}</p>
                   </div>
-                  <div>
+                  {/* <div>
                     <span className="font-medium text-gray-600">Remaining:</span>
                     <p className="text-purple-600 font-bold">₹{selectedUtilization?.remainingAmount?.toLocaleString('en-IN')}</p>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 

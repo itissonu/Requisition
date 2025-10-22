@@ -42,7 +42,7 @@ const DashboardRouter = () => {
   const { user } = useAuth();
 
   const getDashboardPath = (role) => {
-    console.log("User role:", role);
+    
     const dashboardPaths = {
       'RTO': '/rto/dashboard',
       'Collector': '/collector/dashboard',
@@ -52,7 +52,7 @@ const DashboardRouter = () => {
   };
 
   if (user) {
-    console.log("Redirecting to dashboard for role:", user.role);
+ 
     return <Navigate to={getDashboardPath(user.role)} replace />;
   }
 

@@ -464,8 +464,6 @@ export default function ViewCollectorRequests() {
     ? requests
     : requests.filter(req => req.status === filterStatus);
 
-  console.log("Filtered Requests:", filteredRequests);
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
@@ -505,7 +503,7 @@ export default function ViewCollectorRequests() {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all"
+                className="px-4 py-2 border-2 hover:cursor-pointer border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all"
               >
                 <option value="ALL">All Status</option>
                 <option value="CREATED">Pending</option>
@@ -597,15 +595,15 @@ export default function ViewCollectorRequests() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleViewPdf(request.id, request.letterName)}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all"
+                      className="flex-1 flex hover:cursor-pointer items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all"
                     >
-                      <Eye className="w-4 h-4" />
+                      <Eye className="w-4 h-4 " />
                       View
                     </button>
 
                     <button
                       onClick={() => handleDownloadPdf(request.id, request.letterName)}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium text-xs transition-all"
+                      className="flex-1 hover:cursor-pointer flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium text-xs transition-all"
                     >
                       <Download className="w-4 h-4" />
                       Download Requested Letter
@@ -615,7 +613,7 @@ export default function ViewCollectorRequests() {
                   {request.status === "CREATED" && (
                     <button
                       onClick={() => handleApprove(request.id)}
-                      className="w-full mt-2 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-all"
+                      className="w-full hover:cursor-pointer mt-2 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-all"
                     >
                       <CheckCircle className="w-4 h-4" />
                       Mark this event completed
@@ -641,7 +639,7 @@ export default function ViewCollectorRequests() {
                 onClick={() => setViewingPdf(null)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                <XCircle className="w-6 h-6 text-gray-500" />
+                <XCircle className="w-6 h-6 hover:cursor-pointer text-gray-500" />
               </button>
             </div>
 

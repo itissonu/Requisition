@@ -27,7 +27,6 @@ export default function ShowAllEvents() {
         const response = await eventAPI.list();
         setEvents(response.data);
         setFilteredEvents(response.data);
-        console.log(response.data, 'fetched events');
       } catch (error) {
         console.error('Error fetching events:', error);
         alert('Failed to load events. Please try again.');
@@ -251,7 +250,7 @@ export default function ShowAllEvents() {
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full pl-10 pr-4 py-3 hover:cursor-pointer border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="ALL">All Status</option>
                     <option value="CREATED">Created</option>
@@ -297,7 +296,7 @@ export default function ShowAllEvents() {
                       <td className="p-4 border-r border-gray-200 text-center">
                         <button
                           onClick={() => toggleEventExpansion(event.id)}
-                          className="p-1 hover:bg-blue-100 rounded transition-colors"
+                          className="p-1 hover:bg-blue-100 hover:cursor-pointer rounded transition-colors"
                         >
                           {expandedEventId === event.id ? (
                             <ChevronDown className="w-5 h-5 text-blue-600" />
@@ -340,7 +339,7 @@ export default function ShowAllEvents() {
                         <div className="flex gap-2 justify-center">
                           <button
                             onClick={() => handleViewDetails(event)}
-                            className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-colors"
+                            className="bg-blue-600 hover:cursor-pointer text-white p-2 rounded-lg hover:bg-blue-700 transition-colors"
                             title="View Details"
                           >
                             <Eye className="w-4 h-4" />
@@ -348,7 +347,7 @@ export default function ShowAllEvents() {
 
                           <button
                             onClick={() => handleViewPdf(event.id)}
-                            className="bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 transition-colors"
+                            className="bg-green-600 hover:cursor-pointer text-white p-2 rounded-lg hover:bg-green-700 transition-colors"
                             title="View PDF"
                           >
                             <FileText className="w-4 h-4" />
@@ -511,7 +510,7 @@ export default function ShowAllEvents() {
                 <h3 className="text-xl font-semibold">Event Details - ID #{selectedEvent.id}</h3>
                 <button
                   onClick={() => setSelectedEvent(null)}
-                  className="text-white hover:text-gray-300 p-1"
+                  className="text-white hover:text-gray-300 p-1 hover:cursor-pointer"
                 >
                   <XCircle className="w-6 h-6" />
                 </button>
@@ -523,49 +522,49 @@ export default function ShowAllEvents() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
-                    <label className="font-semibold text-gray-700 block mb-1">Event Name:</label>
-                    <p className="text-gray-900">{selectedEvent.requestEventName}</p>
+                    <label className="font-bold text-lg text-gray-700 block mb-1">Event Name:</label>
+                    <p className="text-gray-900 text-sm font-semibold">{selectedEvent.requestEventName}</p>
                   </div>
 
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
-                    <label className="font-semibold text-gray-700 block mb-1">Letter No:</label>
-                    <p className="text-gray-900">{selectedEvent.requestEventLetterNo}</p>
+                    <label className="font-bold text-lg text-gray-700 block mb-1">Letter No:</label>
+                    <p className="text-gray-900 text-sm font-semibold">{selectedEvent.requestEventLetterNo}</p>
                   </div>
 
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
-                    <label className="font-semibold text-gray-700 block mb-1">Department:</label>
-                    <p className="text-gray-900">{selectedEvent.requestingDepartment}</p>
+                    <label className="font-bold text-lg text-gray-700 block mb-1">Department:</label>
+                    <p className="text-gray-900 text-sm font-semibold">{selectedEvent.requestingDepartment}</p>
                   </div>
 
-                  <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
+                  {/* <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
                     <label className="font-semibold text-gray-700 block mb-1">Collector:</label>
                     <p className="text-gray-900">{selectedEvent.collectorName || 'Not Assigned'}</p>
                     <p className="text-sm text-gray-600">{selectedEvent.collectorDistrict}</p>
-                  </div>
+                  </div> */}
                 </div>
 
                 <div className="space-y-4">
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
-                    <label className="font-semibold text-gray-700 block mb-1">Status:</label>
-                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold border ${getStatusColor(selectedEvent.status)}`}>
+                    <label className="font-bold text-lg text-gray-700 block mb-1">Status:</label>
+                    <span className={`inline-flex items-center  gap-1 px-1 py-1 rounded-full text-xs font-semibold border ${getStatusColor(selectedEvent.status)}`}>
                       {getStatusIcon(selectedEvent.status)}
                       {getStatusDisplayName(selectedEvent.status)}
                     </span>
                   </div>
 
-                  <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
+                  {/* <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
                     <label className="font-semibold text-gray-700 block mb-1">Created By:</label>
                     <p className="text-gray-900">{selectedEvent?.createdByName}</p>
                     <p className="text-sm text-gray-600">{selectedEvent?.createdByRole}</p>
+                  </div> */}
+
+                  <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
+                    <label className="font-bold text-lg text-gray-700  mb-1">Created At:</label>
+                    <p className="text-gray-900 text-xs font-semibold">{new Date(selectedEvent.createdAt).toLocaleString('en-IN')}</p>
                   </div>
 
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
-                    <label className="font-semibold text-gray-700 block mb-1">Created At:</label>
-                    <p className="text-gray-900">{new Date(selectedEvent.createdAt).toLocaleString('en-IN')}</p>
-                  </div>
-
-                  <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
-                    <label className="font-semibold text-gray-700 block mb-1">Total Sub-Events:</label>
+                    <label className="font-bold text-lg text-gray-700  mb-1">Total Sub-Events:</label>
                     <p className="text-gray-900 font-bold text-xl">{selectedEvent.subEvents?.length || 0}</p>
                   </div>
                 </div>
@@ -624,7 +623,7 @@ export default function ShowAllEvents() {
               <div className="flex justify-end gap-3">
                 <button
                   onClick={() => setSelectedEvent(null)}
-                  className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                  className="bg-gray-600 text-white px-4 hover:cursor-pointer py-2 rounded-lg hover:bg-gray-700 transition-colors"
                 >
                   Close
                 </button>

@@ -30,7 +30,6 @@ export default function CommissionerApproveUtilizations() {
     (async () => {
       try {
         const res = await utilizationAPI.getByStatus("PENDING_COMMISSIONER_APPROVAL");
-        console.log(res.data);
         setUtilizations(res.data);
       } catch {
         alert("Failed to load utilizations.");

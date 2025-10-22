@@ -2,15 +2,54 @@ import axios from "axios";
 import { API_ENDPOINTS } from "./endpoint.js";
 
 const api = axios.create({
-  baseURL: "https://vehicle-backend-d3l9.onrender.com/Requisition",
+  // baseURL: "https://vehicle-backend-d3l9.onrender.com/Requisition",
+  baseURL: 'http://localhost:8091/Requisition',
   withCredentials: true,
+   headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json, text/plain, */*',
+  },
 });
+
+
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token'); // or sessionStorage
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+   
+    if (error.response && (error.response.status === 403 || error.response.status === 401)) {
+      // Clear stored authentication data
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      alert('Your session has expired. Please login again.');
+      window.location.href = '/login'; 
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 
 const getAuthHeader = () => {
   const token = localStorage.getItem("token");
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
-// Authentication
+
 export const authAPI = {
   login: credentials => api.post(API_ENDPOINTS.auth.login(), credentials),
   loginWithOtp: data => api.post(API_ENDPOINTS.auth.loginOtp(), data),

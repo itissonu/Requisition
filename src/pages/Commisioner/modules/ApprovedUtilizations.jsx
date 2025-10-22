@@ -32,8 +32,6 @@ export default function ApprovedUtilizations() {
           ...approvedRes.data.map(u => ({ ...u, status: "COMMISSIONER_APPROVED" })),
           ...completedRes.data.map(u => ({ ...u, status: "COMPLETED" }))
         ];
-        console.log("Fetched utilizations:", utilizations);
-
         const list = utilizations.map(u => {
           const vehicles = u.subEventUtilizations?.reduce((sum, se) => 
             sum + (se.vehicleUtilizations?.reduce((vSum, v) => vSum + (v.actualQuantity || 0), 0) || 0), 0) || 0;
@@ -64,100 +62,7 @@ export default function ApprovedUtilizations() {
     })();
   }, []);
 
-  const downloadPDF = (util) => {
-    const pdfContent = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <style>
-          body { font-family: Arial, sans-serif; padding: 30px; }
-          .header { text-align: center; margin-bottom: 40px; border-bottom: 3px solid #1e40af; padding-bottom: 20px; }
-          .header h1 { margin: 5px 0; font-size: 22px; color: #1e40af; }
-          .header h2 { margin: 5px 0; font-size: 16px; font-weight: normal; color: #475569; }
-          .stamp { position: absolute; top: 80px; right: 50px; border: 4px solid #059669; color: #059669; padding: 10px 20px; font-size: 24px; font-weight: bold; transform: rotate(-15deg); border-radius: 8px; }
-          .info-section { margin: 30px 0; }
-          .info-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-          .info-table td { padding: 12px; border: 2px solid #e2e8f0; }
-          .info-table td:first-child { font-weight: bold; width: 35%; background: #f1f5f9; }
-          .section-title { font-weight: bold; font-size: 16px; margin-top: 30px; margin-bottom: 15px; color: #1e40af; border-bottom: 2px solid #1e40af; padding-bottom: 5px; }
-          .vehicle-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-          .vehicle-table th { background: #1e40af; color: white; padding: 12px; text-align: left; }
-          .vehicle-table td { padding: 10px; border: 1px solid #cbd5e1; }
-          .vehicle-table tr:nth-child(even) { background: #f8fafc; }
-          .total-row { font-weight: bold; background: #dcfce7 !important; font-size: 18px; }
-          .footer { margin-top: 50px; text-align: center; font-size: 11px; color: #64748b; border-top: 2px solid #cbd5e1; padding-top: 20px; }
-        </style>
-      </head>
-      <body>
-        <div class="stamp">APPROVED</div>
-        <div class="header">
-          <h1>GOVERNMENT OF ODISHA</h1>
-          <h2>Commerce & Transport (Transport) Department</h2>
-          <h1 style="margin-top: 20px; color: #059669;">UTILIZATION CERTIFICATE</h1>
-        </div>
-        
-        <div class="info-section">
-          <table class="info-table">
-            <tr><td>Certificate No:</td><td>UC-${String(util.id).padStart(4, '0')}</td></tr>
-            <tr><td>Event Name:</td><td>${util.eventName}</td></tr>
-            <tr><td>Department:</td><td>${util.department}</td></tr>
-            <tr><td>Vehicles Used:</td><td>${util.vehiclesUsed}</td></tr>
-            <tr><td>Approved By:</td><td>${util.approvedBy}</td></tr>
-            <tr><td>Approval Date:</td><td>${util.approvedDate}</td></tr>
-            <tr><td>Status:</td><td><strong style="color: #059669;">${util.status === "COMPLETED" ? "COMPLETED" : "APPROVED"}</strong></td></tr>
-          </table>
-        </div>
-        
-        <div class="section-title">VEHICLE UTILIZATION BREAKDOWN:</div>
-        ${util.subEventUtilizations.map((subEvent, idx) => `
-          <div style="margin-bottom: 30px;">
-            <h3 style="background: #f1f5f9; padding: 10px; margin: 10px 0;">Sub-Event ${idx + 1}: ${subEvent.subEventPlace} (${new Date(subEvent.subEventReportingDate).toLocaleDateString('en-GB')})</h3>
-            <table class="vehicle-table">
-              <thead>
-                <tr>
-                  <th>S.No</th>
-                  <th>Vehicle Type</th>
-                  <th>Quantity</th>
-                  <th>Total Cost (₹)</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${subEvent.vehicleUtilizations.map((vehicle, vIdx) => `
-                  <tr>
-                    <td>${vIdx + 1}</td>
-                    <td>${vehicle.vehicleName || 'N/A'}</td>
-                    <td>${vehicle.actualQuantity || 0}</td>
-                    <td>₹${(vehicle.totalCost || 0).toLocaleString('en-IN')}</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
-        `).join('')}
-        <table class="vehicle-table">
-          <tr class="total-row">
-            <td colspan="3" style="text-align: right; padding: 15px;">TOTAL AMOUNT:</td>
-            <td style="padding: 15px;">₹${util.totalAmount.toLocaleString('en-IN')}</td>
-          </tr>
-        </table>
-        
-        <div class="footer">
-          <p><strong>This is a computer-generated certificate and does not require a physical signature.</strong></p>
-          <p>Government of Odisha - Commerce & Transport Department</p>
-          <p>For queries, contact: transport@odisha.gov.in | Phone: 0674-XXXXXXX</p>
-        </div>
-      </body>
-      </html>
-    `;
-
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(pdfContent);
-    printWindow.document.close();
-    printWindow.focus();
-    setTimeout(() => {
-      printWindow.print();
-    }, 250);
-  };
+  
 
   const handleViewDetails = (util) => {
     setSelectedUtil(util);
@@ -272,7 +177,7 @@ export default function ApprovedUtilizations() {
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-blue-900 text-white">
-                    <th className="px-4 py-3 text-left text-sm font-semibold border-r border-blue-800">Certificate ID</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold border-r border-blue-800">Utilization ID</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold border-r border-blue-800">Event Details</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold border-r border-blue-800">Department</th>
                     <th className="px-4 py-3 text-center text-sm font-semibold border-r border-blue-800">Vehicles</th>
@@ -286,7 +191,7 @@ export default function ApprovedUtilizations() {
                     <tr key={util.id} className={`border-b border-gray-200 hover:bg-green-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
                       <td className="px-4 py-4 border-r border-gray-200">
                         <div className="font-mono font-bold text-blue-700">
-                          UC-{String(util.id).padStart(4, '0')}
+                          {String(util.id).padStart(4, '0')}
                         </div>
                       </td>
                       <td className="px-4 py-4 border-r border-gray-200">
@@ -298,9 +203,9 @@ export default function ApprovedUtilizations() {
                       </td>
                       <td className="px-4 py-4 border-r border-gray-200">
                         <div className="text-gray-900 font-medium">{util.department}</div>
-                        <div className="text-sm text-gray-500 flex items-center mt-1">
+                        <div className="text-xs text-gray-500 flex items-center mt-1">
                           <User className="w-3 h-3 mr-1" />
-                          {util.approvedBy}
+                          {util?.dto?.rtoOfficeName}
                         </div>
                       </td>
                       <td className="px-4 py-4 text-center border-r border-gray-200">
@@ -335,7 +240,7 @@ export default function ApprovedUtilizations() {
                             className="p-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors shadow-sm"
                             title="View Details"
                           >
-                            <Eye className="w-4 h-4" />
+                            <Eye className="w-4 h-4 hover:cursor-pointer" />
                           </button>
                           {/* <button
                             onClick={() => downloadPDF(util)}
@@ -362,12 +267,12 @@ export default function ApprovedUtilizations() {
             <div className="bg-blue-900 text-white p-6 rounded-t-lg">
               <div className="flex justify-between items-center">
                 <div>
-                  <h3 className="text-2xl font-bold">Utilization Certificate Details</h3>
-                  <p className="text-blue-200 mt-1">Certificate No: UC-{String(selectedUtil.id).padStart(4, '0')}</p>
+                  <h3 className="text-2xl font-bold">Utilization  Details</h3>
+                 
                 </div>
                 <button
                   onClick={closeModal}
-                  className="text-white hover:bg-blue-800 p-2 rounded-full transition-colors"
+                  className="text-white hover:cusror-p hover:bg-blue-800 hover:cursor-pointer p-2 rounded-full transition-colors"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -378,30 +283,27 @@ export default function ApprovedUtilizations() {
               {/* Basic Information */}
               <div>
                 <h4 className="text-lg font-bold text-gray-900 mb-3 pb-2 border-b-2 border-blue-600">Event Information</h4>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-4 gap-4">
                   <div className="bg-gray-50 border border-gray-300 p-4 rounded">
-                    <p className="text-sm text-gray-600 mb-1 font-semibold">Event Name</p>
-                    <p className="font-semibold text-gray-900">{selectedUtil.eventName}</p>
+                    <p className="text-base text-gray-600 mb-1 font-bold">Event Name</p>
+                    <p className="font-semibold text-xs text-gray-900">{selectedUtil.eventName}</p>
                   </div>
                   <div className="bg-gray-50 border border-gray-300 p-4 rounded">
-                    <p className="text-sm text-gray-600 mb-1 font-semibold">Department</p>
-                    <p className="font-semibold text-gray-900">{selectedUtil.department}</p>
+                    <p className="text-base text-gray-600 mb-1 font-bold">Department</p>
+                    <p className="font-semibold text-xs text-gray-900">{selectedUtil.department}</p>
                   </div>
                   <div className="bg-gray-50 border border-gray-300 p-4 rounded">
-                    <p className="text-sm text-gray-600 mb-1 font-semibold">Approved By</p>
-                    <p className="font-semibold text-gray-900">{selectedUtil.approvedBy}</p>
+                    <p className="text-base text-gray-600 mb-1 font-bold">Requested RTO</p>
+                    <p className="font-semibold text-xs text-gray-900">{selectedUtil?.dto?.rtoOfficeName}</p>
                   </div>
-                  <div className="bg-gray-50 border border-gray-300 p-4 rounded">
-                    <p className="text-sm text-gray-600 mb-1 font-semibold">Approval Date</p>
-                    <p className="font-semibold text-gray-900">{selectedUtil.approvedDate}</p>
-                  </div>
-                </div>
-                {selectedUtil.remarks && (
-                  <div className="mt-4 bg-yellow-50 border border-yellow-300 p-4 rounded">
-                    <p className="text-sm text-gray-600 mb-1 font-semibold">Remarks</p>
-                    <p className="text-gray-900">{selectedUtil.remarks}</p>
+                  {selectedUtil.remarks && (
+                  <div className=" bg-yellow-50 border border-yellow-300 p-4 rounded">
+                    <p className="text-base text-gray-600 mb-1 font-bold">Remarks</p>
+                    <p className="text-gray-900 text-xs">{selectedUtil.remarks}</p>
                   </div>
                 )}
+                </div>
+              
               </div>
 
               {/* Sub-Event Details */}

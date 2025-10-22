@@ -55,7 +55,6 @@ export default function ApproveUtilizations() {
       try {
         const response = await utilizationAPI.getByStatus("UTILIZATION_SUBMITTED");
         setUtilizations(response.data);
-        console.log('Fetched utilizations:', response.data);
       } catch (error) {
         console.error('Error fetching utilizations:', error);
         alert('Failed to load utilizations. Please try again.');
@@ -240,14 +239,14 @@ export default function ApproveUtilizations() {
                             <div className="flex items-center justify-center gap-2">
                               <button
                                 onClick={() => handleViewDetails(utilization)}
-                                className="p-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                                className="p-2 bg-blue-600 hover:cursor-pointer text-white rounded hover:bg-blue-700 transition-colors"
                                 title="View Details"
                               >
                                 <Eye className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => handleApprovalAction(utilization, "reject")}
-                                className="p-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                                className="p-2 bg-red-600 hover:cursor-pointer text-white rounded hover:bg-red-700 transition-colors"
                                 title="Reject"
                                 disabled={actionLoading}
                               >
@@ -255,7 +254,7 @@ export default function ApproveUtilizations() {
                               </button>
                               <button
                                 onClick={() => handleApprovalAction(utilization, "approve")}
-                                className="p-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                                className="p-2 bg-green-600 hover:cursor-pointer text-white rounded hover:bg-green-700 transition-colors"
                                 title="Approve"
                                 disabled={actionLoading}
                               >
@@ -326,7 +325,7 @@ export default function ApproveUtilizations() {
                   <h4 className="text-2xl font-bold text-white">Utilization Details</h4>
                   <p className="text-white text-sm mt-1 opacity-90">{viewingUtilization.eventName} - UT{String(viewingUtilization.id).padStart(3, '0')}</p>
                 </div>
-                <button onClick={() => setViewingUtilization(null)} className="p-2 text-white hover:bg-white/20 rounded-full"><XCircle /></button>
+                <button onClick={() => setViewingUtilization(null)} className="p-2 hover:cursor-pointer text-white hover:bg-white/20 rounded-full"><XCircle /></button>
               </div>
             </div>
             <div className="p-6 max-h-[70vh] overflow-y-auto">

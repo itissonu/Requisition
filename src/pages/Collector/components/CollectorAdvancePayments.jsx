@@ -34,10 +34,6 @@ const CollectorAdvancePayments = () => {
 
       const requests = requestsRes.data;
       const bills = billsRes.data;
-
-      console.log("Fetched Requests:", requests);
-      console.log("Fetched Bills:", bills);
-
       const processedRequests = requests.map(request => {
         const requestBills = bills.filter(bill => bill?.advancePaymentRequestId === request?.id);
         const paidAmount = requestBills.reduce((sum, bill) => sum + bill.amount, 0);
@@ -162,8 +158,8 @@ const CollectorAdvancePayments = () => {
               </td>
               <td className="px-4 py-4 whitespace-nowrap text-center">
                 <div className="flex items-center justify-center space-x-2">
-                  <button onClick={() => openDetailModal(request)} className="p-2 text-blue-500 hover:text-blue-600" title="View Details"><Eye className="w-5 h-5" /></button>
-                  <button onClick={() => openActionModal(request, 'approve')} className="p-2 text-green-500 hover:text-green-600" title="Approve"><CheckCircle className="w-5 h-5" /></button>
+                  <button onClick={() => openDetailModal(request)} className="p-2 hover:cursor-pointer text-blue-500 hover:text-blue-600" title="View Details"><Eye className="w-5 h-5" /></button>
+                  <button onClick={() => openActionModal(request, 'approve')} className="p-2 hover:cursor-pointer text-green-500 hover:text-green-600" title="Approve"><CheckCircle className="w-5 h-5" /></button>
                 </div>
               </td>
             </tr>
@@ -208,7 +204,7 @@ const CollectorAdvancePayments = () => {
                 {request.billSanctions && request.billSanctions.length > 0 && (
                   <button
                     onClick={() => openBillSanctionsModal(request)}
-                    className="mt-1 text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                    className="mt-1 text-xs text-blue-600 hover:cursor-pointer hover:text-blue-800 flex items-center gap-1"
                   >
                     <FileText className="w-3 h-3" />
                     View {request.billSanctions.length} Bill{request.billSanctions.length > 1 ? 's' : ''}
@@ -221,7 +217,7 @@ const CollectorAdvancePayments = () => {
               <td className="px-4 py-4 whitespace-nowrap text-center">
                 <button
                   onClick={() => openDetailModal(request)}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                  className="inline-flex items-center gap-2 hover:cursor-pointer px-3 py-1.5 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                   title="View Details"
                 >
                   <Eye className="w-4 h-4" />
@@ -276,7 +272,7 @@ const CollectorAdvancePayments = () => {
         <div className="max-w-7xl mx-auto p-4 md:p-6">
           <div className="bg-white shadow-md rounded-lg overflow-hidden">
             <div className="border-b border-gray-200">
-              <nav className="-mb-px flex space-x-6 px-6">
+              <nav className="-mb-px flex space-x-6 px-6 ">
                 <TabButton
                   label="Pending Approval"
                   count={pendingRequests.length}
@@ -330,7 +326,7 @@ const CollectorAdvancePayments = () => {
 const TabButton = ({ label, count, isActive, onClick, Icon }) => (
   <button
     onClick={onClick}
-    className={`flex items-center gap-2 py-4 px-1 text-sm font-medium border-b-2 transition-colors duration-200 ${isActive
+    className={`flex  hover:cursor-pointer items-center gap-2 py-4 px-1 text-sm font-medium border-b-2 transition-colors duration-200 ${isActive
       ? "border-blue-600 text-blue-600"
       : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
       }`}
@@ -355,7 +351,7 @@ const BillSanctionsModal = ({ request, onClose }) => (
             </h3>
             <p className="text-sm text-gray-100 mt-1">{request.eventName} - {request.billSanctions?.length || 0} Sanction{request.billSanctions?.length !== 1 ? 's' : ''}</p>
           </div>
-          <button onClick={onClose} className="text-white hover:text-gray-200">
+          <button onClick={onClose} className="text-white hover:cursor-pointer hover:text-gray-200">
             <XCircle className="w-7 h-7" />
           </button>
         </div>
@@ -455,7 +451,7 @@ const BillSanctionsModal = ({ request, onClose }) => (
         )}
       </div>
 
-      <div className="p-4 bg-gray-50 border-t border-gray-200 text-right rounded-b-xl">
+      <div className="p-4 hover:cursor-pointer bg-gray-50 border-t border-gray-200 text-right rounded-b-xl">
         <button onClick={onClose} className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">
           Close
         </button>
@@ -481,7 +477,7 @@ const ActionModal = ({ request, actionType, remarks, setRemarks, onClose, onConf
           <textarea value={remarks} onChange={(e) => setRemarks(e.target.value)} placeholder={isApprove ? "Enter optional comments..." : "Enter mandatory rejection reason..."} className="w-full border-2 border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500" rows={4} />
           <div className="flex gap-3 mt-6">
             <button onClick={onClose} disabled={loading} className="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 font-semibold disabled:opacity-50">Cancel</button>
-            <button onClick={onConfirm} disabled={loading || (!remarks.trim() && !isApprove)} className={`flex-1 ${isApprove ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"} text-white py-3 rounded-lg font-semibold disabled:opacity-50 shadow-md`}>
+            <button onClick={onConfirm} disabled={loading || (!remarks.trim() && !isApprove)} className={`flex-1 ${isApprove ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"} text-white py-3 rounded-lg font-semibold hover:cursor-pointer disabled:opacity-50 shadow-md`}>
               {loading ? "Processing..." : (isApprove ? "Confirm Approval" : "Confirm Rejection")}
             </button>
           </div>
@@ -500,7 +496,7 @@ const DetailModal = ({ request, onClose }) => (
             <h3 className="text-2xl font-bold text-white">{request.eventName}</h3>
             <p className="text-sm text-gray-50">{request.requestingDepartment}</p>
           </div>
-          <button onClick={onClose} className="text-white hover:text-gray-200"><XCircle className="w-7 h-7" /></button>
+          <button onClick={onClose} className="text-white hover:cursor-pointer hover:text-gray-200"><XCircle className="w-7 h-7" /></button>
         </div>
       </div>
       <div className="p-6 overflow-y-auto space-y-6">

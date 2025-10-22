@@ -342,18 +342,14 @@ export default function EventUtilizationForm() {
   };
 
   const handleSubmit = async () => {
-    // Check advance payment conditions first
     if (!checkAdvancePaymentConditions()) {
       alert('Please contact authorities to approve at least some advance payment bills before creating utilization.');
       return;
     }
-
-    // Check for zero amount
     if (totalCost === 0) {
       setShowZeroAmountModal(true);
       return;
     }
-
     await submitUtilization();
   };
 
@@ -385,7 +381,7 @@ export default function EventUtilizationForm() {
         })
       };
 
-      console.log("Submit Utilization:", payload);
+
       await utilizationAPI.create(payload);
 
       alert("Utilization created successfully!");

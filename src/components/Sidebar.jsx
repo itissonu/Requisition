@@ -83,10 +83,10 @@ export default function Sidebar({ activePage, setActivePage }) {
               <button
                 key={item.key}
                 onClick={() => setActivePage(item.key)}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                className={`w-full hover:cursor-pointer flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
                   isActive 
                     ? 'bg-blue-800 border-r-4 border-white' 
-                    : 'hover:bg-blue-800' 
+                    : 'hover:bg-blue-800 hover:cursor-pointer' 
                 }`}
               >
                 <Icon className="w-5 h-5 mr-3" />

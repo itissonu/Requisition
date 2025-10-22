@@ -52,7 +52,6 @@ export default function UploadLetterToRTO() {
         setFetchingRtos(true);
         const response = await userAPI.getRtosInMyDistrict();
         const districtRtos = response.data;
-        console.log(districtRtos,'districtRtos');
         setRtos(districtRtos);
 
         if (districtRtos.length === 1) {
@@ -90,9 +89,7 @@ export default function UploadLetterToRTO() {
     formData.append("letterPdf", data.letterFile[0]);
     formData.append("status", "CREATED");
 
-// for (const [key, value] of formData.entries()) {
-//   console.log(key, value);
-// }
+
 
     try {
       // console.log(formData,'formdataaaaa')
@@ -232,7 +229,7 @@ export default function UploadLetterToRTO() {
                 </label>
                 <select
                   {...register("rtoUserId")}
-                  className="w-full px-4 py-2.5 border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-200 outline-none"
+                  className="w-full px-4 hover:cursor-pointer py-2.5 border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-200 outline-none"
                 >
                   <option value="">-- Please Select --</option>
                   {rtos.map((rto) => (
@@ -243,7 +240,7 @@ export default function UploadLetterToRTO() {
                 </select>
                 {errors.rtoUserId && (
                   <p className="text-red-600 text-sm mt-1.5">
-                    ⚠ {errors.rtoUserId.message}
+                     {errors.rtoUserId.message}
                   </p>
                 )}
               </div>
@@ -264,7 +261,7 @@ export default function UploadLetterToRTO() {
               />
               {errors.letterName && (
                 <p className="text-red-600 text-sm mt-1.5">
-                  ⚠ {errors.letterName.message}
+                   {errors.letterName.message}
                 </p>
               )}
             </div>
@@ -284,7 +281,7 @@ export default function UploadLetterToRTO() {
               />
               {errors.requestedOffice && (
                 <p className="text-red-600 text-sm mt-1.5">
-                  ⚠ {errors.requestedOffice.message}
+                   {errors.requestedOffice.message}
                 </p>
               )}
             </div>
@@ -304,7 +301,7 @@ export default function UploadLetterToRTO() {
               />
               {errors.letterNo && (
                 <p className="text-red-600 text-sm mt-1.5">
-                  ⚠ {errors.letterNo.message}
+                   {errors.letterNo.message}
                 </p>
               )}
             </div>
@@ -361,7 +358,7 @@ export default function UploadLetterToRTO() {
                 type="button"
                 onClick={handleSubmit(onSubmit)}
                 disabled={loading}
-                className="flex-1 bg-blue-900 hover:bg-blue-800 disabled:bg-gray-400 text-white py-3 px-6 
+                className="flex-1 bg-blue-900 hover:cursor-pointer hover:bg-blue-800 disabled:bg-gray-400 text-white py-3 px-6 
                          font-semibold shadow-md hover:shadow-lg transition-all duration-200 
                          disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
@@ -387,7 +384,7 @@ export default function UploadLetterToRTO() {
                   letterFile: null,
                 })}
                 disabled={loading}
-                className="px-8 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold 
+                className="px-8 py-3 hover:cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold 
                          transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Clear Form

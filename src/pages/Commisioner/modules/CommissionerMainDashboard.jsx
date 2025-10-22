@@ -3,15 +3,15 @@ import { Clock, CheckCircle, FileText, AlertCircle, DollarSign, TrendingUp, Indi
 import { utilizationAPI, billSanctionAPI, advancePaymentAPI } from "../../../apis/apiService";
 
 export default function CommissionerMainDashboard() {
-const [stats, setStats] = useState({
-  pendingUtilizations: 0,
-  approvedThisMonth: 0,
-  totalAmountSanctioned: 0,
-  totalAmountNeedToSanction: 0,
-  rejectedUtilizations: 0,
-  pendingBills: 0,
-  advancePaymentsRequested: 0
-});
+  const [stats, setStats] = useState({
+    pendingUtilizations: 0,
+    approvedThisMonth: 0,
+    totalAmountSanctioned: 0,
+    totalAmountNeedToSanction: 0,
+    rejectedUtilizations: 0,
+    pendingBills: 0,
+    advancePaymentsRequested: 0
+  });
 
   const [recentActivity, setRecentActivity] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,7 +29,7 @@ const [stats, setStats] = useState({
         utilizationAPI.list(),
         billSanctionAPI.list(),
         advancePaymentAPI.list(),
-        
+
       ]);
 
       const utilizations = utilizationsResponse.data || [];
@@ -41,12 +41,12 @@ const [stats, setStats] = useState({
       const currentYear = new Date().getFullYear();
 
       const pendingUtilizations = utilizations.filter(u =>
-        u.utilizationStatus === 'COLLECTOR_APPROVED' 
+        u.utilizationStatus === 'COLLECTOR_APPROVED'
       ).length;
 
       const approvedThisMonth = utilizations.filter(u => {
         const approvalDate = new Date(u.updatedAt);
-        return (u.utilizationStatus === 'COMMISSIONER_APPROVED'|| u.utilizationStatus==='COMPLETED') &&
+        return (u.utilizationStatus === 'COMMISSIONER_APPROVED' || u.utilizationStatus === 'COMPLETED') &&
           approvalDate.getMonth() === currentMonth &&
           approvalDate.getFullYear() === currentYear;
       }).length;
@@ -222,7 +222,7 @@ const [stats, setStats] = useState({
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
         {dashboardStats.map((stat, index) => {
           const Icon = stat.icon;
           return (

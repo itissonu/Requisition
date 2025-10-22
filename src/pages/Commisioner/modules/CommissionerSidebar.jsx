@@ -61,7 +61,7 @@ export default function CommissionerSidebar({ activePage, setActivePage }) {
               <button
                 key={item.key}
                 onClick={() => setActivePage(item.key)}
-                className={`w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
+                className={`w-full flex items-center hover:cursor-pointer px-4 py-3 text-left rounded-lg transition-colors ${
                   isActive 
                     ? 'bg-blue-800 border-r-4 border-white' 
                     : 'hover:bg-blue-800'

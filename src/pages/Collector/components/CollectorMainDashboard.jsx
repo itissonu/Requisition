@@ -21,8 +21,6 @@ export default function CollectorMainDashboard() {
   });
 
   const [recentRequests, setRecentRequests] = useState([]);
-
-  console.log("Rendering CollectorMainDashboard",recentRequests);
   useEffect(() => {
     async function fetchDashboardData() {
       try {

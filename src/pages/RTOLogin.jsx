@@ -392,10 +392,7 @@ export default function RTOLogin({ onLogin }) {
         username,
         password,
       });
-
-      console.log(response.data);
       localStorage.setItem("authToken", response.data.token);
-
       onLogin({
         role: selectedRole?.id,
         username,
