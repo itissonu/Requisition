@@ -325,7 +325,7 @@ const CommissionerAdvancePayments = () => {
               </div>
               <div>
                 <h1 className="text-2xl font-bold">GOVERNMENT OF ODISHA</h1>
-                <h2 className="text-lg opacity-90">Commerce & Transport (Transport) Department</h2>
+                <h2 className="text-lg opacity-90">Commerce & Transport   Department</h2>
               </div>
             </div>
             <div className="mt-3 pt-3 border-t border-blue-700">
@@ -909,6 +909,11 @@ const CommissionerAdvancePayments = () => {
           </div>
         </div>
       )}
+       <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">
+       <p className="mb-2"> Vehicles Requisition System</p>
+        <p>© Government of Odisha – Commerce & Transport Department </p>
+        {/* <p className="text-xs opacity-75 mt-1">For assistance, contact: commissioner@odisha.gov.in</p> */}
+      </div>
     </div>
   );
 };

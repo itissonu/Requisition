@@ -92,7 +92,7 @@ export default function UploadLetterToRTO() {
 
 
     try {
-      // console.log(formData,'formdataaaaa')
+   
      await requestEventAPI.create(formData);
       setSuccess(true);
       reset({
@@ -161,11 +161,11 @@ export default function UploadLetterToRTO() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold">GOVERNMENT OF ODISHA</h1>
-                <h2 className="text-lg opacity-90">Commerce & Transport (Transport) Department</h2>
+                <h2 className="text-lg opacity-90">Commerce & Transport   Department</h2>
               </div>
             </div>
             <div className="mt-3 pt-3 border-t border-blue-700">
-              <h3 className="text-lg font-semibold tracking-wide uppercase">Event Request Submission Form</h3>
+              <h3 className="text-lg font-semibold tracking-wide uppercase">create event for rto</h3>
             </div>
           </div>
         </div>
@@ -234,7 +234,7 @@ export default function UploadLetterToRTO() {
                   <option value="">-- Please Select --</option>
                   {rtos.map((rto) => (
                     <option key={rto.id} value={rto.id}>
-                      {rto.fullName} - {rto?.rtoofficeName || "N/A"}
+                     {rto?.rtoofficeName || "N/A"}
                     </option>
                   ))}
                 </select>
@@ -296,7 +296,7 @@ export default function UploadLetterToRTO() {
               <input
                 type="text"
                 {...register("letterNo")}
-                placeholder="Enter letter reference number (e.g., COLL/2025/VR/001)"
+                placeholder="Enter letter reference number "
                 className="w-full px-4 py-2.5 border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-200 outline-none"
               />
               {errors.letterNo && (
@@ -397,7 +397,7 @@ export default function UploadLetterToRTO() {
         <div className="mt-6 bg-yellow-50 border-l-4 border-yellow-500 p-4 shadow-sm">
           <p className="text-sm text-gray-800">
             <strong className="text-yellow-800">Important:</strong> Please verify all information before submission.
-            The request will be sent to  the selected RTO for approval and processing.
+            The request will be sent to  the selected RTO for  processing.
             Ensure that the uploaded PDF contains all required data.
           </p>
         </div>
@@ -406,8 +406,10 @@ export default function UploadLetterToRTO() {
 
       </div>
       {/* Footer */}
-      <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">
-        © Government of Odisha - Commerce & Transport Department | Vehicle Requisition System
+        <div className="bg-blue-900 text-white p-4 text-center text-sm mt-8">
+        <p className="mb-2">Vehicles Requisition System</p>
+        <p className="font-semibold">© 2025 Government of Odisha – Commerce & Transport Department</p>
+        {/* <p className="text-xs opacity-75 mt-1">Approved Utilizations System | For assistance: transport@odisha.gov.in</p> */}
       </div>
     </div>
   );

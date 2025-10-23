@@ -141,7 +141,7 @@
 //               </div>
 //               <div>
 //                 <h1 className="text-2xl font-bold">GOVERNMENT OF ODISHA</h1>
-//                 <h2 className="text-lg opacity-90">Commerce & Transport (Transport) Department</h2>
+//                 <h2 className="text-lg opacity-90">Commerce & Transport   Department</h2>
 //               </div>
 //             </div>
 //             <div className="mt-3 pt-3 border-t border-blue-700">
@@ -585,12 +585,12 @@ export default function ShowPaymentBill() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold">GOVERNMENT OF ODISHA</h1>
-                <h2 className="text-lg opacity-90">Commerce & Transport (Transport) Department</h2>
+                <h2 className="text-lg opacity-90">Commerce & Transport   Department</h2>
               </div>
             </div>
             <div className="mt-3 pt-3 border-t border-blue-700">
-              <h3 className="text-lg font-semibold tracking-wide uppercase">Advance Payment Management System</h3>
-              <p className="text-sm text-blue-200 mt-1">Track and manage advance payment requests for events</p>
+              <h3 className="text-lg font-semibold tracking-wide uppercase">Track and manage advance payment requests for events</h3>
+              {/* <p className="text-sm text-blue-200 mt-1">Track and manage advance payment requests for events</p> */}
             </div>
           </div>
         </div>
@@ -688,7 +688,7 @@ export default function ShowPaymentBill() {
                 <tr className="bg-blue-900 text-white">
                   <th className="p-4 text-left font-bold border border-gray-400">Event Details</th>
                   <th className="p-4 text-right font-bold border border-gray-400">Advance Requested</th>
-                  <th className="p-4 text-right font-bold border border-gray-400">Total Amounts Sanctioned</th>
+                  <th className="p-4 text-right font-bold border border-gray-400">Total Amount Sanctioned</th>
                   <th className="p-4 text-right font-bold border border-gray-400">Total Amount Billed</th>
                   <th className="p-4 text-center font-bold border border-gray-400">Requests</th>
                   <th className="p-4 text-center font-bold border border-gray-400">Actions</th>
@@ -709,8 +709,8 @@ export default function ShowPaymentBill() {
                   currentEvents.map((event, index) => (
                     <tr key={event.id} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
                       <td className="p-4 border border-gray-300">
-                        <div className="font-semibold text-gray-900">{event?.requestEventName}</div>
-                        <div className="text-xs text-gray-500 mt-1">
+                        <div className="font-bold text-sm text-gray-900 uppercase">{event?.requestEventName}</div>
+                        <div className="text-sm text-gray-500 font-semibold  mt-1">
                           Event ID: {event.id}
                         </div>
                       </td>
@@ -734,8 +734,15 @@ export default function ShowPaymentBill() {
                       <td className="p-4 border border-gray-300">
                         <div className="text-right">
                           <div className="font-bold text-yellow-600 text-lg">
-                            {event?.totalAmountWillGet === 0 ? 'Utilization Not Created Yet' : `₹${event.totalAmountWillGet.toLocaleString('en-IN')}`}
+                            {event?.totalAmountWillGet === 0 ? (
+                              <span className="font-semibold text-red-600 text-xs">
+                                Utilization Not Created Yet
+                              </span>
+                            ) : (
+                              <>₹{event.totalAmountWillGet?.toLocaleString('en-IN')}</>
+                            )}
                           </div>
+
                         </div>
                       </td>
                       <td className="p-4 border border-gray-300 text-center">
@@ -853,6 +860,12 @@ export default function ShowPaymentBill() {
       {isRequestModalOpen && selectedEventForRequest && (
         <AdvanceRequestModal event={selectedEventForRequest} onClose={closeModal} onSuccess={fetchData} />
       )}
+       {/* Footer */}
+      <div className="bg-gradient-to-r from-blue-900 gap-3 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">
+        <p className="mb-2">Vehicles Requisition System</p>
+        <p>© Government of Odisha – Commerce & Transport Department </p>
+        {/* <p className="text-xs opacity-75 mt-1">For assistance, contact: collector@odisha.gov.in</p> */}
+      </div>
     </div>
   );
 }
@@ -1043,8 +1056,8 @@ function EventDetailModal({ event, onClose }) {
                   {/* <p className="text-xs text-gray-600 mt-1">{event.approvedRequestsCount} approved</p> */}
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-orange-600">
-                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Total Amount Will Get </h4>
-                  <p className="text-2xl font-bold text-green-600">₹{event?.totalAmountWillGet?.toLocaleString('en-IN')}</p>
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2">Total Amount Billed </h4>
+                  <p className="text-2xl font-bold text-orange-600">₹{event?.totalAmountWillGet?.toLocaleString('en-IN')}</p>
                   {/* <p className="text-xs text-gray-600 mt-1">{event.approvedRequestsCount} approved</p> */}
                 </div>
                 {/* <div className="bg-green-50 rounded-lg p-4 border-l-4 border-green-600">
@@ -1059,28 +1072,7 @@ function EventDetailModal({ event, onClose }) {
                 </div>
               </div>
 
-              {/* Quick Stats */}
-              <div className="bg-gray-50 rounded-lg p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Payment Statistics</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center">
-                    <p className="text-3xl font-bold text-purple-600">{event.advanceRequests.length}</p>
-                    <p className="text-sm text-gray-600 mt-1">Total Advance Amount Requests</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-3xl font-bold text-yellow-600">{event.pendingRequestsCount}</p>
-                    <p className="text-sm text-gray-600 mt-1">Pending</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-3xl font-bold text-green-600">{event.approvedRequestsCount}</p>
-                    <p className="text-sm text-gray-600 mt-1">Approved</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-3xl font-bold text-blue-600">{event.sanctionedBills.length}</p>
-                    <p className="text-sm text-gray-600 mt-1">Bills Sanctioned</p>
-                  </div>
-                </div>
-              </div>
+
             </div>
           )}
 

@@ -82,10 +82,10 @@
 //     if (path === '/rto/dashboard' || path === '/rto/dashboard/') {
 //       return 'DashBoard';
 //     }
-    
+
 //     const segments = path.split('/');
 //     const lastSegment = segments[segments.length - 1];
-    
+
 //     // Map URL segments to page keys
 //     const pathToPageMap = {
 //       'create-event': 'CreateEvent',
@@ -96,7 +96,7 @@
 //       'event-activity': 'EventActivity',
 //       'create-user': 'CreateUser'
 //     };
-    
+
 //     return pathToPageMap[lastSegment] || 'DashBoard';
 //   };
 
@@ -109,7 +109,7 @@
 
 //   const handlePageChange = (pageKey) => {
 //     setActivePage(pageKey);
-    
+
 //     // Map page keys to URL paths
 //     const pageToPathMap = {
 //       'DashBoard': '/rto/dashboard',
@@ -121,7 +121,7 @@
 //       'UploadLetterToCollector': '/rto/dashboard/pending-requisition',
 //       'EventActivity': '/rto/dashboard/event-activity'
 //     };
-    
+
 //     const path = pageToPathMap[pageKey] || '/rto/dashboard';
 //     navigate(path);
 //   };
@@ -181,10 +181,10 @@ export default function RTODashboard({ user, onLogout }) {
     if (path === '/rto/dashboard' || path === '/rto/dashboard/') {
       return 'DashBoard';
     }
-    
+
     const segments = path.split('/');
     const lastSegment = segments[segments.length - 1];
-    
+
     // Map URL segments to page keys
     const pathToPageMap = {
       'create-event': 'CreateEvent',
@@ -195,7 +195,7 @@ export default function RTODashboard({ user, onLogout }) {
       'event-activity': 'EventActivity',
       'create-user': 'CreateUser'
     };
-    
+
     return pathToPageMap[lastSegment] || 'DashBoard';
   };
 
@@ -208,7 +208,7 @@ export default function RTODashboard({ user, onLogout }) {
 
   const handlePageChange = (pageKey) => {
     setActivePage(pageKey);
-    
+
     // Map page keys to URL paths
     const pageToPathMap = {
       'DashBoard': '/rto/dashboard',
@@ -220,7 +220,7 @@ export default function RTODashboard({ user, onLogout }) {
       'UploadLetterToCollector': '/rto/dashboard/pending-requisition',
       'EventActivity': '/rto/dashboard/event-activity'
     };
-    
+
     const path = pageToPathMap[pageKey] || '/rto/dashboard';
     navigate(path);
   };
@@ -234,19 +234,19 @@ export default function RTODashboard({ user, onLogout }) {
     <div className="flex h-screen overflow-hidden">
       {/* Fixed Sidebar */}
       <div className="fixed left-0 top-0 h-full z-30 overflow-y-auto">
-        <Sidebar 
-          activePage={activePage} 
-          setActivePage={handlePageChange} 
+        <Sidebar
+          activePage={activePage}
+          setActivePage={handlePageChange}
         />
       </div>
-      
-     
-      <div className="flex-1 flex flex-col ml-72"> 
+
+
+      <div className="flex-1 flex flex-col ml-72">
         {/* Fixed Header */}
-        <div className="fixed top-0 right-0 left-72 z-20 bg-white shadow-sm"> 
+        <div className="fixed top-0 right-0 left-72 z-20 bg-white shadow-sm">
           <Header user={user} onLogout={onLogout} />
         </div>
-        
+
         {/* Scrollable Content */}
         <main className="flex-1 overflow-y-auto pt-24 p-6">
           <Routes>
@@ -260,6 +260,11 @@ export default function RTODashboard({ user, onLogout }) {
             <Route path="event-activity" element={<EventActivity />} />
           </Routes>
         </main>
+        {/* <div className="bg-gradient-to-r from-blue-200 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">
+          <p className="mb-2">Vehicles Requisition System</p>
+          <p>© Government of Odisha – Commerce & Transport Department </p>
+
+        </div> */}
       </div>
     </div>
   );

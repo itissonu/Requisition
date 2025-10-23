@@ -20,6 +20,8 @@ const CollectorAdvancePayments = () => {
   const [remarks, setRemarks] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
 
+
+  console.log(selectedRequest,"selelee")
   useEffect(() => {
     fetchData();
   }, []);
@@ -260,7 +262,7 @@ const CollectorAdvancePayments = () => {
               </div>
               <div>
                 <h1 className="text-2xl font-bold">GOVERNMENT OF ODISHA</h1>
-                <h2 className="text-lg opacity-90">Commerce & Transport (Transport) Department</h2>
+                <h2 className="text-lg opacity-90">Commerce & Transport   Department</h2>
               </div>
             </div>
             <div className="mt-4 pt-3 border-t border-blue-700 w-full max-w-lg">
@@ -317,6 +319,11 @@ const CollectorAdvancePayments = () => {
       {isActionModalOpen && <ActionModal request={selectedRequest} actionType={actionType} remarks={remarks} setRemarks={setRemarks} onClose={closeModal} onConfirm={handleConfirmAction} loading={actionLoading} />}
       {isDetailModalOpen && <DetailModal request={selectedRequest} onClose={closeModal} />}
       {isBillSanctionsModalOpen && <BillSanctionsModal request={selectedRequest} onClose={closeModal} />}
+        <div className="bg-blue-900 text-white p-4 text-center text-sm mt-8">
+        <p className="mb-2">Vehicles Requisition System</p>
+        <p className="font-semibold">© 2025 Government of Odisha – Commerce & Transport Department</p>
+        {/* <p className="text-xs opacity-75 mt-1">Approved Utilizations System | For assistance: transport@odisha.gov.in</p> */}
+      </div>
     </>
   );
 };
@@ -342,11 +349,11 @@ const TabButton = ({ label, count, isActive, onClick, Icon }) => (
 const BillSanctionsModal = ({ request, onClose }) => (
   <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
     <div className="bg-white w-full max-w-4xl rounded-xl shadow-2xl max-h-[90vh] flex flex-col">
-      <div className="p-6 bg-gradient-to-r from-green-600 to-green-700 border-b border-gray-200 rounded-t-xl">
+      <div className="p-6 bg-gradient-to-r from-blue-400 to-blue-500 border-b border-gray-200 rounded-t-xl">
         <div className="flex justify-between items-center">
           <div>
             <h3 className="text-2xl font-bold text-white flex items-center gap-2">
-              <DollarSign className="w-7 h-7" />
+              <IndianRupee className="w-7 h-7" />
               Bill Sanctions
             </h3>
             <p className="text-sm text-gray-100 mt-1">{request.eventName} - {request.billSanctions?.length || 0} Sanction{request.billSanctions?.length !== 1 ? 's' : ''}</p>
@@ -379,7 +386,7 @@ const BillSanctionsModal = ({ request, onClose }) => (
               <div key={bill.id} className="border-2 border-gray-200 rounded-lg p-5 bg-gray-50 hover:shadow-md transition-shadow">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-green-600 text-white rounded-full flex items-center justify-center font-bold">
+                    <div className="w-10 h-10 bg-blue-400 text-white rounded-full flex items-center justify-center font-bold">
                       {index + 1}
                     </div>
                     <div>
@@ -388,7 +395,7 @@ const BillSanctionsModal = ({ request, onClose }) => (
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-green-600">₹{bill.amount.toLocaleString('en-IN')}</p>
+                    <p className="text-2xl font-bold text-green-400">₹{bill.amount?.toLocaleString('en-IN')}</p>
                     <StatusBadge status={bill.status} />
                   </div>
                 </div>
@@ -396,11 +403,11 @@ const BillSanctionsModal = ({ request, onClose }) => (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
                   <div>
                     <p className="text-xs text-gray-500 font-semibold">Request Date</p>
-                    <p className="text-sm text-gray-900">{new Date(bill.requestDate).toLocaleDateString('en-IN')}</p>
+                    <p className="text-sm text-gray-900">{new Date(bill?.requestDate).toLocaleDateString('en-IN')}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 font-semibold">Created By</p>
-                    <p className="text-sm text-gray-900">{bill.createdByName || 'N/A'}</p>
+                    <p className="text-sm text-gray-900">{bill?.cretedByRto || 'N/A'}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 font-semibold">Created At</p>
@@ -422,9 +429,9 @@ const BillSanctionsModal = ({ request, onClose }) => (
                       {bill.collectorApprovedByName && (
                         <div className="bg-blue-50 p-2 rounded">
                           <p className="text-xs text-gray-600">Collector</p>
-                          <p className="text-sm font-medium text-gray-900">{bill.collectorApprovedByName}</p>
+                          <p className="text-sm font-medium text-gray-900">{bill?.collectorApprovedByName}</p>
                           {bill.collectorApprovalDate && (
-                            <p className="text-xs text-gray-500">{new Date(bill.collectorApprovalDate).toLocaleDateString('en-IN')}</p>
+                            <p className="text-xs text-gray-500">{new Date(bill?.collectorApprovalDate).toLocaleDateString('en-IN')}</p>
                           )}
                         </div>
                       )}

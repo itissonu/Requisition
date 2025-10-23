@@ -101,7 +101,7 @@ export default function ShowAllRequests() {
   const [priorityFilter, setPriorityFilter] = useState("ALL");
   const [selectedRequest, setSelectedRequest] = useState(null);
 
-  // Filter requests based on search and filters
+  
   useEffect(() => {
     let filtered = requests;
 
@@ -169,7 +169,7 @@ export default function ShowAllRequests() {
         </div>
       </div>
 
-      {/* Search and Filters */}
+     
       <div className="mb-6 flex flex-col md:flex-row gap-4">
         <div className="flex-1">
           <div className="relative">
@@ -213,7 +213,7 @@ export default function ShowAllRequests() {
         </div>
       </div>
 
-      {/* Requests Table */}
+      
       <div className="overflow-x-auto">
         <table className="w-full border-collapse border border-gray-200">
           <thead>
@@ -282,7 +282,7 @@ export default function ShowAllRequests() {
         )}
       </div>
 
-      {/* Request Details Modal */}
+      {/* Details Modal */}
       {selectedRequest && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-96 overflow-y-auto">

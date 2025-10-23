@@ -83,8 +83,8 @@ export default function CommissionerSidebar({ activePage, setActivePage }) {
         </nav>
       </div>
 
-      <div className="absolute bottom-0 w-64 p-6">
-        <div className="text-xs text-gray-400">
+      <div className="absolute bottom-0 w-64 p-6 flex items-center justify-center"> 
+        <div className="text-xs text-gray-400 flex flex-col items-center justify-center">
           <p>Government of Odisha</p>
           <p>Commerce & Transport Department</p>
         </div>

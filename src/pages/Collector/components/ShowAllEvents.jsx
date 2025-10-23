@@ -199,7 +199,7 @@ export default function ShowAllEvents() {
     setCurrentEventForPdf(null);
   };
 
-  // Clear all filters
+ 
   const handleClearFilters = () => {
     setSearchTerm("");
     setStatusFilter("ALL");
@@ -219,7 +219,7 @@ export default function ShowAllEvents() {
 
   return (
     <div className="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
-      {/* Government Header */}
+      {/*  Header */}
       <div className="bg-gradient-to-r from-orange-500 via-white to-green-600 h-2"></div>
       <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-6 shadow-xl">
         <div className="max-w-7xl mx-auto">
@@ -230,11 +230,11 @@ export default function ShowAllEvents() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold">GOVERNMENT OF ODISHA</h1>
-                <h2 className="text-lg opacity-90">Commerce & Transport (Transport) Department</h2>
+                <h2 className="text-lg opacity-90">Commerce & Transport   Department</h2>
               </div>
             </div>
             <div className="mt-3 pt-3 border-t border-blue-700">
-              <h3 className="text-lg font-semibold tracking-wide">ALL EVENTS MANAGEMENT SYSTEM</h3>
+              <h3 className="text-lg font-semibold tracking-wide">ALL EVENTS DETAILS</h3>
             </div>
           </div>
         </div>
@@ -254,7 +254,7 @@ export default function ShowAllEvents() {
             </div>
           </div>
 
-          {/* Search and Filter Section */}
+          
           <div className="p-6 bg-gray-50 border-b border-gray-200">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1">
@@ -303,7 +303,7 @@ export default function ShowAllEvents() {
             )}
           </div>
 
-          {/* Events Table */}
+          
           <div className="p-6">
             <div className="overflow-x-auto">
               <table className="w-full border-collapse border-2 border-gray-300">
@@ -405,16 +405,16 @@ export default function ShowAllEvents() {
             </div>
           </div>
 
-          {/* Pagination Section */}
+        
           {filteredEvents.length > 0 && (
             <div className="bg-gray-50 border-t border-gray-200 p-4">
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                {/* Results Info */}
+             
                 <div className="text-sm text-gray-600">
                   Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredEvents.length)} of {filteredEvents.length} events
                 </div>
 
-                {/* Pagination Controls */}
+               
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handlePrevPage}
@@ -473,7 +473,7 @@ export default function ShowAllEvents() {
         </div>
       </div>
 
-      {/* Event Details Modal */}
+    {/* event details modal */}
       {selectedEvent && (
         <div className="fixed inset-0 bg-black/60 bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
@@ -583,7 +583,6 @@ export default function ShowAllEvents() {
         </div>
       )}
 
-      {/* PDF Viewer Modal */}
       {pdfModalOpen && (
         <div className="fixed inset-0 bg-black/60 bg-opacity-75 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-6xl w-full max-h-[95vh] overflow-hidden shadow-2xl">
@@ -639,8 +638,10 @@ export default function ShowAllEvents() {
       )}
 
       {/* Footer */}
-      <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">
-        © Government of Odisha - Commerce & Transport Department | Vehicle Requisition System
+       <div className="bg-blue-900 text-white p-4 text-center text-sm mt-8">
+        <p className="mb-2">Vehicles Requisition System</p>
+        <p className="font-semibold">© 2025 Government of Odisha – Commerce & Transport Department</p>
+        {/* <p className="text-xs opacity-75 mt-1">Approved Utilizations System | For assistance: transport@odisha.gov.in</p> */}
       </div>
     </div>
   );

@@ -2,8 +2,8 @@ import axios from "axios";
 import { API_ENDPOINTS } from "./endpoint.js";
 
 const api = axios.create({
-  baseURL: "https://vehicle-backend-d3l9.onrender.com/Requisition",
- // baseURL: 'http://localhost:8091/Requisition',
+ // baseURL: "https://vehicle-backend-d3l9.onrender.com/Requisition",
+ baseURL: 'http://localhost:8091/Requisition',
   withCredentials: true,
    headers: {
     'Content-Type': 'application/json',
@@ -32,8 +32,8 @@ api.interceptors.response.use(
   },
   (error) => {
    
-    if (error.response && (error.response.status === 403 || error.response.status === 401)) {
-      // Clear stored authentication data
+    if (error.response && (error.response.status === 403 )) {
+     
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       alert('Your session has expired. Please login again.');

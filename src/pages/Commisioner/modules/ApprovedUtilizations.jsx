@@ -104,7 +104,7 @@ export default function ApprovedUtilizations() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold">Government of Odisha</h1>
-                <p className="text-sm text-blue-200">Commerce & Transport (Transport) Department</p>
+                <p className="text-sm text-blue-200">Commerce & Transport   Department</p>
               </div>
             </div>
             <Shield className="w-12 h-12 opacity-50" />
@@ -125,7 +125,7 @@ export default function ApprovedUtilizations() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600 font-semibold text-sm mb-1 uppercase">Total Approved</p>
-                <p className="text-4xl font-bold text-gray-900">{utilizations.length}</p>
+                <p className="text-4xl font-bold text-gray-900">{utilizations?.length}</p>
                 <p className="text-gray-600 text-sm mt-1">Utilizations</p>
               </div>
               <CheckCircle className="w-12 h-12 text-green-600" />
@@ -137,7 +137,7 @@ export default function ApprovedUtilizations() {
               <div>
                 <p className="text-gray-600 font-semibold text-sm mb-1 uppercase">Total Vehicles</p>
                 <p className="text-4xl font-bold text-gray-900">
-                  {utilizations.reduce((sum, u) => sum + u.vehiclesUsed, 0)}
+                  {utilizations.reduce((sum, u) => sum + u?.vehiclesUsed, 0)}
                 </p>
                 <p className="text-gray-600 text-sm mt-1">Used</p>
               </div>
@@ -150,7 +150,7 @@ export default function ApprovedUtilizations() {
               <div>
                 <p className="text-gray-600 font-semibold text-sm mb-1 uppercase">Total Amount</p>
                 <p className="text-4xl font-bold text-gray-900">
-                  ₹{utilizations.reduce((sum, u) => sum + u.totalAmount, 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                  ₹{utilizations.reduce((sum, u) => sum + u?.totalAmount, 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                 </p>
                 <p className="text-gray-600 text-sm mt-1">Approved</p>
               </div>
@@ -187,7 +187,7 @@ export default function ApprovedUtilizations() {
                   </tr>
                 </thead>
                 <tbody>
-                  {utilizations.map((util, index) => (
+                  {utilizations?.map((util, index) => (
                     <tr key={util.id} className={`border-b border-gray-200 hover:bg-green-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
                       <td className="px-4 py-4 border-r border-gray-200">
                         <div className="font-mono font-bold text-blue-700">
@@ -195,14 +195,14 @@ export default function ApprovedUtilizations() {
                         </div>
                       </td>
                       <td className="px-4 py-4 border-r border-gray-200">
-                        <div className="font-semibold text-gray-900">{util.eventName}</div>
+                        <div className="font-semibold text-gray-900">{util?.eventName}</div>
                         <div className="text-sm text-gray-500 flex items-center mt-1">
                           <Calendar className="w-3 h-3 mr-1" />
-                          Approved: {util.approvedDate}
+                          Approved: {util?.approvedDate}
                         </div>
                       </td>
                       <td className="px-4 py-4 border-r border-gray-200">
-                        <div className="text-gray-900 font-medium">{util.department}</div>
+                        <div className="text-gray-900 font-medium">{util?.department}</div>
                         <div className="text-xs text-gray-500 flex items-center mt-1">
                           <User className="w-3 h-3 mr-1" />
                           {util?.dto?.rtoOfficeName}
@@ -211,13 +211,13 @@ export default function ApprovedUtilizations() {
                       <td className="px-4 py-4 text-center border-r border-gray-200">
                         <div className="inline-flex items-center bg-purple-100 text-purple-800 px-3 py-1 rounded text-sm font-bold">
                           <Truck className="w-4 h-4 mr-1" />
-                          {util.vehiclesUsed}
+                          {util?.vehiclesUsed}
                         </div>
                       </td>
                       <td className="px-4 py-4 text-right border-r border-gray-200">
                         <div className="flex items-center justify-end gap-1">
                           <IndianRupee className="w-4 h-4 text-green-600" />
-                          <span className="font-bold text-green-700 text-lg">{util.totalAmount.toLocaleString('en-IN')}</span>
+                          <span className="font-bold text-green-700 text-lg">{util?.totalAmount?.toLocaleString('en-IN')}</span>
                         </div>
                       </td>
                       <td className="px-4 py-4 text-center border-r border-gray-200">
@@ -286,11 +286,11 @@ export default function ApprovedUtilizations() {
                 <div className="grid grid-cols-4 gap-4">
                   <div className="bg-gray-50 border border-gray-300 p-4 rounded">
                     <p className="text-base text-gray-600 mb-1 font-bold">Event Name</p>
-                    <p className="font-semibold text-xs text-gray-900">{selectedUtil.eventName}</p>
+                    <p className="font-semibold text-xs text-gray-900">{selectedUtil?.eventName}</p>
                   </div>
                   <div className="bg-gray-50 border border-gray-300 p-4 rounded">
                     <p className="text-base text-gray-600 mb-1 font-bold">Department</p>
-                    <p className="font-semibold text-xs text-gray-900">{selectedUtil.department}</p>
+                    <p className="font-semibold text-xs text-gray-900">{selectedUtil?.department}</p>
                   </div>
                   <div className="bg-gray-50 border border-gray-300 p-4 rounded">
                     <p className="text-base text-gray-600 mb-1 font-bold">Requested RTO</p>
@@ -299,7 +299,7 @@ export default function ApprovedUtilizations() {
                   {selectedUtil.remarks && (
                   <div className=" bg-yellow-50 border border-yellow-300 p-4 rounded">
                     <p className="text-base text-gray-600 mb-1 font-bold">Remarks</p>
-                    <p className="text-gray-900 text-xs">{selectedUtil.remarks}</p>
+                    <p className="text-gray-900 text-xs">{selectedUtil?.remarks}</p>
                   </div>
                 )}
                 </div>
@@ -316,16 +316,16 @@ export default function ApprovedUtilizations() {
                       <div className="flex items-center gap-6 mt-2 text-sm text-gray-700">
                         <span className="flex items-center gap-2">
                           <MapPin className="w-4 h-4 text-blue-600" />
-                          <span className="font-semibold">Place:</span> {subEvent.subEventPlace}
+                          <span className="font-semibold">Place:</span> {subEvent?.subEventPlace}
                         </span>
                         <span className="flex items-center gap-2">
                           <Calendar className="w-4 h-4 text-blue-600" />
-                          <span className="font-semibold">Date:</span> {new Date(subEvent.subEventReportingDate).toLocaleDateString('en-GB')}
+                          <span className="font-semibold">Date:</span> {new Date(subEvent?.subEventReportingDate).toLocaleDateString('en-GB')}
                         </span>
                       </div>
                       {subEvent.subEventStartTime && (
                         <div className="mt-2 text-sm text-gray-700">
-                          <span className="font-semibold">Time:</span> {subEvent.subEventStartTime} {subEvent.subEventEndTime && `- ${subEvent.subEventEndTime}`}
+                          <span className="font-semibold">Time:</span> {subEvent?.subEventStartTime} {subEvent?.subEventEndTime && `- ${subEvent.subEventEndTime}`}
                         </div>
                       )}
                     </div>
@@ -382,8 +382,9 @@ export default function ApprovedUtilizations() {
 
       {/* Footer */}
       <div className="bg-blue-900 text-white p-4 text-center text-sm mt-8">
+        <p className="mb-2">Vehicles Requisition System</p>
         <p className="font-semibold">© 2025 Government of Odisha – Commerce & Transport Department</p>
-        <p className="text-xs opacity-75 mt-1">Approved Utilizations System | For assistance: transport@odisha.gov.in</p>
+        {/* <p className="text-xs opacity-75 mt-1">Approved Utilizations System | For assistance: transport@odisha.gov.in</p> */}
       </div>
     </div>
   );

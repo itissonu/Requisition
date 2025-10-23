@@ -418,7 +418,7 @@ export default function ViewCollectorRequests() {
   };
 
   const handleApprove = async (id) => {
-    if (!window.confirm("Are you sure you want to approve this request?")) return;
+    if (!window.confirm("No more event can not be created further, Are you sure you want to complete this event ")) return;
 
     try {
       await requestEventAPI.approve(id, {
@@ -555,13 +555,13 @@ export default function ViewCollectorRequests() {
                     <span className="font-semibold text-gray-900">{request.letterNo}</span>
                   </div>
 
-                  <div className="flex items-center text-sm">
+                  {/* <div className="flex items-center text-sm">
                     <User className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
                     <span className="text-gray-600 mr-2">RTO:</span>
                     <span className="font-semibold text-gray-900 truncate">
                       {request.rtoUserName || "N/A"}
                     </span>
-                  </div>
+                  </div> */}
 
                   <div className="flex items-center text-sm">
                     <Landmark className="w-4 h-4 text-gray-400 mr-2 flex-shrink-0" />
@@ -654,6 +654,12 @@ export default function ViewCollectorRequests() {
           </div>
         </div>
       )}
+       {/* Footer */}
+      <div className="bg-gradient-to-r from-blue-900 gap-3 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">
+        <p className="mb-2">Vehicles Requisition System</p>
+        <p>© Government of Odisha – Commerce & Transport Department </p>
+        {/* <p className="text-xs opacity-75 mt-1">For assistance, contact: collector@odisha.gov.in</p> */}
+      </div>
     </div>
   );
 }

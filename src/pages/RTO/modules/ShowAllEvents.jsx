@@ -212,11 +212,11 @@ export default function ShowAllEvents() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold">GOVERNMENT OF ODISHA</h1>
-                <h2 className="text-lg opacity-90">Commerce & Transport (Transport) Department</h2>
+                <h2 className="text-lg opacity-90">Commerce & Transport   Department</h2>
               </div>
             </div>
             <div className="mt-3 pt-3 border-t border-blue-700">
-              <h3 className="text-lg font-semibold tracking-wide">EVENT MANAGEMENT SYSTEM</h3>
+              <h3 className="text-lg font-semibold tracking-wide">ALL EVENTS DETAILS</h3>
             </div>
           </div>
         </div>
@@ -571,13 +571,13 @@ export default function ShowAllEvents() {
               </div>
 
               {/* Sub-Events Section */}
-              <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-purple-500">
+              <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
                 <label className="font-semibold text-gray-700 block mb-3">Sub-Events & Vehicle Requirements:</label>
                 <div className="space-y-4">
                   {selectedEvent.subEvents?.map((subEvent, index) => (
                     <div key={subEvent.id} className="bg-white p-4 rounded-lg border-2 border-purple-200">
                       <div className="flex items-center mb-3">
-                        <div className="w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold text-sm mr-2">
+                        <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-sm mr-2">
                           {index + 1}
                         </div>
                         <h5 className="font-bold text-gray-800">Sub-Event #{index + 1}</h5>
@@ -640,8 +640,10 @@ export default function ShowAllEvents() {
       />
 
       {/* Footer */}
-      <div className="bg-blue-900 text-white p-4 text-center text-sm mt-8">
-        © Government of Odisha - Commerce & Transport Department | Vehicle Requisition System
+      <div className="bg-gradient-to-r from-blue-900 gap-3 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">
+        <p>Vehicles Requisition System</p>
+        <p>© Government of Odisha – Commerce & Transport Department </p>
+        {/* <p className="text-xs opacity-75 mt-1">For assistance, contact: collector@odisha.gov.in</p> */}
       </div>
     </div>
   );

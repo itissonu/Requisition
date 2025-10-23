@@ -219,11 +219,11 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
             </div>
             <div>
               <h1 className="text-2xl font-bold">GOVERNMENT OF ODISHA</h1>
-              <h2 className="text-base opacity-90">Commerce & Transport (Transport) Department</h2>
+              <h2 className="text-base opacity-90">Commerce & Transport   Department</h2>
             </div>
           </div>
           <div className="text-center border-t border-blue-700 pt-3">
-            <h3 className="text-lg font-semibold tracking-wide">VEHICLE REQUISITION APPLICATION</h3>
+            <h3 className="text-lg font-semibold tracking-wide uppercase">create requisition schedule</h3>
           </div>
         </div>
       </div>
@@ -254,9 +254,9 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
                       className="w-full border-2 hover:cursor-pointer border-gray-300 rounded-lg px-3 py-3  focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                     >
                       <option value="">Select a requesting event</option>
-                      {requests.map(request => (
-                        <option key={request.id} value={request.id}>
-                          {request.letterName}  (letterNo - {request.letterNo})
+                      {requests?.map(request => (
+                        <option key={request?.id} value={request?.id} className=" capitalize">
+                          {request?.letterName}  (LetterNo - {request?.letterNo})
                         </option>
                       ))}
                     </select>
@@ -274,7 +274,7 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
                   </label><input
                     {...register("reportingDepartment")}
                     type="text"
-                    value={selectedRequest ? selectedRequest.requestingDepartment : ""}
+                    value={selectedRequest ? selectedRequest?.requestingDepartment : ""}
                     readOnly
                     placeholder="Enter reporting department"
                    className="w-full border-2 border-gray-300 rounded-lg px-3 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
@@ -316,7 +316,7 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {subEvents.map((subEvent, index) => {
-                  const totalVehicles = subEvent.vehicles.reduce((sum, v) => sum + v.quantity, 0);
+                  const totalVehicles = subEvent?.vehicles?.reduce((sum, v) => sum + v.quantity, 0);
                   return (
                     <div key={index} className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg p-4 hover:shadow-lg transition-all">
                       <div className="flex items-start justify-between mb-3">
@@ -350,12 +350,12 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
                         <div className="flex items-center text-gray-700">
                           <MapPin className="w-4 h-4 mr-2 text-blue-600" />
                           <span className="font-semibold">Place:</span>
-                          <span className="ml-2">{subEvent.place}</span>
+                          <span className="ml-2">{subEvent?.place}</span>
                         </div>
                         <div className="flex items-center text-gray-700">
                           <Calendar className="w-4 h-4 mr-2 text-blue-600" />
                           <span className="font-semibold">Date:</span>
-                          <span className="ml-2">{subEvent.reportingDate}</span>
+                          <span className="ml-2">{subEvent?.reportingDate}</span>
                         </div>
                         <div className="flex items-center text-gray-700">
                           <Car className="w-4 h-4 mr-2 text-blue-600" />
@@ -471,13 +471,13 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
                         </tr>
                       </thead>
                       <tbody>
-                        {vehicles.map((vehicle, vehicleIndex) => (
+                        {vehicles?.map((vehicle, vehicleIndex) => (
                           <tr key={vehicle.id} className="border-b border-gray-200 hover:bg-blue-50 transition-colors">
                             <td className="p-2 text-center font-semibold text-gray-700 border-r border-gray-200 bg-gray-50">
                               {vehicleIndex + 1}
                             </td>
                             <td className="p-2 text-gray-800 border-r border-gray-200">
-                              <div className="font-medium">{vehicle.name}</div>
+                              <div className="font-medium">{vehicle?.name}</div>
                             </td>
                             <td className="p-2 text-center">
                               <Controller
@@ -582,13 +582,10 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
       />
 
       {/* Footer */}
-      <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-4 mt-12 shadow-lg">
-        <p className="text-center text-sm">
-          © Government of Odisha - Commerce & Transport Department | Vehicle Requisition System
-        </p>
-        <p className="text-center text-xs opacity-75 mt-1">
-          For assistance, contact: [transport@odisha.gov.in](mailto:transport@odisha.gov.in)
-        </p>
+       <div className="bg-gradient-to-r gap-2 from-blue-900 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">
+        <p className="mb-2">Vehicles Requisition System</p>
+        <p>© Government of Odisha – Commerce & Transport Department </p>
+        {/* <p className="text-xs opacity-75 mt-1">For assistance, contact: collector@odisha.gov.in</p> */}
       </div>
     </div>
   );

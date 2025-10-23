@@ -208,8 +208,16 @@ export default function CommissionerMainDashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+       <div className="min-h-screen bg-gradient-to-b from-orange-50 via-white to-green-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="flex items-center justify-center mb-4">
+            <div className="w-3 h-16 bg-orange-500 animate-pulse"></div>
+            <div className="w-3 h-16 bg-white animate-pulse mx-1"></div>
+            <div className="w-3 h-16 bg-green-600 animate-pulse"></div>
+          </div>
+          <p className="text-lg text-gray-700 font-semibold">Loading Commissioner Dashboard...</p>
+          <p className="text-sm text-gray-500 mt-1">Please wait</p>
+        </div>
       </div>
     );
   }

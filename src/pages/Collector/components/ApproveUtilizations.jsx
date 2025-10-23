@@ -142,7 +142,7 @@ export default function ApproveUtilizations() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold">GOVERNMENT OF ODISHA</h1>
-                <h2 className="text-lg opacity-90">Commerce & Transport (Transport) Department</h2>
+                <h2 className="text-lg opacity-90">Commerce & Transport  Department</h2>
               </div>
             </div>
             <div className="mt-3 pt-3 border-t border-blue-700">
@@ -273,7 +273,7 @@ export default function ApproveUtilizations() {
         </div>
       </div>
 
-      {/* Approval/Rejection Modal */}
+
       {showActionModal && selectedUtilization && (
         <div className="fixed inset-0 bg-black/10 bg-opacity-60 flex items-center justify-center p-4 z-50">
           <div className="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden">
@@ -315,7 +315,7 @@ export default function ApproveUtilizations() {
         </div>
       )}
 
-      {/* View Details Modal */}
+  
       {viewingUtilization && (
         <div className="fixed inset-0 bg-black/10 bg-opacity-60 flex items-center justify-center p-4 z-50">
           <div className="bg-white w-full max-w-2xl rounded-xl shadow-2xl">
@@ -368,8 +368,9 @@ export default function ApproveUtilizations() {
 
       {/* Footer */}
       <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">
-        <p>© Government of Odisha – Commerce & Transport Department | Vehicle Utilization System</p>
-        <p className="text-xs opacity-75 mt-1">For assistance, contact: collector@odisha.gov.in</p>
+        <p className="mb-2">Vehicles Requisition System</p>
+        <p>© Government of Odisha – Commerce & Transport Department </p>
+        {/* <p className="text-xs opacity-75 mt-1">For assistance, contact: collector@odisha.gov.in</p> */}
       </div>
     </div>
   );

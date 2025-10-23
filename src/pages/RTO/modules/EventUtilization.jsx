@@ -76,7 +76,7 @@ export default function EventUtilizationDashboard() {
       case "SUBMITTED": return "bg-blue-100 text-blue-800 border-blue-300";
       case "APPROVED": return "bg-green-100 text-green-800 border-green-300";
       case "REJECTED": return "bg-red-100 text-red-800 border-red-300";
-      case "COMPLETED": return "bg-gray-100 text-gray-800 border-gray-300";
+      case "COMPLETED": return "bg-green-100 text-gray-800 border-gray-300";
       default: return "bg-gray-100 text-gray-800 border-gray-300";
     }
   }; const handleViewDetails = (util) => {
@@ -112,10 +112,14 @@ export default function EventUtilizationDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-orange-50 via-white to-green-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-lg text-gray-600 font-medium">Loading utilization data...</p>
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-lg text-gray-600 font-medium">Loading utilization data...</p>
+          </div>
+
+          <p className="text-sm text-gray-500 mt-1">Please wait</p>
         </div>
       </div>
     );
@@ -138,11 +142,11 @@ export default function EventUtilizationDashboard() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold">GOVERNMENT OF ODISHA</h1>
-                <h2 className="text-lg opacity-90">Commerce & Transport (Transport) Department</h2>
+                <h2 className="text-lg opacity-90">Commerce & Transport   Department</h2>
               </div>
             </div>
             <div className="mt-3 pt-3 border-t border-blue-700">
-              <h3 className="text-lg font-semibold tracking-wide">VEHICLE UTILIZATION MANAGEMENT SYSTEM</h3>
+              <h3 className="text-lg font-semibold tracking-wide">EVENT VEHICLE UTILIZATION </h3>
             </div>
           </div>
         </div>
@@ -193,7 +197,8 @@ export default function EventUtilizationDashboard() {
                           className={`border-b border-gray-200 hover:bg-green-50 transition-colors ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}
                         >
                           <td className="px-4 py-3">
-                            <span className="font-mono font-bold text-blue-600">EV{String(event.id).padStart(3, '0')}</span>
+                             <span className="font-mono font-bold text-blue-600">{event?.id}</span>
+                            {/* <span className="font-mono font-bold text-blue-600">EV{String(event.id).padStart(3, '0')}</span> */}
                           </td>
                           {/* <td className="px-4 py-3">
                             <div className="flex items-center gap-2">
@@ -508,9 +513,10 @@ export default function EventUtilizationDashboard() {
         </div>
       )}
       {/* Footer */}
-      <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">
-        <p>© Government of Odisha – Commerce & Transport Department | Vehicle Utilization Management System</p>
-        <p className="text-xs opacity-75 mt-1">For assistance, contact: transport@odisha.gov.in</p>
+      <div className="bg-gradient-to-r from-blue-900 gap-3 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">
+        <p className="mb-2">Vehicles Requisition System</p>
+        <p>© Government of Odisha – Commerce & Transport Department </p>
+        {/* <p className="text-xs opacity-75 mt-1">For assistance, contact: collector@odisha.gov.in</p> */}
       </div>
     </div>
   );

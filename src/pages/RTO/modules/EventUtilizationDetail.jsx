@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   FileText, Calculator, Save, X, ChevronLeft, MapPin, Calendar, Clock,
-  AlertCircle, DollarSign, Eye, Trash2, CheckCircle, XCircle
+  AlertCircle, DollarSign, Eye, Trash2, CheckCircle, XCircle,
+  IndianRupee
 } from "lucide-react";
 import { eventAPI, utilizationAPI, vehicleAPI, advancePaymentAPI } from "../../../apis/apiService";
 
@@ -455,7 +456,7 @@ export default function EventUtilizationForm() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center">
             <h1 className="text-2xl font-bold">GOVERNMENT OF ODISHA</h1>
-            <h2 className="text-lg opacity-90">Commerce & Transport (Transport) Department</h2>
+            <h2 className="text-lg opacity-90">Commerce & Transport   Department</h2>
             <div className="mt-3 pt-3 border-t border-blue-700">
               <h3 className="text-lg font-semibold tracking-wide">VEHICLE UTILIZATION FORM</h3>
             </div>
@@ -519,12 +520,12 @@ export default function EventUtilizationForm() {
 
               <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border-l-4 border-blue-500">
                 <label className="font-semibold text-blue-900 block mb-1 text-sm">Collector:</label>
-                <p className="text-blue-800 font-bold">{event.collectorName}</p>
-                <p className="text-blue-600 text-xs mt-1">{event.collectorDistrict}</p>
+                {/* <p className="text-blue-800 font-bold">{event.collectorName}</p> */}
+                <p className="text-blue-600 text-sm mt-1">{event.collectorDistrict}</p>
               </div>
 
               <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg border-l-4 border-orange-500">
-                <label className="font-semibold text-orange-900 block mb-1 text-sm">Sub-Events:</label>
+                <label className="font-semibold text-orange-900 block mb-1 text-sm">Sub-Events Count:</label>
                 <p className="text-orange-800 font-bold text-2xl">{event.subEvents?.length || 0}</p>
               </div>
             </div>
@@ -553,7 +554,7 @@ export default function EventUtilizationForm() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
                   <div className="flex items-center gap-2 mb-2">
-                    <DollarSign className="w-5 h-5 text-blue-600" />
+                    <IndianRupee className="w-5 h-5 text-blue-600" />
                     <span className="font-semibold text-blue-900">Total Requested</span>
                   </div>
                   <p className="text-2xl font-bold text-blue-700">
@@ -832,9 +833,10 @@ export default function EventUtilizationForm() {
       />
 
       {/* Footer */}
-      <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">
-        <p>© Government of Odisha – Commerce & Transport Department | Vehicle Utilization Management System</p>
-        <p className="text-xs opacity-75 mt-1">For assistance, contact: transport@odisha.gov.in</p>
+       <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">
+        <p>Vehicle Requisition System</p>
+        <p>© Government of Odisha – Commerce & Transport Department </p>
+        {/* <p className="text-xs opacity-75 mt-1">For assistance, contact: collector@odisha.gov.in</p> */}
       </div>
     </div>
   );

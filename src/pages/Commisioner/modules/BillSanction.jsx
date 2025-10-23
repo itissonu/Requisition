@@ -134,7 +134,7 @@ const SanctionModal = ({ isOpen, onClose, utilization, onSanction, userRole }) =
 
           <div className="mb-6">
             <label className="block text-sm font-bold text-gray-700 mb-3  items-center gap-2">
-              <DollarSign className="w-5 h-5 text-emerald-600" />
+              <IndianRupee className="w-5 h-5 text-emerald-600" />
               Bill Amount <span className="text-red-500">*</span>
             </label>
             <div className="relative">
@@ -246,6 +246,7 @@ const BillSanction = () => {
       setUtilizations(utilizationsResponse.data);
       setBills(billsResponse.data);
       setAdvanceRequests(advanceRequestsResponse.data);
+      console.log(billsResponse.data, "bills sanctionsss")
     } catch (error) {
       console.error("Failed to fetch data:", error);
       alert("Failed to load data. Please try again.");
@@ -463,6 +464,7 @@ const BillSanction = () => {
   return (
     <div className="bg-gradient-to-br from-gray-50 to-blue-50 min-h-screen">
       {/* Header */}
+      <div className="bg-gradient-to-r from-orange-500 via-white to-green-600 h-2"></div>
       <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-6 shadow-lg">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-center mb-3">
@@ -471,11 +473,11 @@ const BillSanction = () => {
             </div>
             <div>
               <h1 className="text-2xl font-bold">GOVERNMENT OF ODISHA</h1>
-              <h2 className="text-base opacity-90">Commerce & Transport (Transport) Department</h2>
+              <h2 className="text-base opacity-90">Commerce & Transport   Department</h2>
             </div>
           </div>
           <div className="text-center border-t border-blue-700 pt-3">
-            <h3 className="text-lg font-semibold tracking-wide">BILL SANCTION MANAGEMENT</h3>
+            <h3 className="text-lg font-semibold tracking-wide">COMMISSIONER - BILL SANCTION</h3>
           </div>
         </div>
       </div>
@@ -533,14 +535,20 @@ const BillSanction = () => {
               <p className="text-gray-500">Loading data...</p>
             </div>
           ) : currentItems.length === 0 ? (
-            <div className="flex py-8 h-80 justify-center items-center">
-              <div className="flex flex-col ">
+            <div className="flex py-8 h-80 p-4 ">
+              {/* <div className="flex flex-col ">
               <File className="w-12 h-12 mx-auto text-gray-400 mb-3" />
               <p className="text-gray-500  font-bold text-sm">
                 {searchTerm || statusFilter !== "all"
                   ? "No utilizations match your search criteria"
                   : "No utilizations found"}
               </p>
+              </div> */}
+              <div className="bg-white  w-full h-full   rounded-xl p-12 text-center ">
+                <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-4" />
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">All Caught Up!</h3>
+                <p className="text-gray-600 text-lg">No pending Events present to Sanction Bills at this time.</p>
+                <p className="text-gray-500 text-sm mt-2">Check back later for new submissions.</p>
               </div>
             </div>
           ) : (
@@ -582,7 +590,7 @@ const BillSanction = () => {
                         <div className="space-y-1 text-sm">
                           <div className="flex justify-between">
                             <span className="text-gray-600">Total Cost:</span>
-                            <span className="font-bold text-gray-900">₹{item.totalCost?.toLocaleString('en-IN')}</span>
+                            <span className="font-bold text-gray-900">₹{item?.totalCost?.toLocaleString('en-IN')}</span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-600 text-xs">Total Amount Sanctioned:</span>
@@ -591,12 +599,12 @@ const BillSanction = () => {
                           {item.totalAdvanceRequested > 0 && (
                             <div className="flex justify-between">
                               <span className="text-gray-600 text-xs">Advance Req:</span>
-                              <span className="font-bold text-blue-600">₹{item.totalAdvanceRequested.toLocaleString('en-IN')}</span>
+                              <span className="font-bold text-blue-600">₹{item?.totalAdvanceRequested?.toLocaleString('en-IN')}</span>
                             </div>
                           )}
                           <div className="flex justify-between">
                             <span className="text-gray-600 text-xs font-semibold">Advance Amount Sanctioned:</span>
-                            <span className="font-bold text-emerald-600">₹{item.totalAdvanceSanctioned?.toLocaleString('en-IN')}</span>
+                            <span className="font-bold text-emerald-600">₹{item?.totalAdvanceSanctioned?.toLocaleString('en-IN')}</span>
                           </div>
                         </div>
                       </td>
@@ -615,29 +623,29 @@ const BillSanction = () => {
                           >
                             <Eye className="w-5 h-5  hover:cursor-pointer" />
                           </button>
-                          {item.remainingAmount > 0 && item.canSanctionFinal && (
+                          {item?.remainingAmount > 0 && item?.canSanctionFinal && (
                             <button
                               onClick={() => openBillModal(item)}
                               className="p-3 text-emerald-600  bg-blue-600 gap-1 flex items-center justify-center hover:bg-emerald-800 hover:cursor-pointer rounded-xl transition-all shadow-sm hover:shadow-md"
                               title="Create Final Bill"
-                            ><span className="text-xs text-gray-50 font-bold">Sanction Amount</span><IndianRupee className="h-4 w-4 text-white" />
+                            ><IndianRupee className="h-4 w-4 text-white" /><span className="text-xs text-gray-50 font-bold">Sanction Amount</span>
                             </button>
                           )}
-                          {item.remainingAmount > 0 && !item.canSanctionFinal && (
+                          {item?.remainingAmount > 0 && !item?.canSanctionFinal && (
                             <div className="p-3 text-emerald-600 bg-blue-600 gap-1 flex items-center justify-center hover:bg-emerald-800  rounded-xl transition-all shadow-sm hover:shadow-md cursor-not-allowed" title="Complete advance payments first">
-                              <span className="text-xs text-gray-500">Sanction Amount</span><IndianRupee className="h-4 w-4 text-gray-500" />
+                              <IndianRupee className="h-4 w-4 text-gray-300" /> <span className="text-xs text-gray-300">Sanction Amount</span>
                             </div>
                           )}
                         </div>
                       </td>
                       <td className="px-4 py-4 text-center border-r border-gray-200">
                         {item?.totalCost === item?.totalBilled ? (
-                          <span className="inline-flex items-center bg-green-100 text-green-800 px-3 py-1 rounded text-xs font-bold border border-green-300">
+                          <span className="inline-flex  items-center bg-green-100 text-green-800 px-1 py-1 rounded text-xs font-bold border border-green-300">
                             <CheckCircle className="w-3 h-3 mr-1" />
                             FULLY SANCTIONED
                           </span>
                         ) : (
-                          <span className="inline-flex items-center bg-yellow-100 text-yellow-800 px-3 py-1 rounded text-xs font-bold border border-yellow-300">
+                          <span className="inline-flex items-center bg-yellow-100 text-yellow-800 px-1 py-1 rounded text-[10px] font-bold border border-yellow-300">
                             <AlertCircle className="w-3 h-3 mr-1" />
                             PARTIALLY SANCTIONED
                           </span>
@@ -665,8 +673,8 @@ const BillSanction = () => {
                     onClick={handlePrevPage}
                     disabled={currentPage === 1}
                     className={`p-2 rounded-lg ${currentPage === 1
-                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      : 'bg-blue-600 text-white hover:bg-blue-700'
                       }`}
                   >
                     <ChevronLeft className="w-5 h-5" />
@@ -678,10 +686,10 @@ const BillSanction = () => {
                       onClick={() => pageNum !== '...' && handlePageChange(pageNum)}
                       disabled={pageNum === '...'}
                       className={`px-4 py-2 rounded-lg font-semibold ${pageNum === currentPage
-                          ? 'bg-blue-600 text-white'
-                          : pageNum === '...'
-                            ? 'bg-transparent text-gray-400 cursor-default'
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        ? 'bg-blue-600 text-white'
+                        : pageNum === '...'
+                          ? 'bg-transparent text-gray-400 cursor-default'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                         }`}
                     >
                       {pageNum}
@@ -692,8 +700,8 @@ const BillSanction = () => {
                     onClick={handleNextPage}
                     disabled={currentPage === totalPages}
                     className={`p-2 rounded-lg ${currentPage === totalPages
-                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      : 'bg-blue-600 text-white hover:bg-blue-700'
                       }`}
                   >
                     <ChevronRight className="w-5 h-5" />
@@ -777,15 +785,15 @@ const BillSanction = () => {
                         <div>
                           <h4 className="font-semibold text-gray-800 flex items-center gap-2">
                             Bill #{index + 1}
-                            <span className={`px-2 py-1 rounded text-xs ${getStatusBadge(bill.status)}`}>
-                              {bill.status}
+                            <span className={`px-2 py-1 rounded text-xs ${getStatusBadge(bill?.status)}`}>
+                              {bill?.status}
                             </span>
                           </h4>
-                          <p className="text-xs text-gray-800 font-bold mt-1">Type: {getBillTypeLabel(bill.type)}</p>
+                          <p className="text-xs text-gray-800 font-bold mt-1">Type: {getBillTypeLabel(bill?.type)}</p>
                         </div>
                         <div className="text-right">
                           <p className="text-lg font-bold text-green-600">
-                            ₹{bill.amount?.toLocaleString('en-IN')}
+                            ₹{bill?.amount?.toLocaleString('en-IN')}
                           </p>
                           {bill.advancePaymentRequestId && (
                             <p className="text-xs text-blue-600 capitalize border-[1px] border-blue-600 rounded-4xl bg-blue-50 p-1">
@@ -798,34 +806,34 @@ const BillSanction = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
                           <span className="font-medium text-gray-600">Created For:</span>
-                          <p className="text-gray-800">{bill.cretedByRto}</p>
+                          <p className="text-gray-800">{bill?.cretedByRto}</p>
                         </div>
 
-                        {bill.collectorApprovedByName && (
+                        {bill?.collectorApprovedByName && (
                           <>
                             <div>
                               <span className="font-medium text-gray-600">Collector Approved By:</span>
-                              <p className="text-gray-800">{bill.collectorApprovedByName}</p>
+                              <p className="text-gray-800">{bill?.collectorApprovedByName}</p>
                             </div>
                             <div>
                               <span className="font-medium text-gray-600">Collector Approval Date:</span>
                               <p className="text-gray-800">
-                                {new Date(bill.collectorApprovalDate).toLocaleDateString('en-IN')}
+                                {new Date(bill?.collectorApprovalDate).toLocaleDateString('en-IN')}
                               </p>
                             </div>
                           </>
                         )}
 
-                        {bill.commissionerApprovedByName && (
+                        {bill?.commissionerApprovedByName && (
                           <>
                             <div>
                               <span className="font-medium text-gray-600">Commissioner Approved By:</span>
-                              <p className="text-gray-800">{bill.commissionerApprovedByName}</p>
+                              <p className="text-gray-800">{bill?.commissionerApprovedByName}</p>
                             </div>
                             <div>
                               <span className="font-medium text-gray-600">Commissioner Approval Date:</span>
                               <p className="text-gray-800">
-                                {new Date(bill.commissionerApprovalDate).toLocaleDateString('en-IN')}
+                                {new Date(bill?.commissionerApprovalDate).toLocaleDateString('en-IN')}
                               </p>
                             </div>
                           </>
@@ -835,7 +843,7 @@ const BillSanction = () => {
                           <div>
                             <span className="font-medium text-gray-600">Payment Date:</span>
                             <p className="text-gray-800">
-                              {new Date(bill.advancePaymentDate).toLocaleDateString('en-IN')}
+                              {new Date(bill?.advancePaymentDate).toLocaleDateString('en-IN')}
                             </p>
                           </div>
                         )}
@@ -844,14 +852,14 @@ const BillSanction = () => {
                       {bill.remarks && (
                         <div className="mt-3 pt-3 border-t border-gray-200">
                           <span className="font-medium text-gray-600 text-sm">Remarks:</span>
-                          <p className="text-gray-800 text-sm mt-1">{bill.remarks}</p>
+                          <p className="text-gray-800 text-sm mt-1">{bill?.remarks}</p>
                         </div>
                       )}
 
                       {bill.status === 'COMMISSIONER_APPROVED' && (
                         <div className="mt-3 pt-3 border-t border-gray-200 flex justify-end">
                           <button
-                            onClick={() => handleMarkAsPaid(bill.id)}
+                            onClick={() => handleMarkAsPaid(bill?.id)}
                             className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
                           >
                             <CheckCircle className="w-4 h-4" />
@@ -876,6 +884,11 @@ const BillSanction = () => {
           </div>
         </div>
       )}
+      <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">
+        <p className="mb-2"> Vehicles Requisition System</p>
+        <p>© Government of Odisha – Commerce & Transport Department </p>
+        {/* <p className="text-xs opacity-75 mt-1">For assistance, contact: commissioner@odisha.gov.in</p> */}
+      </div>
     </div>
   );
 };

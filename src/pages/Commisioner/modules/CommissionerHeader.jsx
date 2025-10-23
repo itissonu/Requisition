@@ -6,7 +6,7 @@ export default function CommissionerHeader({ user, onLogout }) {
     <header className="h-16 bg-white shadow flex items-center justify-between px-6 border-b border-gray-200">
       <div className="flex items-center">
         <div className="text-lg font-semibold text-blue-700">
-          Vehicle Requisition System — Commissioner Portal
+          Vehicles Requisition System — Commissioner Portal
         </div>
       </div>
       
@@ -21,7 +21,7 @@ export default function CommissionerHeader({ user, onLogout }) {
         
         <button
           onClick={onLogout}
-          className="flex items-center px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+          className="flex items-center px-3 py-1  hover:cursor-pointer bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
         >
           <LogOut className="w-4 h-4 mr-1" />
           Logout

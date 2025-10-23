@@ -12,7 +12,7 @@ const renderActiveShape = (props) => {
         <Sector
             cx={cx} cy={cy}
             innerRadius={innerRadius}
-            outerRadius={outerRadius + 10}
+            outerRadius={outerRadius }
             startAngle={startAngle}
             endAngle={endAngle}
             fill={fill}
@@ -119,11 +119,22 @@ export default function RTOMainDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-white p-4 shadow rounded">
                     <h3 className="font-semibold mb-4">Events Per Month</h3>
-                    <BarChart width={400} height={250} data={eventsData}>
-                        <XAxis dataKey="month" />
-                        <YAxis />
-                        <Tooltip />
-                        <Bar dataKey="events" fill="#1e40af" />
+                   <BarChart
+                        width={400}
+                        height={250}
+                        data={eventsData}
+                        margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
+                    >
+                        <XAxis dataKey="month" tick={{ fill: "#374151" }} />
+                        <YAxis tick={{ fill: "#374151" }} />
+                        <Tooltip cursor={{ fill: "rgba(37,99,235,0.1)" }} />
+                        <Bar
+                            dataKey="events"
+                            fill="#2563EB"
+                            barSize={65}
+                            animationDuration={700}
+                            style={{ filter: "drop-shadow(0px 4px 6px rgba(0,0,0,0.25))" }}
+                        />
                     </BarChart>
                 </div>
 
@@ -132,21 +143,45 @@ export default function RTOMainDashboard() {
                     <PieChart width={400} height={250}>
                         <Pie
                             data={statusData}
-                            dataKey="value"
                             cx="50%"
                             cy="50%"
-                            outerRadius={90}
+                            innerRadius={45}
+                            outerRadius={85}
+                            // paddingAngle={0}
+                            dataKey="value"
+                            animationDuration={1000}
+                            isAnimationActive={true}
                             activeIndex={activeIndex}
                             activeShape={renderActiveShape}
                             onMouseEnter={(_, i) => setActiveIndex(i)}
                             onMouseLeave={() => setActiveIndex(null)}
+                            style={{ filter: "drop-shadow(0px 4px 6px rgba(0,0,0,0.25))" }}
                         >
-                            {statusData.map((_, i) => (
-                                <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                            {statusData.map((entry, index) => (
+                                <Cell
+                                    key={`cell-${index}`}
+                                    fill={COLORS[index % COLORS.length]}
+                                    stroke="#fff"
+                                    strokeWidth={2}
+                                />
                             ))}
                         </Pie>
-                        <Legend />
-                        <Tooltip />
+                        <Tooltip
+                            contentStyle={{
+                                backgroundColor: "#fff",
+                                borderRadius: "8px",
+                                border: "1px solid #ddd",
+                                boxShadow: "0px 2px 6px rgba(0,0,0,0.15)"
+                            }}
+                        />
+                        <Legend
+                            verticalAlign="bottom"
+                            height={36}
+                            iconType="circle"
+                            formatter={(value) => (
+                                <span style={{ color: "#374151", fontSize: "14px" }}>{value}</span>
+                            )}
+                        />
                     </PieChart>
                 </div>
             </div>

@@ -65,6 +65,7 @@ export default function CommissionerApproveUtilizations() {
     setSelected(util);
     setShowDetailsModal(true);
   };
+  console.log(utilizations,"utilizionss")
 
   // Calculate total vehicles across all sub-events
   const getTotalVehicles = (utilization) => {
@@ -78,13 +79,17 @@ export default function CommissionerApproveUtilizations() {
   const getTotalSubEvents = (utilization) => {
     return utilization.subEventUtilizations?.length || 0;
   };
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-50 flex items-center justify-center">
+       <div className="min-h-screen bg-gradient-to-b from-orange-50 via-white to-green-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-lg text-gray-600 font-medium">Loading utilizations...</p>
+          <div className="flex items-center justify-center mb-4">
+            <div className="w-3 h-16 bg-orange-500 animate-pulse"></div>
+            <div className="w-3 h-16 bg-white animate-pulse mx-1"></div>
+            <div className="w-3 h-16 bg-green-600 animate-pulse"></div>
+          </div>
+          <p className="text-lg text-gray-700 font-semibold">Loading approved utilizations...</p>
+          <p className="text-sm text-gray-500 mt-1">Please wait</p>
         </div>
       </div>
     );
@@ -93,6 +98,7 @@ export default function CommissionerApproveUtilizations() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Government Header */}
+      <div className="bg-gradient-to-r from-orange-500 via-white to-green-600 h-2"></div>
       <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-6 shadow-xl">
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
@@ -106,7 +112,7 @@ export default function CommissionerApproveUtilizations() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold">GOVERNMENT OF ODISHA</h1>
-                <h2 className="text-lg opacity-90">Commerce & Transport (Transport) Department</h2>
+                <h2 className="text-lg opacity-90">Commerce & Transport   Department</h2>
               </div>
             </div>
             <div className="mt-3 pt-3 border-t border-blue-700">
@@ -134,7 +140,7 @@ export default function CommissionerApproveUtilizations() {
                     <th className="px-4 py-3 text-left text-sm font-semibold">ID</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold">Event Name</th>
                     <th className="px-4 py-3 text-left text-sm font-semibold">Department</th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold">Collector</th>
+                    <th className="px-4 py-3 text-center text-sm font-semibold">RTO</th>
                     <th className="px-4 py-3 text-center text-sm font-semibold">Sub-Events</th>
                     <th className="px-4 py-3 text-center text-sm font-semibold">Vehicles</th>
                     <th className="px-4 py-3 text-right text-sm font-semibold">Total Cost</th>
@@ -157,15 +163,15 @@ export default function CommissionerApproveUtilizations() {
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
                             <FileText className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                            <span className="font-medium text-gray-900">{u.eventName}</span>
+                            <span className="font-medium text-gray-900">{u?.eventName}</span>
                           </div>
                         </td>
                         <td className="px-4 py-3">
-                          <span className="text-sm text-gray-700">{u.requestingDepartment}</span>
+                          <span className="text-sm text-gray-700">{u?.requestingDepartment}</span>
                         </td>
                         <td className="px-4 py-3 text-center">
                           <div className="text-sm">
-                            <div className="font-semibold text-blue-700">{u.collectorApprovedByName}</div>
+                            <div className="font-semibold text-blue-700">{u?.rtoOfficeName}</div>
                           </div>
                         </td>
                         <td className="px-4 py-3 text-center">
@@ -438,8 +444,9 @@ export default function CommissionerApproveUtilizations() {
 
       {/* Footer */}
       <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">
-        <p>© Government of Odisha – Commerce & Transport Department | Commissioner Approval System</p>
-        <p className="text-xs opacity-75 mt-1">For assistance, contact: commissioner@odisha.gov.in</p>
+       <p className="mb-2"> Vehicles Requisition System</p>
+        <p>© Government of Odisha – Commerce & Transport Department </p>
+        {/* <p className="text-xs opacity-75 mt-1">For assistance, contact: commissioner@odisha.gov.in</p> */}
       </div>
     </div>
   );
