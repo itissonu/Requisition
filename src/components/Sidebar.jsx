@@ -1,5 +1,5 @@
 import React from "react";
-import { 
+import {
   Home,        // For Dashboard
   UserPlus,    // For CreateUser
   CalendarPlus, // For CreateEvent
@@ -7,10 +7,11 @@ import {
   LayoutList,  // For ShowAllEvents
   Receipt,     // For ShowPaymentBill
   Mail,        // For UploadLetterToCollector
-  Activity    // For EventActivity
+  Activity,    // For EventActivity
+  ReceiptText
 } from "lucide-react";
 
-// Map your original string items to richer menu objects
+
 const menuItems = [
   {
     key: "DashBoard",
@@ -54,7 +55,13 @@ const menuItems = [
     icon: Mail,
     description: "View Collector Requests"
   },
- 
+  {
+    key: "ShowAllBills",
+    label: "View All Bills",
+    icon: ReceiptText,
+    description: "Get All Bills Details"
+  },
+
 ];
 
 export default function Sidebar({ activePage, setActivePage }) {
@@ -78,16 +85,15 @@ export default function Sidebar({ activePage, setActivePage }) {
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = activePage === item.key;
-            
+
             return (
               <button
                 key={item.key}
                 onClick={() => setActivePage(item.key)}
-                className={`w-full hover:cursor-pointer flex items-center px-4 py-3 text-left rounded-lg transition-colors ${
-                  isActive 
-                    ? 'bg-blue-800 border-r-4 border-white' 
-                    : 'hover:bg-blue-800 hover:cursor-pointer' 
-                }`}
+                className={`w-full hover:cursor-pointer flex items-center px-4 py-3 text-left rounded-lg transition-colors ${isActive
+                    ? 'bg-blue-800 border-r-4 border-white'
+                    : 'hover:bg-blue-800 hover:cursor-pointer'
+                  }`}
               >
                 <Icon className="w-5 h-5 mr-3" />
                 <div className="flex-1">
@@ -106,7 +112,7 @@ export default function Sidebar({ activePage, setActivePage }) {
         </nav>
       </div>
 
-     <div className="absolute bottom-0 w-64 p-6 flex items-center justify-center"> 
+      <div className="absolute bottom-0 w-64 p-6 flex items-center justify-center">
         <div className="text-xs text-gray-400 flex flex-col items-center justify-center">
           <p>Government of Odisha</p>
           <p>Commerce & Transport Department</p>

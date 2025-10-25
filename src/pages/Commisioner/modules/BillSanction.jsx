@@ -74,7 +74,7 @@ const SanctionModal = ({ isOpen, onClose, utilization, onSanction, userRole }) =
           </div>
         </div>
 
-        <div className="p-6">
+        <div className="p-3">
           {/* Utilization Summary */}
           <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-xl mb-6 border border-blue-200">
             <div className="flex items-center gap-2 mb-4">
@@ -483,7 +483,7 @@ const BillSanction = () => {
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-7xl mx-auto p-3">
         {/* Search and Filter */}
         <div className="bg-white p-6 rounded-lg shadow-md mb-6">
           <div className="flex flex-col md:flex-row gap-4 mb-4">
@@ -554,14 +554,15 @@ const BillSanction = () => {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                <thead className="bg-blue-900 text-white">
                   <tr>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase">Event Details</th>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase">RTO</th>
-                    <th className="px-6 py-4 text-right text-sm font-bold text-gray-700 uppercase">Financial Summary</th>
-                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-700 uppercase">Bills</th>
-                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-700 uppercase">Actions</th>
-                    <th className="px-6 py-4 text-center text-sm font-bold text-gray-700 uppercase">Remark</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">Event Details</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">RTO</th>
+                    <th className="px-6 py-4 text-right text-xs font-medium uppercase tracking-wider">Financial Summary</th>
+                    <th className="px-6 py-4 text-center text-xs font-medium uppercase tracking-wider">Bills</th>
+
+                  <th className="px-6 py-4 text-center text-xs font-medium uppercase tracking-wider">Remark</th>
+                       <th className="px-6 py-4 text-center text-xs font-medium uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -569,11 +570,8 @@ const BillSanction = () => {
                     <tr key={item.id} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
                       <td className="px-6 py-5">
                         <div>
-                          <div className="font-bold text-gray-900 mb-1">{item.eventName}</div>
-                          <div className="text-sm text-gray-500 flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
-                            {new Date(item.createdAt).toLocaleDateString()}
-                          </div>
+                          <div className="font-semibold text-gray-900 mb-1 capitalize">{item.eventName}</div>
+
                           <div className="text-xs text-gray-400 mt-1">ID: {item.eventId}</div>
                         </div>
                       </td>
@@ -581,7 +579,7 @@ const BillSanction = () => {
                         <div className="flex items-center gap-2">
                           <Building2 className="w-4 h-4 text-gray-400" />
                           <div>
-                            <span className="font-semibold text-gray-900 block">{item.rtoOfficeName}</span>
+                            <span className="font-semibold text-sm  text-gray-900 block">{item.rtoOfficeName}</span>
                             {/* <span className="text-xs text-gray-500">{item.rtoName}</span> */}
                           </div>
                         </div>
@@ -609,10 +607,24 @@ const BillSanction = () => {
                         </div>
                       </td>
                       <td className="px-6 py-5 text-center">
-                        <span className="inline-flex items-center gap-1 bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-3 py-1.5 rounded-full text-sm font-bold shadow-md">
+                        <span className="inline-flex items-center gap-1 bg-gradient-to-r from-blue-500 to-blue-500 text-white px-3 py-1.5 rounded-full text-sm font-bold shadow-md">
                           <Receipt className="w-3 h-3" />
                           {item.bills.length}
                         </span>
+                      </td>
+
+                      <td className="px-4 py-4 text-center  border-gray-200">
+                        {item?.totalCost === item?.totalBilled ? (
+                          <span className="inline-flex  items-center bg-green-100 text-green-800 px-1 py-1 rounded text-xs font-bold border border-green-300">
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            FULLY SANCTIONED
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center bg-yellow-100 text-yellow-800 px-1 py-1 rounded text-[10px] font-bold border border-yellow-300">
+                            <AlertCircle className="w-3 h-3 mr-1" />
+                            PARTIALLY SANCTIONED
+                          </span>
+                        )}
                       </td>
                       <td className="px-6 py-5 text-center">
                         <div className="flex items-center justify-center gap-2">
@@ -637,19 +649,6 @@ const BillSanction = () => {
                             </div>
                           )}
                         </div>
-                      </td>
-                      <td className="px-4 py-4 text-center border-r border-gray-200">
-                        {item?.totalCost === item?.totalBilled ? (
-                          <span className="inline-flex  items-center bg-green-100 text-green-800 px-1 py-1 rounded text-xs font-bold border border-green-300">
-                            <CheckCircle className="w-3 h-3 mr-1" />
-                            FULLY SANCTIONED
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center bg-yellow-100 text-yellow-800 px-1 py-1 rounded text-[10px] font-bold border border-yellow-300">
-                            <AlertCircle className="w-3 h-3 mr-1" />
-                            PARTIALLY SANCTIONED
-                          </span>
-                        )}
                       </td>
                     </tr>
                   ))}

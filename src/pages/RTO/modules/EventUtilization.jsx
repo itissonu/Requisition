@@ -208,7 +208,7 @@ export default function EventUtilizationDashboard() {
                           </td> */}
                           <td className="px-4 py-3">
                             <div className="text-sm">
-                              <div className="font-semibold text-purple-700">{event.requestEventName}</div>
+                              <div className="font-semibold capitalize text-gray-700">{event.requestEventName}</div>
                               <div className="text-xs text-gray-500">{event.requestEventLetterNo}</div>
                             </div>
                           </td>
@@ -225,7 +225,7 @@ export default function EventUtilizationDashboard() {
                             </div>
                           </td> */}
                           <td className="px-4 py-3 text-center">
-                            <span className="inline-flex items-center justify-center w-8 h-8 bg-purple-100 text-purple-700 rounded-full font-bold">
+                            <span className="inline-flex items-center justify-center w-8 h-8 bg-purple-100 text-gray-700 rounded-full font-bold">
                               {totalSubEvents}
                             </span>
                           </td>

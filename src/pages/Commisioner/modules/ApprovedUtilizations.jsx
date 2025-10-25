@@ -195,8 +195,8 @@ export default function ApprovedUtilizations() {
                         </div>
                       </td>
                       <td className="px-4 py-4 border-r border-gray-200">
-                        <div className="font-semibold text-gray-900">{util?.eventName}</div>
-                        <div className="text-sm text-gray-500 flex items-center mt-1">
+                        <div className="font-semibold capitalize text-gray-900">{util?.eventName}</div>
+                        <div className="text-xs text-gray-500 flex items-center mt-1">
                           <Calendar className="w-3 h-3 mr-1" />
                           Approved: {util?.approvedDate}
                         </div>

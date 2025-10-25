@@ -1,377 +1,4 @@
-// import React, { useEffect, useState } from "react";
-// import {
-//   Eye, FileText, CheckCircle, Clock, IndianRupee, TrendingUp, DollarSign, Calendar, Plus
-// } from "lucide-react";
-// import { advancePaymentAPI, billSanctionAPI, eventAPI, utilizationAPI } from "../../../apis/apiService";
-// import logo from '../../../assests/logo.png';
 
-// export default function ShowPaymentBill() {
-//   const [events, setEvents] = useState([]);
-//   const [requests, setRequests] = useState([]);
-//   const [bills, setBills] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [selectedEvent, setSelectedEvent] = useState(null);
-//   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-//   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
-//   const [selectedEventForRequest, setSelectedEventForRequest] = useState(null);
-//   const [utilizations, setUtilizations] = useState([]);
-
-//   console.log(selectedEvent, "selected event")
-
-
-//   useEffect(() => {
-//     fetchData();
-//   }, []);
-
-//   const fetchData = async () => {
-//     try {
-//       setLoading(true);
-//       const [eventsRes, requestsRes, billsRes, utilizationsRes] = await Promise.all([
-//         eventAPI.list(),
-//         advancePaymentAPI.list(),
-//         billSanctionAPI.list(),
-//         utilizationAPI.list()
-//       ]);
-
-//       setEvents(eventsRes.data);
-//       setRequests(requestsRes.data);
-//       console.log(requestsRes.data, 'requestsResData');
-//       setBills(billsRes.data);
-//       setUtilizations(utilizationsRes.data);
-//     } catch (error) {
-//       console.error("Failed to load data:", error);
-//       alert("Failed to load data.");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   const openDetailModal = (event) => {
-//     setSelectedEvent(event);
-//     setIsDetailModalOpen(true);
-//   };
-
-//   const openRequestModal = (event) => {
-//     setSelectedEventForRequest(event);
-//     setIsRequestModalOpen(true);
-//   };
-
-//   const closeModal = () => {
-//     setSelectedEvent(null);
-//     setIsDetailModalOpen(false);
-//     setIsRequestModalOpen(false);
-//     setSelectedEventForRequest(null);
-//   };
-
-//   // Process events with financial data
-//   const processedEvents = events.map(event => {
-//     const eventRequests = requests.filter(r => r.eventId === event.id);
-
-//     const totalAdvanceRequested = eventRequests.reduce((sum, r) => sum + r.requestedAmount, 0);
-
-//     const approvedRequests = eventRequests.filter(r =>
-//       r.status === 'APPROVED' || r.status === 'PAID' || r.status === 'PARTIAL_PAID'
-//     );
-
-
-//     const totalAdvanceApproved = approvedRequests
-//       .flatMap(r => r.billSanctions || [])
-//       .reduce((sum, bill) => sum + (bill.amount || 0), 0);
-
-//     const paidRequests = eventRequests.filter(r => r.status === 'PAID');
-//     const totalPaid = paidRequests.reduce((sum, r) => sum + r.requestedAmount, 0);
-
-//     const pendingRequests = eventRequests.filter(r => r.status === 'PENDING');
-
-//     const eventUtilization = utilizations.find(u => u.eventId === event.id);
-//     const totalAmountWillGet = eventUtilization ? eventUtilization.totalCost : 0;
-
-
-//     const eventBills = bills.filter(b => b.eventId === event.id);
-//     const totalBillsSanctioned = eventBills.reduce((sum, b) => sum + b.amount, 0);
-
-//     //console.log(totalAdvanceApproved,"totalAdvanceRequested.............")
-//     return {
-//       ...event,
-//       advanceRequests: eventRequests,
-//       sanctionedBills: eventBills,
-//       totalAdvanceRequested,
-//       totalAdvanceApproved,
-//        totalAmountWillGet,
-//       totalPaid,
-//       totalBillsSanctioned,
-//       pendingRequestsCount: pendingRequests.length,
-//       approvedRequestsCount: approvedRequests.length,
-//       hasRequests: eventRequests.length > 0
-//     };
-//   });
-
-//   console.log(processedEvents, 'proceedevents')
-
-//   // Calculate overall statistics
-//   const stats = {
-//     totalEvents: processedEvents.length,
-//     eventsWithRequests: processedEvents.filter(e => e.hasRequests).length,
-//     totalAdvanceRequested: processedEvents.reduce((s, e) => s + e.totalAdvanceRequested, 0),
-//     totalAdvanceApproved: processedEvents.reduce((s, e) => s + e.totalAdvanceApproved, 0),
-//     totalPaid: processedEvents.reduce((s, e) => s + e.totalPaid, 0),
-//     totalBillsSanctioned: processedEvents.reduce((s, e) => s + e.totalBillsSanctioned, 0)
-//   };
-
-//   if (loading) {
-//     return (
-//       <div className="flex justify-center items-center h-screen bg-gray-50">
-//         <div className="text-center">
-//           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-//           <p className="text-lg font-semibold text-gray-700">Loading Financial Data...</p>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-//       <div className="bg-gradient-to-r from-orange-500 via-white to-green-600 h-2"></div>
-//       <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-6 shadow-xl">
-//         <div className="max-w-7xl mx-auto">
-//           <div className="text-center">
-//             <div className="flex items-center justify-center mb-3">
-//               <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mr-4">
-//                 <img src={logo} alt="Odisha Logo" className="w-14 h-14 object-contain" />
-//               </div>
-//               <div>
-//                 <h1 className="text-2xl font-bold">GOVERNMENT OF ODISHA</h1>
-//                 <h2 className="text-lg opacity-90">Commerce & Transport   Department</h2>
-//               </div>
-//             </div>
-//             <div className="mt-3 pt-3 border-t border-blue-700">
-//               <h3 className="text-lg font-semibold tracking-wide uppercase">Advance Payment Management System</h3>
-//               <p className="text-sm text-blue-200 mt-1">Track and manage advance payment requests for events</p>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-
-//       <main className="max-w-7xl mx-auto py-8 px-6">
-//         {/* Stats Cards */}
-//         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-//           <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-600">
-//             <div className="flex items-center justify-between">
-//               <div>
-//                 <p className="text-sm text-gray-600 font-semibold">Total Events</p>
-//                 <p className="text-3xl font-bold text-gray-900 mt-1">{stats.totalEvents}</p>
-//                 <p className="text-xs text-blue-600 mt-1">{stats.eventsWithRequests} with requests</p>
-//               </div>
-//               <div className="p-3 bg-blue-100 rounded-full">
-//                 <FileText className="w-8 h-8 text-blue-600" />
-//               </div>
-//             </div>
-//           </div>
-
-//           <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-600">
-//             <div className="flex items-center justify-between">
-//               <div>
-//                 <p className="text-sm text-gray-600 font-semibold"> Advance Amount Sanctioned</p>
-//                 <p className="text-2xl font-bold text-yellow-600 mt-1">
-//                   ₹{stats.totalAdvanceApproved?.toLocaleString('en-IN')}
-//                 </p>
-//                 <p className="text-xs text-gray-500 mt-1">Advance payments</p>
-//               </div>
-//               <div className="p-3 bg-purple-100 rounded-full">
-//                 <IndianRupee className="w-8 h-8 text-purple-600" />
-//               </div>
-//             </div>
-//           </div>
-//           <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-600">
-//             <div className="flex items-center justify-between">
-//               <div>
-//                 <p className="text-sm text-gray-600 font-semibold"> Advance Amount Requested</p>
-//                 <p className="text-2xl font-bold text-purple-600 mt-1">
-//                   ₹{stats.totalAdvanceRequested.toLocaleString('en-IN')}
-//                 </p>
-//                 {/* <p className="text-xs text-gray-500 mt-1">Advance payments</p> */}
-//               </div>
-//               <div className="p-3 bg-purple-100 rounded-full">
-//                 <IndianRupee className="w-8 h-8 text-purple-600" />
-//               </div>
-//             </div>
-//           </div>
-
-//           {/* <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-600">
-//             <div className="flex items-center justify-between">
-//               <div>
-//                 <p className="text-sm text-gray-600 font-semibold">Commissioner Approved</p>
-//                 <p className="text-2xl font-bold text-green-600 mt-1">
-//                   ₹{stats.totalAdvanceApproved.toLocaleString('en-IN')}
-//                 </p>
-//                 <p className="text-xs text-gray-500 mt-1">
-//                   {stats.totalAdvanceRequested > 0 ? 
-//                     `${((stats.totalAdvanceApproved / stats.totalAdvanceRequested) * 100).toFixed(1)}% approval rate` : 
-//                     'No requests yet'}
-//                 </p>
-//               </div>
-//               <div className="p-3 bg-green-100 rounded-full">
-//                 <CheckCircle className="w-8 h-8 text-green-600" />
-//               </div>
-//             </div>
-//           </div> */}
-
-//           <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-600">
-//             <div className="flex items-center justify-between">
-//               <div>
-//                 <p className="text-sm text-gray-600 font-semibold">Bills Sanctioned</p>
-//                 <p className="text-2xl font-bold text-orange-600 mt-1">
-//                   ₹{stats.totalBillsSanctioned.toLocaleString('en-IN')}
-//                 </p>
-//                 <p className="text-xs text-gray-500 mt-1">Against approved requests</p>
-//               </div>
-//               <div className="p-3 bg-orange-100 rounded-full">
-//                 <TrendingUp className="w-8 h-8 text-orange-600" />
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* Main Table */}
-//         <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
-//           <div className="bg-blue-100 border-b border-blue-200 p-4">
-//             <h2 className="text-xl font-bold text-blue-900">Events Advance Payment Overview</h2>
-//             <p className="text-sm text-blue-700 mt-1">Request and track advance payments for events</p>
-//           </div>
-
-//           <div className="overflow-x-auto">
-//             <table className="w-full border-collapse">
-//               <thead>
-//                 <tr className="bg-blue-900 text-white">
-//                   <th className="p-4 text-left font-bold border border-gray-400">Event Details</th>
-//                   {/* <th className="p-4 text-left font-bold border border-gray-400">Status</th> */}
-//                   <th className="p-4 text-right font-bold border border-gray-400">Advance Requested</th>
-//                   <th className="p-4 text-right font-bold border border-gray-400">Total Amounts Sanctioned</th>
-//                   <th className="p-4 text-right font-bold border border-gray-400">Total Amount Billed</th>
-//                   <th className="p-4 text-center font-bold border border-gray-400">Requests</th>
-//                   <th className="p-4 text-center font-bold border border-gray-400">Actions</th>
-//                 </tr>
-//               </thead>
-//               <tbody>
-//                 {processedEvents.map((event, index) => (
-//                   <tr key={event.id} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
-//                     <td className="p-4 border border-gray-300">
-//                       <div className="font-semibold text-gray-900">{event?.requestEventName}</div>
-//                       <div className="text-xs text-gray-500 mt-1">
-//                         Event ID: {event.id}
-//                       </div>
-//                       {/* <div className="text-xs text-gray-500">
-//                         {event.requestingDepartment}
-//                       </div> */}
-//                     </td>
-//                     {/* <td className="p-4 border border-gray-300">
-//                       <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${event.status === 'CREATED' ? 'bg-blue-100 text-blue-800' :
-//                           event.status === 'UTILIZATION_SUBMITTED' ? 'bg-yellow-100 text-yellow-800' :
-//                             event.status === 'COLLECTOR_APPROVED' ? 'bg-purple-100 text-purple-800' :
-//                               event.status === 'COMMISSIONER_APPROVED' ? 'bg-green-100 text-green-800' :
-//                                 event.status === 'COMPLETED' ? 'bg-gray-100 text-gray-800' :
-//                                   'bg-gray-100 text-gray-800'
-//                         }`}>
-//                         {event.status}
-//                       </span>
-//                     </td> */}
-//                     <td className="p-4 border border-gray-300">
-//                       <div className="text-right">
-//                         <div className="font-bold text-purple-600 text-lg">
-//                           ₹{event.totalAdvanceRequested.toLocaleString('en-IN')}
-//                         </div>
-//                         <div className="text-xs text-gray-500 mt-1">
-//                           {event.advanceRequests.length} request(s)
-//                         </div>
-//                       </div>
-//                     </td>
-//                     <td className="p-4 border border-gray-300">
-//                       <div className="text-right">
-//                         <div className="font-bold text-green-600 text-lg">
-//                           ₹{event?.totalBillsSanctioned
-//                             .toLocaleString('en-IN')}
-//                         </div>
-
-//                       </div>
-//                     </td>
-//                     <td className="p-4 border border-gray-300">
-//                       <div className="text-right">
-//                         <div className="font-bold text-yellow-600 text-lg">
-//                           {event?.totalAmountWillGet === 0 ? 'Utilization Not Created Yet' : `₹${event.totalAmountWillGet.toLocaleString('en-IN')}`}
-//                         </div>
-//                         {/* <div className="text-xs text-gray-500 mt-1">
-//                           {event.approvedRequestsCount} approved
-//                         </div> */}
-//                       </div>
-//                     </td>
-//                     <td className="p-4 border border-gray-300 text-center">
-//                       {event.hasRequests ? (
-//                         <div className="space-y-1">
-//                           {event.pendingRequestsCount > 0 && (
-//                             <div className="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
-//                               {event.pendingRequestsCount} Pending
-//                             </div>
-//                           )}
-//                           {event.approvedRequestsCount > 0 && (
-//                             <div className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded ml-1">
-//                               {event.approvedRequestsCount} Approved
-//                             </div>
-//                           )}
-//                           {event.sanctionedBills.length > 0 && (
-//                             <div className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded ml-1">
-//                               {event.sanctionedBills.length} Bills
-//                             </div>
-//                           )}
-//                         </div>
-//                       ) : (
-//                         <span className="text-gray-400 text-sm">No requests</span>
-//                       )}
-//                     </td>
-//                     <td className="p-4 border border-gray-300 text-center">
-//                       <div className="flex gap-2 justify-center">
-//                         <button
-//                           onClick={() => openDetailModal(event)}
-//                           className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center gap-2"
-//                           title="View Details"
-//                         >
-//                           <Eye className="w-4 h-4" />
-//                           <span className="text-sm font-medium">View</span>
-//                         </button>
-//                         {
-//                           event.status === 'CREATED' && (
-//                             <button
-//                               onClick={() => openRequestModal(event)}
-//                               className="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors inline-flex items-center gap-2"
-//                               title="Request Advance Payment"
-//                             >
-//                               <Plus className="w-4 h-4" />
-//                               <span className="text-sm font-medium">Request</span>
-//                             </button>
-//                           )
-//                         }
-
-//                       </div>
-//                     </td>
-//                   </tr>
-//                 ))}
-//               </tbody>
-//             </table>
-//           </div>
-//         </div>
-//       </main>
-
-//       {/* Detail Modal */}
-//       {isDetailModalOpen && selectedEvent && (
-//         <EventDetailModal event={selectedEvent} onClose={closeModal} />
-//       )}
-
-//       {/* Advance Payment Request Modal */}
-//       {isRequestModalOpen && selectedEventForRequest && (
-//         <AdvanceRequestModal event={selectedEventForRequest} onClose={closeModal} onSuccess={fetchData} />
-//       )}
-//     </div>
-//   );
-// }
 
 import React, { useEffect, useState } from "react";
 import {
@@ -413,6 +40,7 @@ export default function ShowPaymentBill() {
       setEvents(eventsRes.data);
       setRequests(requestsRes.data);
       setBills(billsRes.data);
+      console.log("bills sanctionss",billsRes.data)
       setUtilizations(utilizationsRes.data);
     } catch (error) {
       console.error("Failed to load data:", error);
@@ -686,12 +314,12 @@ export default function ShowPaymentBill() {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-blue-900 text-white">
-                  <th className="p-4 text-left font-bold border border-gray-400">Event Details</th>
-                  <th className="p-4 text-right font-bold border border-gray-400">Advance Requested</th>
-                  <th className="p-4 text-right font-bold border border-gray-400">Total Amount Sanctioned</th>
-                  <th className="p-4 text-right font-bold border border-gray-400">Total Amount Billed</th>
-                  <th className="p-4 text-center font-bold border border-gray-400">Requests</th>
-                  <th className="p-4 text-center font-bold border border-gray-400">Actions</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">Event Details</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">Advance Requested</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">Total Amount Sanctioned</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">Total Amount Billed</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">Requests</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -708,15 +336,15 @@ export default function ShowPaymentBill() {
                 ) : (
                   currentEvents.map((event, index) => (
                     <tr key={event.id} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
-                      <td className="p-4 border border-gray-300">
-                        <div className="font-bold text-sm text-gray-900 uppercase">{event?.requestEventName}</div>
+                      <td className="p-2 pl-4 ">
+                        <div className="font-bold text-xs text-gray-900 uppercase">{event?.requestEventName}</div>
                         <div className="text-sm text-gray-500 font-semibold  mt-1">
                           Event ID: {event.id}
                         </div>
                       </td>
-                      <td className="p-4 border border-gray-300">
+                      <td className="p-2 border-gray-200 flex justify-center items-center">
                         <div className="text-right">
-                          <div className="font-bold text-purple-600 text-lg">
+                          <div className="font-bold text-gray-900 text-base">
                             ₹{event.totalAdvanceRequested.toLocaleString('en-IN')}
                           </div>
                           <div className="text-xs text-gray-500 mt-1">
@@ -724,16 +352,16 @@ export default function ShowPaymentBill() {
                           </div>
                         </div>
                       </td>
-                      <td className="p-4 border border-gray-300">
-                        <div className="text-right">
-                          <div className="font-bold text-green-600 text-lg">
+                      <td className="p-2  border-gray-300 ">
+                        <div className=" flex justify-center items-center">
+                          <div className="font-bold text-gray-600 text-base">
                             ₹{event?.totalBillsSanctioned.toLocaleString('en-IN')}
                           </div>
                         </div>
                       </td>
-                      <td className="p-4 border border-gray-300">
-                        <div className="text-right">
-                          <div className="font-bold text-yellow-600 text-lg">
+                      <td className="p-2  border-gray-300">
+                        <div className="">
+                          <div className="font-bold text-red-800 text-sm">
                             {event?.totalAmountWillGet === 0 ? (
                               <span className="font-semibold text-red-600 text-xs">
                                 Utilization Not Created Yet
@@ -745,21 +373,21 @@ export default function ShowPaymentBill() {
 
                         </div>
                       </td>
-                      <td className="p-4 border border-gray-300 text-center">
+                      <td className="p-2 border-gray-300 ">
                         {event.hasRequests ? (
-                          <div className="space-y-1">
+                          <div className="space-y-1 flex ">
                             {event.pendingRequestsCount > 0 && (
-                              <div className="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
+                              <div className="inline-block bg-yellow-100 text-yellow-800 text-xs px-1 py-1 rounded">
                                 {event.pendingRequestsCount} Pending
                               </div>
                             )}
                             {event.approvedRequestsCount > 0 && (
-                              <div className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded ml-1">
+                              <div className="inline-block bg-green-100 text-green-800 text-[10px] mb-0 px-1 py-1 rounded ml-1">
                                 {event.approvedRequestsCount} Approved
                               </div>
                             )}
                             {event.sanctionedBills.length > 0 && (
-                              <div className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded ml-1">
+                              <div className="inline-block bg-blue-100 text-blue-800 text-[10px] px-1 py-1 rounded ml-1">
                                 {event.sanctionedBills.length} Bills
                               </div>
                             )}
@@ -768,7 +396,7 @@ export default function ShowPaymentBill() {
                           <span className="text-gray-400 text-sm">No requests</span>
                         )}
                       </td>
-                      <td className="p-4 border border-gray-300 text-center">
+                      <td className="p-4  border-gray-300 text-center">
                         <div className="flex gap-2 justify-center">
                           <button
                             onClick={() => openDetailModal(event)}

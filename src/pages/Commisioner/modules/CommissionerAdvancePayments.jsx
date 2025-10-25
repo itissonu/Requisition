@@ -376,11 +376,11 @@ const CommissionerAdvancePayments = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 font-semibold">Total Sanctioned</p>
-                <p className="text-2xl font-bold text-purple-600 mt-1">
+                <p className="text-2xl font-bold text-red-800 mt-1">
                   ₹{requests.reduce((sum, r) => sum + r.totalSanctioned, 0).toLocaleString('en-IN')}
                 </p>
               </div>
-              <CheckCircle className="w-10 h-10 text-purple-500" />
+              <CheckCircle className="w-10 h-10 text-red-800" />
             </div>
           </div>
         </div>
@@ -480,7 +480,7 @@ const CommissionerAdvancePayments = () => {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 py-2">
                         <div>
                           <div className="flex items-center mb-2">
                             <IndianRupee className="w-4 h-4 text-green-600 mr-1" />
@@ -501,19 +501,19 @@ const CommissionerAdvancePayments = () => {
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 py-2">
                         <div>
-                          <div className="text-sm font-medium text-gray-900">{request.eventName}</div>
+                          <div className="text-sm font-medium capitalize text-gray-900">{request.eventName}</div>
                           <div className="text-xs text-gray-500">Event ID: {request.eventId}</div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-3 py-2 text-center">
                         {getStatusBadge(request.status)}
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-3 py-2 text-center">
                         {getPaymentStatusBadge(request)}
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 py-2">
                         <div className="flex justify-center space-x-2">
                           {request.status === "CREATED" && (
                             <>

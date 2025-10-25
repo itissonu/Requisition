@@ -278,14 +278,14 @@ export default function ShowAllEvents() {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-blue-900 text-white">
-                  <th className="p-4 text-center font-semibold border-r border-blue-700 w-12"></th>
-                  <th className="p-4 text-left font-semibold border-r border-blue-700">Event ID</th>
-                  <th className="p-4 text-left font-semibold border-r border-blue-700">Event Details</th>
-                  <th className="p-4 text-left font-semibold border-r border-blue-700">Department</th>
-                  <th className="p-4 text-center font-semibold border-r border-blue-700">Status</th>
-                  <th className="p-4 text-center font-semibold border-r border-blue-700">Sub-Events</th>
-                  <th className="p-4 text-left font-semibold border-r border-blue-700">Total Vehicles</th>
-                  <th className="p-4 text-center font-semibold">Actions</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">view</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">Event ID</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">Event Details</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">Department</th>
+                  <th className="px-6 py-4 text-center text-xs font-medium uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-4 text-center text-xs font-medium uppercase tracking-wider">Sub-Events</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">Total Vehicles</th>
+                  <th className="px-6 py-4 text-center text-xs font-medium uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -293,7 +293,7 @@ export default function ShowAllEvents() {
                   <React.Fragment key={event.id}>
                     {/* Main Event Row */}
                     <tr className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-blue-50 transition-colors border-b border-gray-200`}>
-                      <td className="p-4 border-r border-gray-200 text-center">
+                      <td className="p-4 border-gray-200 text-center">
                         <button
                           onClick={() => toggleEventExpansion(event.id)}
                           className="p-1 hover:bg-blue-100 hover:cursor-pointer rounded transition-colors"
@@ -305,37 +305,37 @@ export default function ShowAllEvents() {
                           )}
                         </button>
                       </td>
-                      <td className="p-4 border-r border-gray-200">
-                        <div className="text-lg text-gray-900 font-semibold">
+                      <td className="p-2 border-gray-200">
+                        <div className="text ml-3.5 text-gray-900 font-semibold">
                           {event.id}
                         </div>
                       </td>
-                      <td className="p-4 border-r border-gray-200">
-                        <div className="font-semibold text-gray-900">{event.requestEventName}</div>
+                      <td className="p-2 border-gray-200">
+                        <div className="font-semibold text-xs text-gray-900">{event.requestEventName}</div>
                         <div className="text-xs text-gray-500">Letter No: {event.requestEventLetterNo}</div>
                       </td>
-                      <td className="p-4 border-r border-gray-200 font-medium text-gray-700">
+                      <td className="p-2 font-semibold border-gray-200 text-sm text-gray-700">
                         {event?.requestingDepartment}
                       </td>
-                      <td className="p-4 border-r border-gray-200 text-center">
+                      <td className="p-2 border-gray-200 text-center">
                         <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold border ${getStatusColor(event?.status)}`}>
                           {getStatusIcon(event?.status)}
-                          {getStatusDisplayName(event?.status)}
+                         <span className="text-[10px]"> {getStatusDisplayName(event?.status)}</span>
                         </span>
                       </td>
-                      <td className="p-4 border-r border-gray-200 text-center">
+                      <td className="p-2 border-gray-200 text-center">
                         <div className="inline-flex items-center gap-2 bg-purple-100 text-purple-800 px-3 py-1 rounded-full font-bold">
                           <Calendar className="w-4 h-4" />
                           {event.subEvents?.length || 0}
                         </div>
                       </td>
-                      <td className="p-4 border-r border-gray-200">
+                      <td className="p-2 border-gray-200">
                         <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-3 py-1 rounded-full font-bold">
                           <Car className="w-4 h-4" />
                           {getTotalVehicles(event)}
                         </div>
                       </td>
-                      <td className="p-4">
+                      <td className="p-2">
                         <div className="flex gap-2 justify-center">
                           <button
                             onClick={() => handleViewDetails(event)}
@@ -453,7 +453,7 @@ export default function ShowAllEvents() {
                         : 'bg-blue-600 text-white hover:bg-blue-700'
                     }`}
                   >
-                    <ChevronLeft className="w-5 h-5" />
+                    <ChevronLeft className="w-3 h-3" />
                   </button>
 
                   {getPageNumbers().map((pageNum, index) => (
@@ -482,19 +482,19 @@ export default function ShowAllEvents() {
                         : 'bg-blue-600 text-white hover:bg-blue-700'
                     }`}
                   >
-                    <ChevronRightIcon className="w-5 h-5" />
+                    <ChevronRightIcon className="w-3 h-3" />
                   </button>
                 </div>
 
                 {/* Status Summary */}
-                <div className="flex gap-4 text-sm">
+                {/* <div className="flex gap-4 text-sm">
                   <span className="text-yellow-700">
                     Created: {events.filter(e => e.status === 'CREATED').length}
                   </span>
                   <span className="text-green-700">
                     Completed: {events.filter(e => e.status === 'COMPLETED').length}
                   </span>
-                </div>
+                </div> */}
               </div>
             </div>
           )}
@@ -544,7 +544,7 @@ export default function ShowAllEvents() {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
+                  <div className="bg-gray-50 p-2 rounded-lg border-l-4 border-green-500">
                     <label className="font-bold text-lg text-gray-700 block mb-1">Status:</label>
                     <span className={`inline-flex items-center  gap-1 px-1 py-1 rounded-full text-xs font-semibold border ${getStatusColor(selectedEvent.status)}`}>
                       {getStatusIcon(selectedEvent.status)}

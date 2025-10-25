@@ -169,13 +169,14 @@ import ShowPaymentBill from "./modules/ShowPaymentBill";
 import UploadLetterToCollector from "./modules/UploadLetterToCollector";
 import EventActivity from "./modules/EventActivity";
 import RTOMainDashboard from "./modules/RTOMainDashboard";
+import RTOAllBills from "./modules/AllBillsReport";
 
 export default function RTODashboard({ user, onLogout }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedEventForPayment, setSelectedEventForPayment] = useState(null);
 
-  // Get current page from URL path
+ 
   const getCurrentPage = () => {
     const path = location.pathname;
     if (path === '/rto/dashboard' || path === '/rto/dashboard/') {
@@ -193,7 +194,8 @@ export default function RTODashboard({ user, onLogout }) {
       'payment-bills': 'ShowPaymentBill',
       'pending-requisition': 'UploadLetterToCollector',
       'event-activity': 'EventActivity',
-      'create-user': 'CreateUser'
+      'create-user': 'CreateUser',
+      'all-bills': 'ShowAllBills'
     };
 
     return pathToPageMap[lastSegment] || 'DashBoard';
@@ -201,7 +203,6 @@ export default function RTODashboard({ user, onLogout }) {
 
   const [activePage, setActivePage] = useState(getCurrentPage());
 
-  // Update active page when URL changes
   useEffect(() => {
     setActivePage(getCurrentPage());
   }, [location.pathname]);
@@ -218,7 +219,9 @@ export default function RTODashboard({ user, onLogout }) {
       'ShowAllEvents': '/rto/dashboard/all-events',
       'ShowPaymentBill': '/rto/dashboard/payment-bills',
       'UploadLetterToCollector': '/rto/dashboard/pending-requisition',
-      'EventActivity': '/rto/dashboard/event-activity'
+      'EventActivity': '/rto/dashboard/event-activity',
+      'ShowAllBills': '/rto/dashboard/all-bills'
+
     };
 
     const path = pageToPathMap[pageKey] || '/rto/dashboard';
@@ -232,7 +235,7 @@ export default function RTODashboard({ user, onLogout }) {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Fixed Sidebar */}
+
       <div className="fixed left-0 top-0 h-full z-30 overflow-y-auto">
         <Sidebar
           activePage={activePage}
@@ -240,14 +243,11 @@ export default function RTODashboard({ user, onLogout }) {
         />
       </div>
 
-
       <div className="flex-1 flex flex-col ml-72">
-        {/* Fixed Header */}
         <div className="fixed top-0 right-0 left-72 z-20 bg-white shadow-sm">
           <Header user={user} onLogout={onLogout} />
         </div>
 
-        {/* Scrollable Content */}
         <main className="flex-1 overflow-y-auto pt-24 p-6">
           <Routes>
             <Route index element={<RTOMainDashboard />} />
@@ -258,6 +258,8 @@ export default function RTODashboard({ user, onLogout }) {
             <Route path="payment-bills" element={<ShowPaymentBill selectedEvent={selectedEventForPayment} />} />
             <Route path="pending-requisition" element={<UploadLetterToCollector />} />
             <Route path="event-activity" element={<EventActivity />} />
+            <Route path="all-bills" element={<RTOAllBills />} />
+
           </Routes>
         </main>
         {/* <div className="bg-gradient-to-r from-blue-200 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">

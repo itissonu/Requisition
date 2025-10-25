@@ -50,7 +50,7 @@ export default function RTOMainDashboard() {
     const pendingEvents = events.filter(e => e.status === "CREATED").length;
     const utilizationSubmited = events.filter(e => e.status === "UTILIZATION_SUBMITTED").length;
     const approvedEvents = events.filter(e => e.status === "COLLECTOR_APPROVED").length;
-    const commisionerApproved = events.filter(e => e.status === "COOMMISIONER_APPROVED").length;
+    const commisionerApproved = events.filter(e => e.status === "COMMISSIONER_APPROVED").length;
     const completedEvents = events.filter(e => e.status === "COMPLETED").length;
     const totalUtilizations = utilizationSubmited;
     const totalBills = bills.length;

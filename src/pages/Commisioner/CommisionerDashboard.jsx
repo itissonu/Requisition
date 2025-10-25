@@ -9,6 +9,7 @@ import ApprovedUtilizations from "./modules/ApprovedUtilizations";
 import CommissionerApproveUtilizations from "./modules/PendingApprovals";
 import BillSanction from "./modules/BillSanction";
 import CommissionerAdvancePayments from "./modules/CommissionerAdvancePayments";
+import AllBillsPage from "./modules/AllBills";
 
 export default function CommissionerDashboard({ user, onLogout }) {
   const [activePage, setActivePage] = useState("Dashboard");
@@ -25,6 +26,8 @@ export default function CommissionerDashboard({ user, onLogout }) {
         return <BillSanction />;
       case "AdvancePayment":
         return <CommissionerAdvancePayments />;
+      case "AllBills":
+        return <AllBillsPage />
       default:
         return <CommissionerMainDashboard />;
     }
@@ -36,10 +39,10 @@ export default function CommissionerDashboard({ user, onLogout }) {
       <div className="fixed left-0 top-0 h-full z-30">
         <CommissionerSidebar activePage={activePage} setActivePage={setActivePage} />
       </div>
-      
-      
-      <div className="flex-1 flex flex-col ml-64"> 
-      
+
+
+      <div className="flex-1 flex flex-col ml-64">
+
         <div className="fixed top-0 right-0 left-64 z-20 bg-white shadow-sm"> {/* Adjust left-64 based on sidebar width */}
           <CommissionerHeader user={user} onLogout={onLogout} />
         </div>

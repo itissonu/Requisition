@@ -14,8 +14,8 @@
     "@tailwindcss/vite": "^4.1.13",
     "axios": "^1.12.2",
     "html2pdf.js": "^0.12.1",
-    "jspdf": "^3.0.3",
-    "jspdf-autotable": "^5.0.2",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2",
     "lucide-react": "^0.544.0",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^5.4.296",
@@ -29,6 +29,7 @@
     "react-select": "^5.10.2",
     "recharts": "^3.2.1",
     "tailwindcss": "^4.1.13",
+    "xlsx": "^0.18.5",
     "zod": "^4.1.11"
   },
   "devDependencies": {

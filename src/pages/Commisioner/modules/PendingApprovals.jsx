@@ -312,9 +312,9 @@ export default function CommissionerApproveUtilizations() {
               <div className="p-6 space-y-6">
                 {/* Basic Information */}
                 <div>
-                  <h4 className="text-lg font-bold text-gray-900 mb-3 border-b-2 border-blue-600 pb-2">Event Information</h4>
+                  <h4 className="text-lg font-bold text-gray-900 mb-3  border-blue-600 pb-2">Event Information</h4>
                   <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border-l-4 border-blue-500">
+                    <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border-l-4 border-blue-500">
                       <p className="text-sm text-blue-500 mb-1 font-semibold">Event Name</p>
                       <p className="font-bold text-gray-900">{selected.eventName}</p>
                     </div>
@@ -331,7 +331,7 @@ export default function CommissionerApproveUtilizations() {
 
                 {/* Sub-Events Details */}
                 <div>
-                  <h4 className="text-lg font-bold text-gray-900 mb-3 border-b-2 border-gray-600 pb-2">
+                  <h4 className="text-lg font-bold text-gray-900 mb-3  border-gray-600 pb-2">
                     Sub-Events Utilization ({selected.subEventUtilizations?.length || 0})
                   </h4>
                   
@@ -339,7 +339,7 @@ export default function CommissionerApproveUtilizations() {
                     const subTotal = subEvent.vehicleUtilizations?.reduce((sum, v) => sum + (v.totalCost || 0), 0) || 0;
                     
                     return (
-                      <div key={subEvent.id} className="mb-6 bg-gradient-to-br from-purple-50 to-white rounded-lg border-2 border-purple-200 overflow-hidden">
+                      <div key={subEvent.id} className="mb-6 bg-gradient-to-br from-purple-50 to-white rounded-lg overflow-hidden">
                         {/* Sub-Event Header */}
                         <div className="bg-gradient-to-r from-blue-400 to-blue-500 text-white p-4">
                           <div className="flex justify-between items-center">
@@ -372,7 +372,7 @@ export default function CommissionerApproveUtilizations() {
                         </div>
 
                         {/* Vehicle Table */}
-                        <div className="p-4">
+                        <div className="pt-4">
                           <table className="w-full border-collapse border-2 border-gray-300">
                             <thead>
                               <tr className="bg-blue-900 text-white">
@@ -399,7 +399,7 @@ export default function CommissionerApproveUtilizations() {
                                   </td>
                                 </tr>
                               ))}
-                              <tr className="bg-purple-100 border-t-2 border-purple-600">
+                              <tr className=" border-t-2 border-gray-300">
                                 <td colSpan="6" className="p-3 text-right font-bold">SUB-EVENT TOTAL: ₹{subTotal.toLocaleString('en-IN')}</td>
                                 {/* <td className="p-3 text-right font-bold text-lg text-purple-700">
                                   ₹{subTotal.toLocaleString('en-IN')}

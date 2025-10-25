@@ -65,16 +65,16 @@ export default function ShowAllEvents() {
       filtered = filtered.filter(event => event.status === statusFilter);
     }
     setFilteredEvents(filtered);
-    setCurrentPage(1); 
+    setCurrentPage(1);
   }, [searchTerm, statusFilter, events]);
 
-  
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentEvents = filteredEvents.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
 
- 
+
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -98,7 +98,7 @@ export default function ShowAllEvents() {
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
-    
+
     if (totalPages <= maxPagesToShow) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -126,7 +126,7 @@ export default function ShowAllEvents() {
         pages.push(totalPages);
       }
     }
-    
+
     return pages;
   };
 
@@ -199,7 +199,7 @@ export default function ShowAllEvents() {
     setCurrentEventForPdf(null);
   };
 
- 
+
   const handleClearFilters = () => {
     setSearchTerm("");
     setStatusFilter("ALL");
@@ -254,7 +254,7 @@ export default function ShowAllEvents() {
             </div>
           </div>
 
-          
+
           <div className="p-6 bg-gray-50 border-b border-gray-200">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1">
@@ -303,19 +303,19 @@ export default function ShowAllEvents() {
             )}
           </div>
 
-          
+
           <div className="p-6">
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse border-2 border-gray-300">
-                <thead>
-                  <tr className="bg-blue-900 text-white">
-                    <th className="p-4 border border-gray-400 text-left font-bold">Event ID</th>
-                    <th className="p-4 border border-gray-400 text-left font-bold">Event Details</th>
-                    <th className="p-4 border border-gray-400 text-left font-bold">Department</th>
-                    <th className="p-4 border border-gray-400 text-center font-bold">Status</th>
-                    <th className="p-4 border border-gray-400 text-center font-bold">Sub Events</th>
-                    <th className="p-4 border border-gray-400 text-left font-bold">Vehicles</th>
-                    <th className="p-4 border border-gray-400 text-center font-bold">Actions</th>
+              <table className="w-full border-collapse  border-gray-300">
+                <thead className="border border-gray-400">
+                  <tr className="bg-blue-900 border-gray-400 text-white">
+                    <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">Event ID</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">Event Details</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">Department</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">Sub Events</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">Vehicles</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -332,31 +332,31 @@ export default function ShowAllEvents() {
                   ) : (
                     currentEvents.map((event, index) => (
                       <tr key={event.id} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
-                        <td className="p-4 border border-gray-300">
+                        <td className="p-2 ">
                           <div className="font-bold text-blue-900">{event.id}</div>
-                          <div className="text-xs text-gray-500">
+                          {/* <div className="text-xs text-gray-500">
                             {new Date(event.createdAt).toLocaleDateString('en-IN')}
-                          </div>
+                          </div> */}
                         </td>
-                        <td className="p-4 border border-gray-300">
+                        <td className="p-2 ">
                           <div className="font-semibold text-gray-900">{event.requestEventName}</div>
-                          <div className="text-sm text-gray-600">Letter: {event.requestEventLetterNo}</div>
+                          <div className="text-xs text-gray-600">Letter: {event.requestEventLetterNo}</div>
                         </td>
-                        <td className="p-4 border border-gray-300 font-medium text-gray-700">
+                        <td className="p-2  font-xs font-semibold text-gray-700">
                           {event.requestingDepartment}
                         </td>
-                        <td className="p-4 border border-gray-300 text-center">
+                        <td className="p-2  text-center">
                           <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold border ${getStatusColor(event.status)}`}>
                             {getStatusIcon(event.status)}
-                            {getStatusDisplayName(event.status)}
+                           <span className="text-xs">{getStatusDisplayName(event.status)}</span> 
                           </span>
                         </td>
-                        <td className="p-4 border border-gray-300 text-center">
+                        <td className="p-2  text-center">
                           <span className="bg-purple-100 text-purple-800 px-1 py-1 rounded-full text-[10px] font-bold border border-purple-300">
                             {event.subEvents?.length || 0} Events
                           </span>
                         </td>
-                        <td className="p-4 border border-gray-300">
+                        <td className="p-2 ">
                           <div className="text-sm space-y-1">
                             {event.subEvents && event.subEvents[0]?.vehicles?.slice(0, 2).map((v, idx) => (
                               <div
@@ -379,7 +379,7 @@ export default function ShowAllEvents() {
                             )}
                           </div>
                         </td>
-                        <td className="p-4 border border-gray-300">
+                        <td className="p-2 ">
                           <div className="flex gap-2 justify-center flex-wrap">
                             <button
                               onClick={() => handleViewDetails(event)}
@@ -405,25 +405,24 @@ export default function ShowAllEvents() {
             </div>
           </div>
 
-        
+
           {filteredEvents.length > 0 && (
             <div className="bg-gray-50 border-t border-gray-200 p-4">
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-             
+
                 <div className="text-sm text-gray-600">
                   Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredEvents.length)} of {filteredEvents.length} events
                 </div>
 
-               
+
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handlePrevPage}
                     disabled={currentPage === 1}
-                    className={`p-2 rounded-lg ${
-                      currentPage === 1
-                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        : 'bg-blue-600 text-white hover:bg-blue-700'
-                    }`}
+                    className={`p-2 rounded-lg ${currentPage === 1
+                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      : 'bg-blue-600 text-white hover:bg-blue-700'
+                      }`}
                   >
                     <ChevronLeft className="w-5 h-5" />
                   </button>
@@ -433,13 +432,12 @@ export default function ShowAllEvents() {
                       key={index}
                       onClick={() => pageNum !== '...' && handlePageChange(pageNum)}
                       disabled={pageNum === '...'}
-                      className={`px-4 py-2 rounded-lg font-semibold ${
-                        pageNum === currentPage
-                          ? 'bg-blue-600 text-white'
-                          : pageNum === '...'
+                      className={`px-4 py-2 rounded-lg font-semibold ${pageNum === currentPage
+                        ? 'bg-blue-600 text-white'
+                        : pageNum === '...'
                           ? 'bg-transparent text-gray-400 cursor-default'
                           : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      }`}
+                        }`}
                     >
                       {pageNum}
                     </button>
@@ -448,32 +446,31 @@ export default function ShowAllEvents() {
                   <button
                     onClick={handleNextPage}
                     disabled={currentPage === totalPages}
-                    className={`p-2 rounded-lg ${
-                      currentPage === totalPages
-                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        : 'bg-blue-600 text-white hover:cursor-pointer hover:bg-blue-700'
-                    }`}
+                    className={`p-2 rounded-lg ${currentPage === totalPages
+                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      : 'bg-blue-600 text-white hover:cursor-pointer hover:bg-blue-700'
+                      }`}
                   >
                     <ChevronRight className="w-5 h-5" />
                   </button>
                 </div>
 
-              
-                <div className="flex gap-3 text-sm">
+
+                {/* <div className="flex gap-3 text-sm">
                   <span className="text-yellow-700">
                     Created: {events.filter(e => e.status === 'CREATED').length}
                   </span>
                   <span className="text-purple-700">
                     Completed: {events.filter(e => e.status === 'COMPLETED').length}
                   </span>
-                </div>
+                </div> */}
               </div>
             </div>
           )}
         </div>
       </div>
 
-    {/* event details modal */}
+      {/* event details modal */}
       {selectedEvent && (
         <div className="fixed inset-0 bg-black/60 bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
@@ -490,7 +487,7 @@ export default function ShowAllEvents() {
             </div>
 
             <div className="p-6 space-y-6">
-           
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
@@ -613,7 +610,7 @@ export default function ShowAllEvents() {
               </div>
             </div>
 
-  
+
             <div className="h-[calc(95vh-120px)] bg-gray-100">
               {pdfUrl ? (
                 <iframe
@@ -638,7 +635,7 @@ export default function ShowAllEvents() {
       )}
 
       {/* Footer */}
-       <div className="bg-blue-900 text-white p-4 text-center text-sm mt-8">
+      <div className="bg-blue-900 text-white p-4 text-center text-sm mt-8">
         <p className="mb-2">Vehicles Requisition System</p>
         <p className="font-semibold">© 2025 Government of Odisha – Commerce & Transport Department</p>
         {/* <p className="text-xs opacity-75 mt-1">Approved Utilizations System | For assistance: transport@odisha.gov.in</p> */}
