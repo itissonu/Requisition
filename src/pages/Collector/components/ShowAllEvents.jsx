@@ -340,7 +340,7 @@ export default function ShowAllEvents() {
                         </td>
                         <td className="p-2 ">
                           <div className="font-semibold text-gray-900">{event.requestEventName}</div>
-                          <div className="text-xs text-gray-600">Letter: {event.requestEventLetterNo}</div>
+                          <div className="text-xs text-gray-600">Letter No. : {event.requestEventLetterNo}</div>
                         </td>
                         <td className="p-2  font-xs font-semibold text-gray-700">
                           {event.requestingDepartment}
@@ -533,7 +533,13 @@ export default function ShowAllEvents() {
                         <div>
                           <h4 className="font-bold text-gray-900">Place: {subEvent.place}</h4>
                           <p className="text-xs text-gray-600 mt-1">
-                            Date: {subEvent.reportingDate}
+                            Date : {(() => {
+                              const date = new Date(subEvent.reportingDate);
+                              const day = String(date.getDate()).padStart(2, "0");
+                              const month = String(date.getMonth() + 1).padStart(2, "0");
+                              const year = date.getFullYear();
+                              return `${day}/${month}/${year}`;
+                            })()}
                           </p>
                         </div>
                       </div>

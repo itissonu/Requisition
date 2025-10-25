@@ -204,7 +204,14 @@ export default function CollectorMainDashboard() {
                 </span>
               </div>
               <div className="text-xs text-gray-500 mt-1">
-                {new Date(request.createdAt).toLocaleString()}
+             {new Date(request.createdAt).toLocaleString("en-GB", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: true,
+                })}
               </div>
             </div>
           ))}

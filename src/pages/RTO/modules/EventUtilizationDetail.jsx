@@ -61,7 +61,7 @@ const AdvancePaymentModal = ({ isOpen, onClose, advancePayments, eventName }) =>
                       </h4>
                       <p className="text-sm text-gray-600">
                         Status: <span className={`font-medium ${ap.status === 'APPROVED' ? 'text-green-600' :
-                            ap.status === 'PENDING' ? 'text-yellow-600' : 'text-red-600'
+                          ap.status === 'PENDING' ? 'text-yellow-600' : 'text-red-600'
                           }`}>{ap.status}</span>
                       </p>
                     </div>
@@ -609,7 +609,13 @@ export default function EventUtilizationForm() {
                       </div>
                       <div className="flex items-center gap-2 text-gray-200">
                         <Calendar className="w-4 h-4" />
-                        <span className="text-sm"><span className="font-semibold">Date:</span> {subEvent.reportingDate}</span>
+                        <span className="text-sm"><span className="font-semibold">Date:</span> {(() => {
+                          const date = new Date(subEvent.reportingDate);
+                          const day = String(date.getDate()).padStart(2, "0");
+                          const month = String(date.getMonth() + 1).padStart(2, "0");
+                          const year = date.getFullYear();
+                          return `${day}/${month}/${year}`;
+                        })()}</span>
                       </div>
                     </div>
                   </div>
@@ -712,7 +718,7 @@ export default function EventUtilizationForm() {
 
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-             
+
               <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border-l-4 border-blue-500">
                 <div className="flex items-center gap-2 mb-2">
                   <FileText className="w-5 h-5 text-blue-600" />
@@ -723,7 +729,7 @@ export default function EventUtilizationForm() {
                 </p>
               </div>
 
-            
+
               <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border-l-4 border-green-500">
                 <div className="flex items-center gap-2 mb-2">
                   <CheckCircle className="w-5 h-5 text-green-600" />
@@ -734,9 +740,9 @@ export default function EventUtilizationForm() {
                 </p>
               </div>
 
-            
 
-              
+
+
               <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg border-l-4 border-orange-500">
                 <div className="flex items-center gap-2 mb-2">
                   <Calculator className="w-5 h-5 text-orange-600" />
@@ -751,7 +757,7 @@ export default function EventUtilizationForm() {
               </div>
             </div>
 
-            
+
             <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-lg p-6 text-center">
               <p className="text-green-100 text-sm font-semibold uppercase mb-2">Grand Total Utilization Cost</p>
               <p className="text-5xl font-bold text-white">
@@ -759,7 +765,7 @@ export default function EventUtilizationForm() {
               </p>
             </div>
 
-          
+
             {advancePayments.length > 0 && (
               <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
                 <div className="flex justify-between items-center text-sm">
@@ -789,7 +795,7 @@ export default function EventUtilizationForm() {
             </button>
 
             <button
-             onClick={() => navigate("/rto/dashboard")}
+              onClick={() => navigate("/rto/dashboard")}
               disabled={submitting}
               className="flex items-center gap-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white px-8 py-4 rounded-lg hover:from-gray-700 hover:to-gray-800 font-bold text-lg shadow-lg transform transition-all hover:scale-105 disabled:opacity-50"
             >
@@ -833,7 +839,7 @@ export default function EventUtilizationForm() {
       />
 
       {/* Footer */}
-       <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">
+      <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">
         <p>Vehicle Requisition System</p>
         <p>© Government of Odisha – Commerce & Transport Department </p>
         {/* <p className="text-xs opacity-75 mt-1">For assistance, contact: collector@odisha.gov.in</p> */}
