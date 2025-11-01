@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Car, File, Plus, Trash2, MapPin, Calendar, Clock, ChevronDown, Building, Edit2, X, Download, DollarSign, FileText, CheckCircle, IndianRupee, RefreshCcw } from "lucide-react";
+import { Car, File, Plus, Trash2, MapPin, Calendar, Clock, ChevronDown, Building, Edit2, X, Download, DollarSign, FileText, CheckCircle, IndianRupee, RefreshCcw, Hash } from "lucide-react";
 
 import logo from '../../../assests/logo.png';
 import { eventAPI, requestEventAPI, vehicleAPI } from "../../../apis/apiService";
@@ -20,6 +20,10 @@ const subEventSchema = z.object({
 const eventSchema = z.object({
   requestEventId: z.string().min(1, "Please select a requesting event"),
   reportingDepartment: z.string().min(1, "Reporting department is required"),
+  referenceNumber: z.string()
+    .min(3, "Reference number must be at least 3 characters")
+    .max(50, "Reference number cannot exceed 50 characters"),
+  referenceDate: z.string().min(1, "Reference date is required")
 });
 
 export default function CreateEvent({ onNavigateToPayment = null }) {
@@ -36,7 +40,11 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
 
   const { register, handleSubmit, control, watch, formState: { errors }, reset } = useForm({
     resolver: zodResolver(eventSchema),
+    defaultValues: {
+      referenceDate: new Date().toISOString().split('T')[0]
+    }
   });
+  
   const selectedRequestId = watch("requestEventId");
   const selectedRequest = requests.find(req => req.id === parseInt(selectedRequestId));
 
@@ -168,6 +176,8 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
       const eventData = {
         requestEventId: parseInt(data.requestEventId),
         requestingDepartment: data.reportingDepartment,
+        referenceNumber: data.referenceNumber,
+        referenceDate: data.referenceDate,
         subEvents: filteredSubEvents
       };
 
@@ -187,7 +197,9 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
   };
 
   const resetForm = () => {
-    reset();
+    reset({
+      referenceDate: new Date().toISOString().split('T')[0]
+    });
     setSubEvents([]);
   };
 
@@ -219,7 +231,7 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
             </div>
             <div>
               <h1 className="text-2xl font-bold">GOVERNMENT OF ODISHA</h1>
-              <h2 className="text-base opacity-90">Commerce & Transport   Department</h2>
+              <h2 className="text-base opacity-90">Commerce & Transport Department</h2>
             </div>
           </div>
           <div className="text-center border-t border-blue-700 pt-3">
@@ -251,12 +263,12 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
                   render={({ field }) => (
                     <select
                       {...field}
-                      className="w-full border-2 hover:cursor-pointer border-gray-300 rounded-lg px-3 py-3  focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                      className="w-full border-2 hover:cursor-pointer border-gray-300 rounded-lg px-3 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                     >
                       <option value="">Select a requesting event</option>
                       {requests?.map(request => (
-                        <option key={request?.id} value={request?.id} className=" capitalize">
-                          {request?.letterName}  (LetterNo - {request?.letterNo})
+                        <option key={request?.id} value={request?.id} className="capitalize">
+                          {request?.letterName} (LetterNo - {request?.letterNo})
                         </option>
                       ))}
                     </select>
@@ -266,23 +278,60 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
                   <p className="text-red-500 text-sm mt-1">{errors.requestEventId.message}</p>
                 )}
               </div>
-              <div>
-                {selectedRequest && (<>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    <Building className="inline w-4 h-4 mr-1" />
-                    Reporting Department 
-                  </label><input
-                    {...register("reportingDepartment")}
-                    type="text"
-                    value={selectedRequest ? selectedRequest?.requestingDepartment : ""}
-                    readOnly
-                    placeholder="Enter reporting department"
-                   className="w-full border-2 border-gray-300 rounded-lg px-3 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                  />
-                </>)}
 
+              <div>
+                {selectedRequest && (
+                  <>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      <Building className="inline w-4 h-4 mr-1" />
+                      Requested Office Name
+                    </label>
+                    <input
+                      {...register("reportingDepartment")}
+                      type="text"
+                      value={selectedRequest ? selectedRequest?.requestingDepartment : ""}
+                      readOnly
+                      placeholder="Enter reporting department"
+                      className="w-full border-2 border-gray-300 rounded-lg px-3 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all bg-gray-50"
+                    />
+                  </>
+                )}
                 {errors.reportingDepartment && (
                   <p className="text-red-500 text-sm mt-1">{errors.reportingDepartment.message}</p>
+                )}
+              </div>
+            </div>
+
+            {/* New Fields - Reference Number and Date */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <Hash className="inline w-4 h-4 mr-1" />
+                  Reference Number <span className="text-red-500">*</span>
+                </label>
+                <input
+                  {...register("referenceNumber")}
+                  type="text"
+                  placeholder="Enter reference number (e.g., REF/2025/001)"
+                  className="w-full border-2 border-gray-300 rounded-lg px-3 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                />
+                {errors.referenceNumber && (
+                  <p className="text-red-500 text-sm mt-1">{errors.referenceNumber.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <Calendar className="inline w-4 h-4 mr-1" />
+                  Reference Date <span className="text-red-500">*</span>
+                </label>
+                <input
+                  {...register("referenceDate")}
+                  type="date"
+                  className="w-full border-2 border-gray-300 rounded-lg px-3 py-3 hover:cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                />
+                {errors.referenceDate && (
+                  <p className="text-red-500 text-sm mt-1">{errors.referenceDate.message}</p>
                 )}
               </div>
             </div>
@@ -379,16 +428,16 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
                 disabled={loading}
                 className="bg-gradient-to-r from-blue-700 to-blue-800 hover:cursor-pointer text-white px-10 py-4 rounded-lg hover:from-blue-800 hover:to-blue-900 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-base shadow-lg transform transition-all hover:scale-105 active:scale-95"
               >
-                {loading ? " SUBMITTING..." : "SUBMIT REQUISITION"}
+                {loading ? "SUBMITTING..." : "SUBMIT REQUISITION"}
               </button>
 
               <button
                 type="button"
                 onClick={resetForm}
                 disabled={loading}
-                className="bg-gradient-to-r flex justify-center items-center  gap-1.5 from-gray-600 hover:cursor-pointer to-gray-700 text-white px-10 py-4 rounded-lg hover:from-gray-700 hover:to-gray-800 font-bold text-base shadow-lg transform transition-all hover:scale-105 active:scale-95"
+                className="bg-gradient-to-r flex justify-center items-center gap-1.5 from-gray-600 hover:cursor-pointer to-gray-700 text-white px-10 py-4 rounded-lg hover:from-gray-700 hover:to-gray-800 font-bold text-base shadow-lg transform transition-all hover:scale-105 active:scale-95"
               >
-                <RefreshCcw/> <span>Reset Form</span>
+                <RefreshCcw /> <span>Reset Form</span>
               </button>
             </div>
           </div>
@@ -539,8 +588,13 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
             </div>
 
             <div className="p-6 text-center">
+              <p className="text-gray-600 mb-4">
+                Your vehicle requisition event has been created successfully.
+              </p>
+              
+              
+
               <p className="text-gray-600 mb-6">
-                Your vehicle requisition event has been created successfully. 
                 What would you like to do next?
               </p>
 
@@ -582,10 +636,9 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
       />
 
       {/* Footer */}
-       <div className="bg-gradient-to-r gap-2 from-blue-900 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">
+      <div className="bg-gradient-to-r gap-2 from-blue-900 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">
         <p className="mb-2">Vehicles Requisition System</p>
-        <p>© Government of Odisha – Commerce & Transport Department </p>
-        {/* <p className="text-xs opacity-75 mt-1">For assistance, contact: collector@odisha.gov.in</p> */}
+        <p>© Government of Odisha – Commerce & Transport Department</p>
       </div>
     </div>
   );

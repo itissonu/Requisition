@@ -343,10 +343,10 @@ export default function EventUtilizationForm() {
   };
 
   const handleSubmit = async () => {
-    if (!checkAdvancePaymentConditions()) {
-      alert('Please contact authorities to approve at least some advance payment bills before creating utilization.');
-      return;
-    }
+    // if (!checkAdvancePaymentConditions()) {
+    //   alert('Please contact authorities to approve at least some advance payment bills before creating utilization.');
+    //   return;
+    // }
     if (totalCost === 0) {
       setShowZeroAmountModal(true);
       return;
@@ -484,7 +484,7 @@ export default function EventUtilizationForm() {
             <div className="flex items-center">
               <AlertCircle className="w-5 h-5 text-red-400 mr-2" />
               <div>
-                <p className="text-red-800 font-medium">Advance Payment Required</p>
+                <p className="text-red-800 font-medium">Optional</p>
                 <p className="text-red-700 text-sm">
                   This event has advance payment requests but no bills have been sanctioned yet.
                   Please contact authorities to approve at least partial advance payments before creating utilization.
@@ -787,7 +787,8 @@ export default function EventUtilizationForm() {
           <div className="flex justify-center gap-6">
             <button
               onClick={handleSubmit}
-              disabled={submitting || (advancePayments.length > 0 && !checkAdvancePaymentConditions())}
+              disabled={submitting }
+              // disabled={submitting || (advancePayments.length > 0 && !checkAdvancePaymentConditions())}
               className="flex items-center gap-3 bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-4 rounded-lg hover:from-green-700 hover:to-green-800 font-bold text-lg shadow-lg transform transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Save className="w-5 h-5" />

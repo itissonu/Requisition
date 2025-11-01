@@ -50,7 +50,38 @@ const getAuthHeader = () => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
+
+
+
+
 export const authAPI = {
+   requestOTP: (username) => api.post('/api/auth/otp', { username }, {
+    headers: {
+      "Content-Type": "application/json"
+    }
+  }),
+
+
+  verifyOTP: (username, otp) => api.post('/api/auth/verify-otp', { username, otp }, {
+    headers: {
+      "Content-Type": "application/json"
+    }
+  }),
+
+
+  resetPassword: (data) => api.post('/api/auth/reset-password', data, {
+    headers: {
+      "Content-Type": "application/json"
+    }
+  }),
+
+
+  changePassword: (data) => api.post('/api/auth/change-password', data, {
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
   login: credentials => api.post(API_ENDPOINTS.auth.login(), credentials),
   loginWithOtp: data => api.post(API_ENDPOINTS.auth.loginOtp(), data),
   sendOtp: data => api.post(API_ENDPOINTS.auth.sendOtp(), data),
@@ -295,6 +326,69 @@ export const advancePaymentAPI = {
 };
 
 
+export const districtStampAPI = {
+  
+  getCurrent: () => api.get('/api/district-stamps/current', {
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
+
+
+  uploadCollectorStamp: (districtName, file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post(`/api/district-stamps/${districtName}/collector-stamp`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        ...getAuthHeader()
+      }
+    });
+  },
+
+  
+  updateCollectorInfo: (districtName, data) => api.patch(
+    `/api/district-stamps/${districtName}/collector-info`,
+    data,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader()
+      }
+    }
+  ),
+
+  // Upload collector signature
+  uploadCollectorSignature: (districtName, file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post(`/api/district-stamps/${districtName}/collector-signature`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        ...getAuthHeader()
+      }
+    });
+  },
+
+  // Delete collector stamp
+  deleteCollectorStamp: (districtName) => api.delete(`/api/district-stamps/${districtName}/collector-stamp`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  }),
+
+  // Delete collector signature
+  deleteCollectorSignature: (districtName) => api.delete(`/api/district-stamps/${districtName}/collector-signature`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeader()
+    }
+  })
+};
+
+
 
 export const utilizationAPI = {
   create: data => api.post(API_ENDPOINTS.utilizations.create(), data, {
@@ -383,3 +477,5 @@ export const utilizationAPI = {
 
 
 };
+
+

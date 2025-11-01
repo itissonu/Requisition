@@ -8,7 +8,9 @@ import {
   Receipt,     // For ShowPaymentBill
   Mail,        // For UploadLetterToCollector
   Activity,    // For EventActivity
-  ReceiptText
+  ReceiptText,
+  PenBox,
+  PenLineIcon
 } from "lucide-react";
 
 
@@ -33,7 +35,7 @@ const menuItems = [
   },
   {
     key: "EventUtilization",
-    label: "Event Utilization",
+    label: "Final Bill Submission",
     icon: ClipboardList,
     description: "Monitor Event Resources"
   },
@@ -61,6 +63,13 @@ const menuItems = [
     icon: ReceiptText,
     description: "Get All Bills Details"
   },
+  {
+    key: "UpdateStampSignatureProfile",
+    label: "Update Signature",
+    icon: PenLineIcon,
+    description: "View & Update"
+  },
+
 
 ];
 
@@ -75,11 +84,9 @@ export default function Sidebar({ activePage, setActivePage }) {
           <h1 className="text-xl font-bold">RTO Dashboard</h1> {/* Changed title */}
         </div>
 
-        <nav className="space-y-2">
-          <div className="mb-4">
-            <h2 className="text-gray-300 text-xs uppercase tracking-wide font-semibold">
-              Menu
-            </h2>
+        <nav className="space-y-1 ">
+          <div className="mb-1">
+
           </div>
 
           {menuItems.map((item) => {
@@ -91,8 +98,8 @@ export default function Sidebar({ activePage, setActivePage }) {
                 key={item.key}
                 onClick={() => setActivePage(item.key)}
                 className={`w-full hover:cursor-pointer flex items-center px-4 py-3 text-left rounded-lg transition-colors ${isActive
-                    ? 'bg-blue-800 border-r-4 border-white'
-                    : 'hover:bg-blue-800 hover:cursor-pointer'
+                  ? 'bg-blue-800 border-r-4 border-white'
+                  : 'hover:bg-blue-800 hover:cursor-pointer'
                   }`}
               >
                 <Icon className="w-5 h-5 mr-3" />

@@ -2,19 +2,84 @@ import React, { useRef, useState, useEffect } from "react";
 import { Download, X } from "lucide-react";
 
 import logo from '../../../assests/logo.png';
-import { eventAPI } from "../../../apis/apiService";
+import { eventAPI, districtStampAPI } from "../../../apis/apiService";
+
+// utils/imageUtils.js
+
+ const removeWhiteBackground = (base64Image) => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      
+      // Draw image
+      ctx.drawImage(img, 0, 0);
+      
+      // Get image data
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+      
+      // Process pixels
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const a = data[i + 3];
+        
+        // Calculate brightness
+        const brightness = (r + g + b) / 3;
+        
+        // If pixel is light (background), make transparent
+        if (brightness > 200) {
+          data[i + 3] = 0; // Set alpha to 0 (transparent)
+        } else if (brightness > 150) {
+          // Semi-transparent for light gray
+          data[i + 3] = Math.floor(a * 0.4);
+        } else {
+          // Keep dark pixels and darken them slightly
+          const darkFactor = 0.9;
+          data[i] = Math.floor(r * darkFactor);
+          data[i + 1] = Math.floor(g * darkFactor);
+          data[i + 2] = Math.floor(b * darkFactor);
+          data[i + 3] = 255; // Full opacity
+        }
+      }
+      
+      // Put modified image data back
+      ctx.putImageData(imageData, 0, 0);
+      
+      // Convert canvas to base64
+      const processedBase64 = canvas.toDataURL('image/png');
+      resolve(processedBase64);
+    };
+    
+    img.onerror = () => {
+      reject(new Error('Failed to load image'));
+    };
+    
+    img.src = base64Image;
+  });
+};
+
 
 const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [eventData, setEventData] = useState(null);
+  const [stampData, setStampData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const pdfContentRef = useRef(null);
+   const [processedSignature, setProcessedSignature] = useState(null);
+  const [processedStamp, setProcessedStamp] = useState(null);
 
-  // Fetch event data by ID
+  // Fetch event data and stamp/signature separately
   useEffect(() => {
     if (isOpen && eventId) {
       fetchEventData();
+      fetchStampAndSignature();
     }
   }, [isOpen, eventId]);
 
@@ -23,7 +88,8 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
     setError(null);
     try {
       const response = await eventAPI.details(eventId);
-      setEventData(response.data);
+      console.log("Fetched event data:", response.data);
+      setEventData(response?.data);
     } catch (error) {
       console.error("Error fetching event data:", error);
       setError("Failed to load event data");
@@ -32,8 +98,31 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
     }
   };
 
+ 
+  const fetchStampAndSignature = async () => {
+    try {
+      const response = await districtStampAPI.getCurrent();
+      console.log("Fetched stamp and signature:", response.data);
+      setStampData(response?.data);
+      
+   
+      if (response?.data?.collectorSignature) {
+        const signatureBase64 = `data:image/png;base64,${response.data.collectorSignature}`;
+        const processed = await removeWhiteBackground(signatureBase64);
+        setProcessedSignature(processed);
+      }
+      
+      if (response?.data?.collectorStamp) {
+        const stampBase64 = `data:image/png;base64,${response.data.collectorStamp}`;
+        const processed = await removeWhiteBackground(stampBase64);
+        setProcessedStamp(processed);
+      }
+    } catch (error) {
+      console.error("Error fetching stamp and signature:", error);
+    }
+  };
+
   const handleDownloadPDF = async () => {
-    // Ensure the content is available before attempting to download
     if (!pdfContentRef.current) {
       alert("Cannot generate PDF, content not ready.");
       return;
@@ -45,16 +134,13 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
       const html2pdf = (await import('html2pdf.js')).default;
       const opt = {
         margin: [9, 9, 9, 9],
-        filename: `Vehicle_Requisition_Order_${eventId}.pdf`,
+        filename: `Vehicle_Requisition_Order_${eventData?.referenceNumber || eventId}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: {
-          scale: 2, // You can try reducing this to 1.5 or 1 if quality is okay but alignment is still off
+          scale: 2,
           useCORS: true,
           logging: false,
           backgroundColor: '#ffffff',
-          // --- FIX APPLIED ---
-          // Explicitly set the width for the canvas capture to match the element's rendered width.
-          // This is the key fix for preventing right-side content from being cut off.
           width: element.offsetWidth,
           x: 0,
           y: 0,
@@ -82,11 +168,15 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
   };
 
   const getDistrictName = () => {
-    return eventData?.collectorDistrict || "GANJAM";
+    return eventData?.collectorDistrict?.toUpperCase() || "GANJAM";
   };
 
   const getRequisitionNumber = () => {
-    return eventData?.requestEventLetterNo || `${eventId}/RQN`;
+    return eventData?.referenceNumber || `${eventId}/RQN`;
+  };
+
+  const getRequisitionDate = () => {
+    return formatDate(eventData?.referenceDate);
   };
 
   return (
@@ -144,8 +234,6 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                 width: '210mm',
                 minHeight: '297mm',
                 backgroundColor: '#ffffff',
-                // --- FIX APPLIED ---
-                // Reduced horizontal padding and added boxSizing to prevent overflow.
                 padding: '12mm 10mm',
                 boxSizing: 'border-box',
                 boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
@@ -188,18 +276,18 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                   lineHeight: '1.2'
                 }}>
                   OFFICE OF THE COLLECTOR & DISTRICT MAGISTRATE,<br />
-                  {getDistrictName().toUpperCase()} DISTRICT
+                  {getDistrictName()} DISTRICT
                 </div>
 
-                {/* Document Number and Date */}
+                {/* Document Number and Date - FROM EVENT */}
                 <div style={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   marginBottom: '10px',
                   fontSize: '10.5pt'
                 }}>
-                  <div>No. {getRequisitionNumber()}/RQN</div>
-                  <div>Date: {formatDate()}</div>
+                  <div>No. {getRequisitionNumber()}</div>
+                  <div>Date: {getRequisitionDate()}</div>
                 </div>
 
                 {/* Title */}
@@ -247,7 +335,6 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                       <td style={{
                         border: '1px solid #000',
                         padding: '6px 8px',
-                        // fontWeight: 'bold',
                         width: '50%',
                         verticalAlign: 'top'
                       }}>
@@ -256,8 +343,7 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                       <td style={{
                         border: '1px solid #000',
                         padding: '6px 8px',
-                       
-                         height: '35px', 
+                        height: '35px',
                         verticalAlign: 'top'
                       }}>
                         &nbsp;
@@ -267,15 +353,11 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                       <td style={{
                         border: '1px solid #000',
                         padding: '6px 8px',
-                        // fontWeight: 'bold',
-                        height: '40px',                 // give the cell a fixed height
-                        // display: 'flex',                // use flexbox
-                        //justifyContent: 'center',       // center horizontally
+                        height: '40px',
                         alignItems: 'center',
                         verticalAlign: 'center'
                       }}>
                         2. Type of Vehicle<br />
-                       
                       </td>
                       <td style={{
                         border: '1px solid #000',
@@ -290,8 +372,7 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                       <td style={{
                         border: '1px solid #000',
                         padding: '6px 8px',
-                        // fontWeight: 'bold',
-                         height: '40px', 
+                        height: '40px',
                         verticalAlign: 'top'
                       }}>
                         3. Owner's Name & Address
@@ -309,8 +390,7 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                       <td style={{
                         border: '1px solid #000',
                         padding: '6px 8px',
-                        // fontWeight: 'bold',
-                         height: '40px', 
+                        height: '40px',
                         verticalAlign: 'top'
                       }}>
                         4. Owner's Mobile Number
@@ -328,8 +408,7 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                       <td style={{
                         border: '1px solid #000',
                         padding: '6px 8px',
-                        // fontWeight: 'bold',
-                         height: '40px', 
+                        height: '40px',
                         verticalAlign: 'top'
                       }}>
                         5. Driver's Name
@@ -347,8 +426,7 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                       <td style={{
                         border: '1px solid #000',
                         padding: '6px 8px',
-                        // fontWeight: 'bold',
-                         height: '40px', 
+                        height: '40px',
                         verticalAlign: 'top'
                       }}>
                         6. Driver's Mobile Number
@@ -366,8 +444,7 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                       <td style={{
                         border: '1px solid #000',
                         padding: '6px 8px',
-                        // fontWeight: 'bold',
-                         height: '40px', 
+                        height: '40px',
                         verticalAlign: 'top'
                       }}>
                         7. Date & Time of Reporting
@@ -378,16 +455,14 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                         height: '24px',
                         verticalAlign: 'top'
                       }}>
-                        &nbsp;
+                        {/* {formatDate(eventData?.subEvents?.[0]?.reportingDate)} &nbsp; */}
                       </td>
                     </tr>
                     <tr>
                       <td style={{
                         border: '1px solid #000',
                         padding: '6px 8px',
-                         height: '40px', 
-                        // fontWeight: 'bold',
-                        //   textAlign: 'center',       // centers horizontally
+                        height: '40px',
                         verticalAlign: 'middle'
                       }}>
                         8. Place of Reporting
@@ -398,7 +473,7 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                         height: '24px',
                         verticalAlign: 'top'
                       }}>
-                        &nbsp;
+                        {/* {eventData?.subEvents?.[0]?.place || '&nbsp;'} */}
                       </td>
                     </tr>
                     <tr>
@@ -406,11 +481,8 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                         border: '1px solid #000',
                         padding: '6px 8px',
                         paddingBottom: '8px',
-                         height: '40px', 
-                        // fontWeight: 'bold',
-                        // textAlign: 'center',       // centers horizontally
+                        height: '40px',
                         verticalAlign: 'middle'
-                        // verticalAlign: 'top'
                       }}>
                         9. Officer / Office to Whom the Vehicle<br />
                         Shall Report
@@ -427,7 +499,7 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                   </tbody>
                 </table>
 
-                {/* Signature Section */}
+                {/* Signature Section - USE STAMP DATA */}
                 <div style={{
                   display: 'flex',
                   justifyContent: 'flex-end',
@@ -441,42 +513,54 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                   }}>
                     {/* Signature */}
                     <div style={{ marginBottom: '5px', height: '35px', position: 'relative' }}>
-                      <img
-                        src="/signature.png"
-                        alt="Signature"
-                        style={{
-                          width: '110px',
-                          height: '50px',
-                          objectFit: 'contain',
-                          display: 'block',
-                          margin: '0 auto'
-                        }}
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                        }}
-                      />
+                      {stampData?.collectorSignature && (
+                        <img
+                          src={processedSignature}
+                          alt="Signature"
+                          style={{
+                            width: '110px',
+                            height: '50px',
+                            objectFit: 'contain',
+                            display: 'block',
+                            margin: '0 auto',
+                             //filter: 'contrast(1.5) brightness(1.2) drop-shadow(0px 0px 1px rgba(0,0,0,0.2))',
+                            // backgroundColor: 'transparent'
+                            backgroundColor: 'transparent',
+                          filter: 'contrast(1.3) brightness(1.1)'
+                          }}
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      )}
                     </div>
 
                     {/* Stamp */}
                     <div style={{
                       position: 'absolute',
-                      top: '-5px',
-                      left: '25px',
+                      top: '45px',
+                      left: '45px',
                       opacity: 0.8,
                       zIndex: 3
-                    }}>
-                      <img
-                        src="/stamp.png"
-                        alt="Official Stamp"
-                        style={{
-                          width: '95px',
-                          height: '95px',
-                          objectFit: 'contain'
-                        }}
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                        }}
-                      />
+                    }}> 
+                      {stampData?.collectorStamp && (
+                        <img
+                          src={processedStamp}
+                          alt="Official Stamp"
+                          style={{
+                            width: '95px',
+                            height: '95px',
+                            objectFit: 'contain',
+                            display: 'block',
+                            margin: '0 auto',
+                          
+                         // filter: 'contrast(1.3) brightness(1.1)'
+                          }}
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      )}
                     </div>
 
                     {/* Text */}
@@ -498,7 +582,14 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                   lineHeight: '1.4',
                   marginBottom: '12px'
                 }}>
-                  <h4 style={{ fontSize: '12pt', textUnderlineOffset: '6px', textDecoration: 'underline', fontWeight: 'bold', marginBottom: '4px', textAlign: 'center' }}>
+                  <h4 style={{
+                    fontSize: '12pt',
+                    textUnderlineOffset: '6px',
+                    textDecoration: 'underline',
+                    fontWeight: 'bold',
+                    marginBottom: '4px',
+                    textAlign: 'center'
+                  }}>
                     CONDITIONS OF REQUISITION:
                   </h4>
 
@@ -522,8 +613,12 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                   lineHeight: '1.4'
                 }}>
                   <h4 style={{
-                    fontSize: '12pt', textUnderlineOffset: '6px',
-                    textDecoration: 'underline', fontWeight: 'bold', marginBottom: '4px', textAlign: 'center'
+                    fontSize: '12pt',
+                    textUnderlineOffset: '6px',
+                    textDecoration: 'underline',
+                    fontWeight: 'bold',
+                    marginBottom: '4px',
+                    textAlign: 'center'
                   }}>
                     ACKNOWLEDGEMENT OF SERVICE:
                   </h4>
@@ -533,7 +628,6 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                   <div style={{ textAlign: 'right' }}>
                     Signature of Owner/Driver: _____________________
                   </div>
-
                 </div>
               </div>
             </div>

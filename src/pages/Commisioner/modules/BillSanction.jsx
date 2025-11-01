@@ -561,8 +561,8 @@ const BillSanction = () => {
                     <th className="px-6 py-4 text-right text-xs font-medium uppercase tracking-wider">Financial Summary</th>
                     <th className="px-6 py-4 text-center text-xs font-medium uppercase tracking-wider">Bills</th>
 
-                  <th className="px-6 py-4 text-center text-xs font-medium uppercase tracking-wider">Remark</th>
-                       <th className="px-6 py-4 text-center text-xs font-medium uppercase tracking-wider">Actions</th>
+                    <th className="px-6 py-4 text-center text-xs font-medium uppercase tracking-wider">Remark</th>
+                    <th className="px-6 py-4 text-center text-xs font-medium uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">

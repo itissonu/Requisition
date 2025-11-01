@@ -170,6 +170,7 @@ import UploadLetterToCollector from "./modules/UploadLetterToCollector";
 import EventActivity from "./modules/EventActivity";
 import RTOMainDashboard from "./modules/RTOMainDashboard";
 import RTOAllBills from "./modules/AllBillsReport";
+import RTOStampSignatureProfile from "./modules/RTOStampSignatureProfile";
 
 export default function RTODashboard({ user, onLogout }) {
   const navigate = useNavigate();
@@ -195,7 +196,8 @@ export default function RTODashboard({ user, onLogout }) {
       'pending-requisition': 'UploadLetterToCollector',
       'event-activity': 'EventActivity',
       'create-user': 'CreateUser',
-      'all-bills': 'ShowAllBills'
+      'all-bills': 'ShowAllBills',
+      'stamp-signature-profile': 'UpdateStampSignatureProfile'
     };
 
     return pathToPageMap[lastSegment] || 'DashBoard';
@@ -220,7 +222,8 @@ export default function RTODashboard({ user, onLogout }) {
       'ShowPaymentBill': '/rto/dashboard/payment-bills',
       'UploadLetterToCollector': '/rto/dashboard/pending-requisition',
       'EventActivity': '/rto/dashboard/event-activity',
-      'ShowAllBills': '/rto/dashboard/all-bills'
+      'ShowAllBills': '/rto/dashboard/all-bills',
+      'UpdateStampSignatureProfile': '/rto/dashboard/stamp-signature-profile'
 
     };
 
@@ -259,6 +262,7 @@ export default function RTODashboard({ user, onLogout }) {
             <Route path="pending-requisition" element={<UploadLetterToCollector />} />
             <Route path="event-activity" element={<EventActivity />} />
             <Route path="all-bills" element={<RTOAllBills />} />
+             <Route path="stamp-signature-profile" element={<RTOStampSignatureProfile />} />
 
           </Routes>
         </main>
