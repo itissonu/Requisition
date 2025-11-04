@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@imgly/background-removal": "^1.7.0",
     "@tailwindcss/vite": "^4.1.13",
     "axios": "^1.12.2",
     "crypto-js": "^4.2.0",

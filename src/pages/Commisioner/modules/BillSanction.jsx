@@ -594,16 +594,16 @@ const BillSanction = () => {
                             <span className="text-gray-600 text-xs">Total Amount Sanctioned:</span>
                             <span className="font-bold text-green-600">₹{item?.totalBilled?.toLocaleString('en-IN')}</span>
                           </div>
-                          {item.totalAdvanceRequested > 0 && (
+                          {/* {item.totalAdvanceRequested > 0 && (
                             <div className="flex justify-between">
                               <span className="text-gray-600 text-xs">Advance Req:</span>
                               <span className="font-bold text-blue-600">₹{item?.totalAdvanceRequested?.toLocaleString('en-IN')}</span>
                             </div>
-                          )}
-                          <div className="flex justify-between">
+                          )} */}
+                          {/* <div className="flex justify-between">
                             <span className="text-gray-600 text-xs font-semibold">Advance Amount Sanctioned:</span>
                             <span className="font-bold text-emerald-600">₹{item?.totalAdvanceSanctioned?.toLocaleString('en-IN')}</span>
-                          </div>
+                          </div> */}
                         </div>
                       </td>
                       <td className="px-6 py-5 text-center">

@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Upload, Trash2, Edit2, Eye, X, Save } from "lucide-react";
+import { Upload, Trash2, Edit2, Eye, X, Save, Loader } from "lucide-react";
+import { removeBackground } from '@imgly/background-removal';
 import { districtStampAPI } from "../../../apis/apiService";
 import logo from '../../../assests/logo.png';
+
 
 export default function RTOStampSignatureProfile() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [processingImage, setProcessingImage] = useState(false);
+  const [imageProcessingType, setImageProcessingType] = useState(''); // 'stamp' or 'signature'
   const [editingCollector, setEditingCollector] = useState(false);
   const [collectorFormData, setCollectorFormData] = useState({
     fullName: '',
@@ -19,19 +23,19 @@ export default function RTOStampSignatureProfile() {
     signature: null
   });
 
+
   useEffect(() => {
     fetchProfile();
   }, []);
 
+
   const fetchProfile = async () => {
     try {
       setLoading(true);
-     
       const response = await districtStampAPI.getCurrent();
       console.log("Profile data:", response.data);
       setProfile(response.data);
       
-   
       setCollectorInfo({
         name: response.data.collectorName || 'Not Assigned',
         phoneNumber: response.data.collectorPhoneNumber || 'N/A',
@@ -51,6 +55,7 @@ export default function RTOStampSignatureProfile() {
     }
   };
 
+
   const handleCollectorStampUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -60,21 +65,48 @@ export default function RTOStampSignatureProfile() {
       return;
     }
 
+    if (file.size > 10 * 1024 * 1024) { // 10MB limit
+      alert("File size must be less than 10MB");
+      return;
+    }
+
     try {
       setSaving(true);
-      const response = await districtStampAPI.uploadCollectorStamp(profile.districtName, file);
+      setProcessingImage(true);
+      setImageProcessingType('stamp');
+
+      console.log('Processing stamp image - removing background...');
+      const imageWithoutBackground = await removeBackground(file);
+      console.log('Background removed successfully');
+
+      const processedFile = new File(
+        [imageWithoutBackground],
+        `collector_stamp_${Date.now()}.png`,
+        { type: 'image/png' }
+      );
+
+      // Upload the processed image
+      const response = await districtStampAPI.uploadCollectorStamp(
+        profile.districtName, 
+        processedFile
+      );
+
       setCollectorInfo({
         ...collectorInfo,
         stamp: `data:image/png;base64,${response.data.collectorStamp}`
       });
-      alert("Collector stamp uploaded successfully!");
+
+      alert("Collector stamp uploaded successfully with background removed!");
     } catch (error) {
       console.error("Failed to upload stamp:", error);
-      alert("Failed to upload stamp");
+      alert("Failed to upload stamp: " + error.message);
     } finally {
       setSaving(false);
+      setProcessingImage(false);
+      setImageProcessingType('');
     }
   };
+
 
   const handleCollectorSignatureUpload = async (e) => {
     const file = e.target.files[0];
@@ -85,21 +117,52 @@ export default function RTOStampSignatureProfile() {
       return;
     }
 
+    if (file.size > 10 * 1024 * 1024) { // 10MB limit
+      alert("File size must be less than 10MB");
+      return;
+    }
+
     try {
       setSaving(true);
-      const response = await districtStampAPI.uploadCollectorSignature(profile.districtName, file);
+      setProcessingImage(true);
+      setImageProcessingType('signature');
+
+      console.log('Processing signature image - removing background...');
+      
+      // Remove background from signature image
+      const imageWithoutBackground = await removeBackground(file);
+      
+      console.log('Background removed successfully');
+
+      // Create a new File object from the processed blob
+      const processedFile = new File(
+        [imageWithoutBackground],
+        `collector_signature_${Date.now()}.png`,
+        { type: 'image/png' }
+      );
+
+      // Upload the processed image
+      const response = await districtStampAPI.uploadCollectorSignature(
+        profile.districtName, 
+        processedFile
+      );
+
       setCollectorInfo({
         ...collectorInfo,
         signature: `data:image/png;base64,${response.data.collectorSignature}`
       });
-      alert("Collector signature uploaded successfully!");
+
+      alert("Collector signature uploaded successfully with background removed!");
     } catch (error) {
       console.error("Failed to upload signature:", error);
-      alert("Failed to upload signature");
+      alert("Failed to upload signature: " + error.message);
     } finally {
       setSaving(false);
+      setProcessingImage(false);
+      setImageProcessingType('');
     }
   };
+
 
   const handleDeleteCollectorStamp = async () => {
     if (!window.confirm("Are you sure you want to delete collector's stamp?")) return;
@@ -120,6 +183,7 @@ export default function RTOStampSignatureProfile() {
     }
   };
 
+
   const handleDeleteCollectorSignature = async () => {
     if (!window.confirm("Are you sure you want to delete collector's signature?")) return;
 
@@ -139,36 +203,35 @@ export default function RTOStampSignatureProfile() {
     }
   };
 
- 
 
   const handleUpdateCollectorInfo = async () => {
-  if (!profile?.districtName) {
-    alert("District information not available");
-    return;
-  }
+    if (!profile?.districtName) {
+      alert("District information not available");
+      return;
+    }
 
-  try {
-    setSaving(true);
-    await districtStampAPI.updateCollectorInfo(profile.districtName, {
-      fullName: collectorFormData.fullName,
-      phoneNumber: collectorFormData.phoneNumber
-    });
+    try {
+      setSaving(true);
+      await districtStampAPI.updateCollectorInfo(profile.districtName, {
+        fullName: collectorFormData.fullName,
+        phoneNumber: collectorFormData.phoneNumber
+      });
  
-    setCollectorInfo({
-      ...collectorInfo,
-      name: collectorFormData.fullName,
-      phoneNumber: collectorFormData.phoneNumber
-    });
-    
-    alert("Collector information updated successfully!");
-    setEditingCollector(false);
-  } catch (error) {
-    console.error("Failed to update collector info:", error);
-    alert("Failed to update collector information");
-  } finally {
-    setSaving(false);
-  }
-};
+      setCollectorInfo({
+        ...collectorInfo,
+        name: collectorFormData.fullName,
+        phoneNumber: collectorFormData.phoneNumber
+      });
+      
+      alert("Collector information updated successfully!");
+      setEditingCollector(false);
+    } catch (error) {
+      console.error("Failed to update collector info:", error);
+      alert("Failed to update collector information");
+    } finally {
+      setSaving(false);
+    }
+  };
 
 
   if (loading) {
@@ -181,6 +244,7 @@ export default function RTOStampSignatureProfile() {
       </div>
     );
   }
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
@@ -203,6 +267,27 @@ export default function RTOStampSignatureProfile() {
         </div>
       </div>
 
+      {/* Processing Overlay */}
+      {processingImage && (
+        <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 shadow-2xl">
+            <div className="text-center">
+              <Loader className="w-16 h-16 text-blue-600 mx-auto mb-4 animate-spin" />
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Processing Image</h3>
+              <p className="text-gray-600 mb-1">
+                Removing background from {imageProcessingType}...
+              </p>
+              <p className="text-sm text-gray-500">This may take a few seconds</p>
+              <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-sm text-blue-800">
+                  ✨ Creating professional transparent background
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-6xl mx-auto p-6 space-y-6">
         
         {/* Collector Information - Editable */}
@@ -224,11 +309,11 @@ export default function RTOStampSignatureProfile() {
           </div>
 
           <div className="p-6">
-       
+            {/* Personal Details */}
             <div className="mb-6">
               <h3 className="font-semibold text-gray-900 mb-4">Personal Details</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-           
+                {/* Name */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Name</label>
                   {editingCollector ? (
@@ -245,7 +330,7 @@ export default function RTOStampSignatureProfile() {
                   )}
                 </div>
 
-              
+                {/* Phone Number */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Phone Number</label>
                   {editingCollector ? (
@@ -264,18 +349,35 @@ export default function RTOStampSignatureProfile() {
               </div>
             </div>
 
-          
+            {/* Collector Stamp & Signature */}
             <div className="border-t pt-6">
               <h3 className="font-semibold text-gray-900 mb-4">Collector Stamp & Signature</h3>
+              
+              {/* Info Banner about Background Removal */}
+              <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0">
+                  
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-blue-900">Automatic Background Removal</p>
+                    <p className="text-xs text-blue-700 mt-1">
+                      When you upload a stamp or signature, the background will be automatically removed 
+                      to create professional, transparent images.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
-               
+                {/* Official Stamp */}
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
                   <h4 className="font-semibold text-gray-900 mb-4 text-center">Official Stamp</h4>
                   
                   {collectorInfo.stamp ? (
                     <div className="space-y-4">
-                      <div className="bg-gray-100 rounded-lg p-4 flex items-center justify-center">
+                      <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 flex items-center justify-center min-h-[160px]">
                         <img
                           src={collectorInfo.stamp}
                           alt="Collector Stamp"
@@ -290,15 +392,15 @@ export default function RTOStampSignatureProfile() {
                               accept="image/*"
                               onChange={handleCollectorStampUpload}
                               className="hidden"
-                              disabled={saving}
+                              disabled={saving || processingImage}
                             />
-                            <div className="bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors text-center font-medium">
-                              Change
+                            <div className={`bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors text-center font-medium ${(saving || processingImage) ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                              {processingImage && imageProcessingType === 'stamp' ? 'Processing...' : 'Change'}
                             </div>
                           </label>
                           <button
                             onClick={handleDeleteCollectorStamp}
-                            disabled={saving}
+                            disabled={saving || processingImage}
                             className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
                           >
                             <Trash2 className="w-5 h-5" />
@@ -315,12 +417,13 @@ export default function RTOStampSignatureProfile() {
                             accept="image/*"
                             onChange={handleCollectorStampUpload}
                             className="hidden"
-                            disabled={saving}
+                            disabled={saving || processingImage}
                           />
-                          <div className="border-2 border-dashed border-blue-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors">
+                          <div className={`border-2 border-dashed border-blue-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors ${(saving || processingImage) ? 'opacity-50 cursor-not-allowed' : ''}`}>
                             <Upload className="w-12 h-12 text-blue-500 mx-auto mb-3" />
                             <p className="text-gray-700 font-medium">Upload Stamp</p>
-                            <p className="text-sm text-gray-500 mt-1">PNG, JPG up to 2MB</p>
+                            <p className="text-sm text-gray-500 mt-1">PNG, JPG up to 10MB</p>
+                            <p className="text-xs text-blue-600 mt-2">✨ Background will be removed</p>
                           </div>
                         </label>
                       ) : (
@@ -332,13 +435,13 @@ export default function RTOStampSignatureProfile() {
                   )}
                 </div>
 
-                
+                {/* Uploaded Signature */}
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
-                  <h4 className="font-semibold text-gray-900 mb-4 text-center">Digital Signature</h4>
+                  <h4 className="font-semibold text-gray-900 mb-4 text-center">Uploaded Signature</h4>
                   
                   {collectorInfo.signature ? (
                     <div className="space-y-4">
-                      <div className="bg-gray-100 rounded-lg p-4 flex items-center justify-center">
+                      <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 flex items-center justify-center min-h-[160px]">
                         <img
                           src={collectorInfo.signature}
                           alt="Collector Signature"
@@ -353,15 +456,15 @@ export default function RTOStampSignatureProfile() {
                               accept="image/*"
                               onChange={handleCollectorSignatureUpload}
                               className="hidden"
-                              disabled={saving}
+                              disabled={saving || processingImage}
                             />
-                            <div className="bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors text-center font-medium">
-                              Change
+                            <div className={`bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors text-center font-medium ${(saving || processingImage) ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                              {processingImage && imageProcessingType === 'signature' ? 'Processing...' : 'Change'}
                             </div>
                           </label>
                           <button
                             onClick={handleDeleteCollectorSignature}
-                            disabled={saving}
+                            disabled={saving || processingImage}
                             className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
                           >
                             <Trash2 className="w-5 h-5" />
@@ -378,12 +481,13 @@ export default function RTOStampSignatureProfile() {
                             accept="image/*"
                             onChange={handleCollectorSignatureUpload}
                             className="hidden"
-                            disabled={saving}
+                            disabled={saving || processingImage}
                           />
-                          <div className="border-2 border-dashed border-purple-300 rounded-lg p-8 text-center hover:border-purple-500 transition-colors">
+                          <div className={`border-2 border-dashed border-purple-300 rounded-lg p-8 text-center hover:border-purple-500 transition-colors ${(saving || processingImage) ? 'opacity-50 cursor-not-allowed' : ''}`}>
                             <Upload className="w-12 h-12 text-purple-500 mx-auto mb-3" />
                             <p className="text-gray-700 font-medium">Upload Signature</p>
-                            <p className="text-sm text-gray-500 mt-1">PNG, JPG up to 2MB</p>
+                            <p className="text-sm text-gray-500 mt-1">PNG, JPG up to 10MB</p>
+                            <p className="text-xs text-purple-600 mt-2">✨ Background will be removed</p>
                           </div>
                         </label>
                       ) : (
@@ -397,12 +501,12 @@ export default function RTOStampSignatureProfile() {
               </div>
             </div>
 
-          
+            {/* Action Buttons */}
             {editingCollector && (
               <div className="flex gap-3 pt-6 mt-6 border-t">
                 <button
                   onClick={handleUpdateCollectorInfo}
-                  disabled={saving}
+                  disabled={saving || processingImage}
                   className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   <Save className="w-5 h-5" />
@@ -410,8 +514,8 @@ export default function RTOStampSignatureProfile() {
                 </button>
                 <button
                   onClick={() => setEditingCollector(false)}
-                  disabled={saving}
-                  className="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 transition-colors font-medium flex items-center justify-center gap-2"
+                  disabled={saving || processingImage}
+                  className="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 transition-colors font-medium flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   <X className="w-5 h-5" />
                   Cancel

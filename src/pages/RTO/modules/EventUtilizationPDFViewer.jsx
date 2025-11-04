@@ -108,14 +108,14 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
    
       if (response?.data?.collectorSignature) {
         const signatureBase64 = `data:image/png;base64,${response.data.collectorSignature}`;
-        const processed = await removeWhiteBackground(signatureBase64);
-        setProcessedSignature(processed);
+      //  const processed = await removeWhiteBackground(signatureBase64);
+        setProcessedSignature(signatureBase64);
       }
       
       if (response?.data?.collectorStamp) {
         const stampBase64 = `data:image/png;base64,${response.data.collectorStamp}`;
-        const processed = await removeWhiteBackground(stampBase64);
-        setProcessedStamp(processed);
+      //  const processed = await removeWhiteBackground(stampBase64);
+        setProcessedStamp(stampBase64);
       }
     } catch (error) {
       console.error("Error fetching stamp and signature:", error);
@@ -518,15 +518,15 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                           src={processedSignature}
                           alt="Signature"
                           style={{
-                            width: '110px',
-                            height: '50px',
+                            width: '150px',
+                            height: '70px',
                             objectFit: 'contain',
                             display: 'block',
                             margin: '0 auto',
                              //filter: 'contrast(1.5) brightness(1.2) drop-shadow(0px 0px 1px rgba(0,0,0,0.2))',
                             // backgroundColor: 'transparent'
-                            backgroundColor: 'transparent',
-                          filter: 'contrast(1.3) brightness(1.1)'
+                           // backgroundColor: 'transparent',
+                          //filter: 'contrast(1.3) brightness(1.1)'
                           }}
                           onError={(e) => {
                             e.target.style.display = 'none';
@@ -538,7 +538,7 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
                     {/* Stamp */}
                     <div style={{
                       position: 'absolute',
-                      top: '45px',
+                      top: '55px',
                       left: '45px',
                       opacity: 0.8,
                       zIndex: 3
