@@ -40,7 +40,7 @@ export default function ShowPaymentBill() {
       setEvents(eventsRes.data);
       setRequests(requestsRes.data);
       setBills(billsRes.data);
-      console.log("bills sanctionss",billsRes.data)
+      // console.log("bills sanctionss",billsRes.data)
       setUtilizations(utilizationsRes.data);
     } catch (error) {
       console.error("Failed to load data:", error);

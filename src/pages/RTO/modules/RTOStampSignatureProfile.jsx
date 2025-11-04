@@ -26,12 +26,12 @@ export default function RTOStampSignatureProfile() {
   const fetchProfile = async () => {
     try {
       setLoading(true);
-     
+
       const response = await districtStampAPI.getCurrent();
-      console.log("Profile data:", response.data);
+      // console.log("Profile data:", response.data);
       setProfile(response.data);
-      
-   
+
+
       setCollectorInfo({
         name: response.data.collectorName || 'Not Assigned',
         phoneNumber: response.data.collectorPhoneNumber || 'N/A',
@@ -139,36 +139,36 @@ export default function RTOStampSignatureProfile() {
     }
   };
 
- 
+
 
   const handleUpdateCollectorInfo = async () => {
-  if (!profile?.districtName) {
-    alert("District information not available");
-    return;
-  }
+    if (!profile?.districtName) {
+      alert("District information not available");
+      return;
+    }
 
-  try {
-    setSaving(true);
-    await districtStampAPI.updateCollectorInfo(profile.districtName, {
-      fullName: collectorFormData.fullName,
-      phoneNumber: collectorFormData.phoneNumber
-    });
- 
-    setCollectorInfo({
-      ...collectorInfo,
-      name: collectorFormData.fullName,
-      phoneNumber: collectorFormData.phoneNumber
-    });
-    
-    alert("Collector information updated successfully!");
-    setEditingCollector(false);
-  } catch (error) {
-    console.error("Failed to update collector info:", error);
-    alert("Failed to update collector information");
-  } finally {
-    setSaving(false);
-  }
-};
+    try {
+      setSaving(true);
+      await districtStampAPI.updateCollectorInfo(profile.districtName, {
+        fullName: collectorFormData.fullName,
+        phoneNumber: collectorFormData.phoneNumber
+      });
+
+      setCollectorInfo({
+        ...collectorInfo,
+        name: collectorFormData.fullName,
+        phoneNumber: collectorFormData.phoneNumber
+      });
+
+      alert("Collector information updated successfully!");
+      setEditingCollector(false);
+    } catch (error) {
+      console.error("Failed to update collector info:", error);
+      alert("Failed to update collector information");
+    } finally {
+      setSaving(false);
+    }
+  };
 
 
   if (loading) {
@@ -204,7 +204,7 @@ export default function RTOStampSignatureProfile() {
       </div>
 
       <div className="max-w-6xl mx-auto p-6 space-y-6">
-        
+
         {/* Collector Information - Editable */}
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4 flex justify-between items-center">
@@ -224,11 +224,11 @@ export default function RTOStampSignatureProfile() {
           </div>
 
           <div className="p-6">
-       
+
             <div className="mb-6">
               <h3 className="font-semibold text-gray-900 mb-4">Personal Details</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-           
+
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Name</label>
                   {editingCollector ? (
@@ -245,7 +245,7 @@ export default function RTOStampSignatureProfile() {
                   )}
                 </div>
 
-              
+
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Phone Number</label>
                   {editingCollector ? (
@@ -264,15 +264,15 @@ export default function RTOStampSignatureProfile() {
               </div>
             </div>
 
-          
+
             <div className="border-t pt-6">
               <h3 className="font-semibold text-gray-900 mb-4">Collector Stamp & Signature</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-               
+
+
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
                   <h4 className="font-semibold text-gray-900 mb-4 text-center">Official Stamp</h4>
-                  
+
                   {collectorInfo.stamp ? (
                     <div className="space-y-4">
                       <div className="bg-gray-100 rounded-lg p-4 flex items-center justify-center">
@@ -332,10 +332,10 @@ export default function RTOStampSignatureProfile() {
                   )}
                 </div>
 
-                
+
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
                   <h4 className="font-semibold text-gray-900 mb-4 text-center">Digital Signature</h4>
-                  
+
                   {collectorInfo.signature ? (
                     <div className="space-y-4">
                       <div className="bg-gray-100 rounded-lg p-4 flex items-center justify-center">
@@ -397,7 +397,7 @@ export default function RTOStampSignatureProfile() {
               </div>
             </div>
 
-          
+
             {editingCollector && (
               <div className="flex gap-3 pt-6 mt-6 border-t">
                 <button
@@ -420,7 +420,11 @@ export default function RTOStampSignatureProfile() {
             )}
           </div>
         </div>
-
+      </div>
+      {/* Footer */}
+      <div className="bg-gradient-to-r gap-2 from-blue-900 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">
+        <p className="mb-2">Vehicles Requisition System</p>
+        <p>© Government of Odisha – Commerce & Transport Department</p>
       </div>
     </div>
   );
