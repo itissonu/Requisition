@@ -40,7 +40,7 @@ export default function ShowPaymentBill() {
       setEvents(eventsRes.data);
       setRequests(requestsRes.data);
       setBills(billsRes.data);
-      console.log("bills sanctionss",billsRes.data)
+      // console.log("bills sanctionss",billsRes.data)
       setUtilizations(utilizationsRes.data);
     } catch (error) {
       console.error("Failed to load data:", error);
@@ -404,7 +404,7 @@ export default function ShowPaymentBill() {
                             title="View Details"
                           >
                             <Eye className="w-4 h-4" />
-                            <span className="text-sm font-medium">View</span>
+                            {/* <span className="text-sm font-medium">View</span> */}
                           </button>
                           {event.status === 'CREATED' && (
                             <button

@@ -33,7 +33,7 @@ export default function RTOStampSignatureProfile() {
     try {
       setLoading(true);
       const response = await districtStampAPI.getCurrent();
-      console.log("Profile data:", response.data);
+      // console.log("Profile data:", response.data);
       setProfile(response.data);
       
       setCollectorInfo({
@@ -209,6 +209,10 @@ export default function RTOStampSignatureProfile() {
       alert("District information not available");
       return;
     }
+    if (!profile?.districtName) {
+      alert("District information not available");
+      return;
+    }
 
     try {
       setSaving(true);
@@ -289,7 +293,7 @@ export default function RTOStampSignatureProfile() {
       )}
 
       <div className="max-w-6xl mx-auto p-6 space-y-6">
-        
+
         {/* Collector Information - Editable */}
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4 flex justify-between items-center">
@@ -374,7 +378,7 @@ export default function RTOStampSignatureProfile() {
                 {/* Official Stamp */}
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
                   <h4 className="font-semibold text-gray-900 mb-4 text-center">Official Stamp</h4>
-                  
+
                   {collectorInfo.stamp ? (
                     <div className="space-y-4">
                       <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 flex items-center justify-center min-h-[160px]">
@@ -524,7 +528,11 @@ export default function RTOStampSignatureProfile() {
             )}
           </div>
         </div>
-
+      </div>
+      {/* Footer */}
+      <div className="bg-gradient-to-r gap-2 from-blue-900 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">
+        <p className="mb-2">Vehicles Requisition System</p>
+        <p>© Government of Odisha – Commerce & Transport Department</p>
       </div>
     </div>
   );

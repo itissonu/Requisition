@@ -2,9 +2,19 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Upload, FileText, CheckCircle, User, Hash, Send, AlertCircle, Shield, House, HousePlug, Landmark, Tag } from "lucide-react";
+import {
+  Upload,
+  FileText,
+  CheckCircle,
+  User,
+  Send,
+  AlertCircle,
+  Landmark,
+  Tag,
+} from "lucide-react";
 import { userAPI, requestEventAPI } from "../../../apis/apiService";
-import logo from '../../../assests/logo.png';
+import logo from "../../../assests/logo.png";
+
 const letterSchema = z.object({
   letterName: z
     .string()
@@ -15,12 +25,19 @@ const letterSchema = z.object({
     .min(1, "Requested Office Name is required")
     .max(100, "Must be less than 100 characters"),
   letterNo: z.string().min(1, "Letter number is required"),
+  // keep rtoUserId as string validation (same message as original)
   rtoUserId: z.string().min(1, "RTO selection is required"),
   letterFile: z
     .any()
-    .refine(files => files?.length === 1, "PDF file is required")
-    .refine(files => files[0]?.type === "application/pdf", "Only PDF files are allowed")
-    .refine(files => files[0]?.size <= 5_000_000, "File size must be less than 5MB"),
+    .refine((files) => files?.length === 1, "PDF file is required")
+    .refine(
+      (files) => files[0]?.type === "application/pdf",
+      "Only PDF files are allowed"
+    )
+    .refine(
+      (files) => files[0]?.size <= 5_000_000,
+      "File size must be less than 5MB"
+    ),
 });
 
 export default function UploadLetterToRTO() {
@@ -31,33 +48,43 @@ export default function UploadLetterToRTO() {
   const [autoSelectedRto, setAutoSelectedRto] = useState(null);
   const [showRtoDropdown, setShowRtoDropdown] = useState(false);
 
-  const { register, handleSubmit, reset, watch, setValue, formState: { errors } } = useForm({
+  // selectedRtos is the local multi-selection state (array of rto objects)
+  const [selectedRtos, setSelectedRtos] = useState([]);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm({
     resolver: zodResolver(letterSchema),
     defaultValues: {
       letterName: "",
       requestedOffice: "",
       letterNo: "",
-      rtoUserId: "",
+      rtoUserId: "", 
       letterFile: null,
-    }
+    },
   });
 
   const file = watch("letterFile");
 
-
-  
   useEffect(() => {
     const fetchRtos = async () => {
       try {
         setFetchingRtos(true);
         const response = await userAPI.getRtosInMyDistrict();
-        const districtRtos = response.data;
+        const districtRtos = response.data || [];
         setRtos(districtRtos);
 
         if (districtRtos.length === 1) {
           const singleRto = districtRtos[0];
           setAutoSelectedRto(singleRto);
+          // single auto selection stored as CSV string
           setValue("rtoUserId", singleRto.id.toString());
+          setSelectedRtos([singleRto]);
           setShowRtoDropdown(false);
         } else if (districtRtos.length > 1) {
           setShowRtoDropdown(true);
@@ -77,31 +104,78 @@ export default function UploadLetterToRTO() {
     fetchRtos();
   }, [setValue]);
 
+  // helper to sync hidden rtoUserId field (CSV) with selectedRtos state
+  const syncRtoHiddenValue = (rtoArray) => {
+    const csv = rtoArray.map((r) => r.id).join(",");
+    setValue("rtoUserId", csv);
+  };
+
+  // when user selects an option from the single-select dropdown, add it to selectedRtos
+  const handleRtoSelect = (e) => {
+    const selectedId = e.target.value;
+    if (!selectedId) return;
+    // prevent duplicates
+    const already = selectedRtos.some((r) => r.id.toString() === selectedId);
+    if (!already) {
+      const rtoObj = rtos.find((r) => r.id.toString() === selectedId);
+      if (rtoObj) {
+        const updated = [...selectedRtos, rtoObj];
+        setSelectedRtos(updated);
+        syncRtoHiddenValue(updated);
+      }
+    }
+    // reset select to default
+    e.target.value = "";
+  };
+
+  const removeSelectedRto = (id) => {
+    const updated = selectedRtos.filter((r) => r.id !== id);
+    setSelectedRtos(updated);
+    syncRtoHiddenValue(updated);
+  };
+
   const onSubmit = async (data) => {
     setLoading(true);
     setSuccess(false);
 
-    const formData = new FormData();
-    formData.append("letterName", data.letterName);
-    formData.append("requestedOffice", data.requestedOffice);
-    formData.append("letterNo", data.letterNo);
-    formData.append("rtoUserId", data.rtoUserId);
-    formData.append("letterPdf", data.letterFile[0]);
-    formData.append("status", "CREATED");
 
+    const rtoIds = data.rtoUserId.split(",").map(id => id.trim()).filter(Boolean);
 
-
+    for (const rtoId of rtoIds) {
+      const formData = new FormData();
+      formData.append("letterName", data.letterName);
+      formData.append("requestedOffice", data.requestedOffice);
+      formData.append("letterNo", data.letterNo);
+      formData.append("rtoUserId", rtoId); // backend accepts Long
+      formData.append("letterPdf", data.letterFile[0]);
+      formData.append("status", "CREATED");
+      await requestEventAPI.create(formData);
+    }
     try {
-   
-     await requestEventAPI.create(formData);
+
       setSuccess(true);
-      reset({
-        letterName: "",
-        requestedOffice: "",
-        letterNo: "",
-        rtoUserId: autoSelectedRto ? autoSelectedRto.id.toString() : "",
-        letterFile: null,
-      });
+
+      // reset form; if autoSelectedRto exists, keep it selected as before
+      if (autoSelectedRto) {
+        reset({
+          letterName: "",
+          requestedOffice: "",
+          letterNo: "",
+          rtoUserId: autoSelectedRto.id.toString(),
+          letterFile: null,
+        });
+        setSelectedRtos([autoSelectedRto]);
+      } else {
+        reset({
+          letterName: "",
+          requestedOffice: "",
+          letterNo: "",
+          rtoUserId: "",
+          letterFile: null,
+        });
+        setSelectedRtos([]);
+      }
+
       setTimeout(() => setSuccess(false), 4000);
     } catch (error) {
       console.error("Upload failed:", error);
@@ -120,7 +194,9 @@ export default function UploadLetterToRTO() {
             <div className="w-3 h-16 bg-white animate-pulse mx-1"></div>
             <div className="w-3 h-16 bg-green-600 animate-pulse"></div>
           </div>
-          <p className="text-lg text-gray-700 font-semibold">Loading RTO information...</p>
+          <p className="text-lg text-gray-700 font-semibold">
+            Loading RTO information...
+          </p>
           <p className="text-sm text-gray-500 mt-1">Please wait</p>
         </div>
       </div>
@@ -135,9 +211,12 @@ export default function UploadLetterToRTO() {
             <div className="flex items-start">
               <AlertCircle className="w-12 h-12 text-red-600 mr-4 flex-shrink-0" />
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">No RTO Found</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  No RTO Found
+                </h2>
                 <p className="text-gray-600">
-                  No RTO officers are available in your district. Please contact the administrator for assistance.
+                  No RTO officers are available in your district. Please contact
+                  the administrator for assistance.
                 </p>
               </div>
             </div>
@@ -213,11 +292,11 @@ export default function UploadLetterToRTO() {
                   <div className="flex items-center">
                     <CheckCircle className="w-5 h-5 text-green-700 mr-3" />
                     <div>
-                      {/* <p className="font-semibold text-gray-900">{autoSelectedRto.fullName}</p> */}
                       <p className="text-sm text-gray-600">{autoSelectedRto.district} RTO</p>
                     </div>
                   </div>
                 </div>
+                {/* hidden registered input; value already set in effect */}
                 <input type="hidden" {...register("rtoUserId")} />
               </div>
             ) : showRtoDropdown ? (
@@ -227,22 +306,49 @@ export default function UploadLetterToRTO() {
                   Select RTO
                   <span className="text-red-600 ml-1">*</span>
                 </label>
+
+                {/* keep select single (UI unchanged), change onChange to add to selected list */}
                 <select
-                  {...register("rtoUserId")}
+                  onChange={handleRtoSelect}
                   className="w-full px-4 hover:cursor-pointer py-2.5 border border-gray-300 focus:border-blue-900 focus:ring-2 focus:ring-blue-200 outline-none"
                 >
                   <option value="">-- Please Select --</option>
                   {rtos.map((rto) => (
                     <option key={rto.id} value={rto.id}>
-                     {rto?.rtoofficeName || "N/A"}
+                      {rto?.rtoofficeName || "N/A"}
                     </option>
                   ))}
                 </select>
+
+                {/* hidden input registered for validation/submission (value set via syncRtoHiddenValue) */}
+                <input type="hidden" {...register("rtoUserId")} />
+
                 {errors.rtoUserId && (
                   <p className="text-red-600 text-sm mt-1.5">
-                     {errors.rtoUserId.message}
+                    {errors.rtoUserId.message}
                   </p>
                 )}
+
+                {/* Selected RTO List (line-by-line) */}
+                <div className="mt-3 space-y-2">
+                  {selectedRtos.map((rto) => (
+                    <div
+                      key={rto.id}
+                      className="flex justify-between items-center bg-blue-50 border border-blue-200 px-3 py-1 rounded"
+                    >
+                      <span className="text-sm font-medium text-gray-800">
+                        {rto?.rtoofficeName || "N/A"}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeSelectedRto(rto.id)}
+                        className="text-red-600 hover:text-red-800 px-2 py-0.5 rounded"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             ) : null}
 
@@ -261,7 +367,7 @@ export default function UploadLetterToRTO() {
               />
               {errors.letterName && (
                 <p className="text-red-600 text-sm mt-1.5">
-                   {errors.letterName.message}
+                  {errors.letterName.message}
                 </p>
               )}
             </div>
@@ -281,7 +387,7 @@ export default function UploadLetterToRTO() {
               />
               {errors.requestedOffice && (
                 <p className="text-red-600 text-sm mt-1.5">
-                   {errors.requestedOffice.message}
+                  {errors.requestedOffice.message}
                 </p>
               )}
             </div>
@@ -301,7 +407,7 @@ export default function UploadLetterToRTO() {
               />
               {errors.letterNo && (
                 <p className="text-red-600 text-sm mt-1.5">
-                   {errors.letterNo.message}
+                  {errors.letterNo.message}
                 </p>
               )}
             </div>
@@ -313,10 +419,12 @@ export default function UploadLetterToRTO() {
                 Upload Requesting Letter (PDF)
                 <span className="text-red-600 ml-1">*</span>
               </label>
-              <div className={`border-2 border-dashed p-8 text-center transition-colors ${file?.[0]
-                ? "border-green-400 bg-green-50"
-                : "border-gray-300 bg-gray-50 hover:border-blue-900 hover:bg-blue-50"
-                }`}>
+              <div
+                className={`border-2 border-dashed p-8 text-center transition-colors ${file?.[0]
+                  ? "border-green-400 bg-green-50"
+                  : "border-gray-300 bg-gray-50 hover:border-blue-900 hover:bg-blue-50"
+                  }`}
+              >
                 <input
                   type="file"
                   accept="application/pdf"
@@ -346,9 +454,7 @@ export default function UploadLetterToRTO() {
                 </label>
               </div>
               {errors.letterFile && (
-                <p className="text-red-600 text-sm mt-1.5">
-                  ⚠ {errors.letterFile.message}
-                </p>
+                <p className="text-red-600 text-sm mt-1.5">⚠ {errors.letterFile.message}</p>
               )}
             </div>
 
@@ -377,12 +483,14 @@ export default function UploadLetterToRTO() {
 
               <button
                 type="button"
-                onClick={() => reset({
-                  letterName: "",
-                  letterNo: "",
-                  rtoUserId: autoSelectedRto ? autoSelectedRto.id.toString() : "",
-                  letterFile: null,
-                })}
+                onClick={() =>
+                  reset({
+                    letterName: "",
+                    letterNo: "",
+                    rtoUserId: autoSelectedRto ? autoSelectedRto.id.toString() : "",
+                    letterFile: null,
+                  }) || setSelectedRtos(autoSelectedRto ? [autoSelectedRto] : [])
+                }
                 disabled={loading}
                 className="px-8 py-3 hover:cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold 
                          transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -397,19 +505,16 @@ export default function UploadLetterToRTO() {
         <div className="mt-6 bg-yellow-50 border-l-4 border-yellow-500 p-4 shadow-sm">
           <p className="text-sm text-gray-800">
             <strong className="text-yellow-800">Important:</strong> Please verify all information before submission.
-            The request will be sent to  the selected RTO for  processing.
+            The request will be sent to the selected RTO(s) for processing.
             Ensure that the uploaded PDF contains all required data.
           </p>
         </div>
-
-
-
       </div>
+
       {/* Footer */}
-        <div className="bg-blue-900 text-white p-4 text-center text-sm mt-8">
+      <div className="bg-blue-900 text-white p-4 text-center text-sm mt-8">
         <p className="mb-2">Vehicles Requisition System</p>
         <p className="font-semibold">© 2025 Government of Odisha – Commerce & Transport Department</p>
-        {/* <p className="text-xs opacity-75 mt-1">Approved Utilizations System | For assistance: transport@odisha.gov.in</p> */}
       </div>
     </div>
   );

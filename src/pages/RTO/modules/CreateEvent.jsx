@@ -7,6 +7,8 @@ import { Car, File, Plus, Trash2, MapPin, Calendar, Clock, ChevronDown, Building
 import logo from '../../../assests/logo.png';
 import { eventAPI, requestEventAPI, vehicleAPI } from "../../../apis/apiService";
 import EventUtilizationPDFViewer from "./EventUtilizationPDFViewer";
+import { districtStampAPI } from "../../../apis/apiService";
+import { toast } from "react-toastify";
 
 const subEventSchema = z.object({
   place: z.string().min(2, "Place is required"),
@@ -44,7 +46,8 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
       referenceDate: new Date().toISOString().split('T')[0]
     }
   });
-  
+
+
   const selectedRequestId = watch("requestEventId");
   const selectedRequest = requests.find(req => req.id === parseInt(selectedRequestId));
 
@@ -59,6 +62,30 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
   } = useForm({
     resolver: zodResolver(subEventSchema),
   });
+
+
+  const [hasStampAndSignature, setHasStampAndSignature] = useState(true);
+
+
+
+  const checkDistrictStamps = async () => {
+    try {
+      const response = await districtStampAPI.getCurrent();
+      const { collectorStamp, collectorSignature } = response.data;
+      const hasBoth = collectorStamp && collectorSignature;
+      setHasStampAndSignature(hasBoth);
+    } catch (error) {
+      console.error("Failed to check district stamps:", error);
+      setHasStampAndSignature(false);
+    } finally {
+
+    }
+  };
+
+  useEffect(() => {
+    checkDistrictStamps();
+  }, []);
+
 
   useEffect(() => {
     fetchRequests();
@@ -182,7 +209,7 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
       };
 
       const response = await eventAPI.create(eventData);
-      
+
       setCreatedEvent(response.data);
       setShowSuccessModal(true);
       resetForm();
@@ -238,6 +265,13 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
             <h3 className="text-lg font-semibold tracking-wide uppercase">create requisition schedule</h3>
           </div>
         </div>
+      </div>
+      <div>
+        {!hasStampAndSignature && (
+          <marquee behavior="scroll" direction="left" scrollamount="10" style={{ color: "red", fontSize: "18px", fontWeight: "bold" }}>
+            ⚠️ Please Upload The Signature and Stamp (Update Signature Tab) Otherwise Requisition Pdf won't Have The Signature & Stamp Of The Collector.
+          </marquee>
+        )}
       </div>
 
       <div className="max-w-6xl mx-auto p-6">
@@ -591,8 +625,8 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
               <p className="text-gray-600 mb-4">
                 Your vehicle requisition event has been created successfully.
               </p>
-              
-              
+
+
 
               <p className="text-gray-600 mb-6">
                 What would you like to do next?

@@ -155,13 +155,13 @@ export default function CommissionerMainDashboard() {
   };
 
   const dashboardStats = [
-    {
-      title: "Pending Approvals",
-      value: stats.pendingUtilizations,
-      icon: Clock,
-      color: "yellow",
-      description: "Utilizations awaiting approval"
-    },
+    // {
+    //   title: "Pending Approvals",
+    //   value: stats.pendingUtilizations,
+    //   icon: Clock,
+    //   color: "yellow",
+    //   description: "Utilizations awaiting approval"
+    // },
     {
       title: "Utilization Approved This Month",
       value: stats.approvedThisMonth,

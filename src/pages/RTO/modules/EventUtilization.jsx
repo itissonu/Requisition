@@ -146,7 +146,7 @@ export default function EventUtilizationDashboard() {
               </div>
             </div>
             <div className="mt-3 pt-3 border-t border-blue-700">
-              <h3 className="text-lg font-semibold tracking-wide">EVENT VEHICLE UTILIZATION </h3>
+              <h3 className="text-lg font-semibold tracking-wide">FINAL BILL SUBMISSION </h3>
             </div>
           </div>
         </div>
@@ -159,9 +159,9 @@ export default function EventUtilizationDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-bold text-green-900">
-                  APPROVED EVENTS - READY FOR UTILIZATION
+                  APPROVED EVENTS - READY FOR FINAL BILL SUBMISSION
                 </h3>
-                <p className="text-sm text-green-700 mt-1">Events approved by collector and available for vehicle utilization</p>
+                <p className="text-sm text-green-700 mt-1">Events approved by collector and available for final bill submission</p>
               </div>
               <div className="bg-green-600 text-white px-4 py-2 rounded-full font-bold">
                 {approvedEvents.length} Available
