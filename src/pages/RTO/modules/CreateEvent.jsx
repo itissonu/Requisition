@@ -499,10 +499,10 @@ export default function CreateEvent({ onNavigateToPayment = null }) {
               </button>
             </div>
 
-            {/* Modal Body */}
+         
             <div className="p-6 max-h-[calc(100vh-200px)] overflow-y-auto">
               <div className="space-y-6">
-                {/* Sub-event Details */}
+              
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">

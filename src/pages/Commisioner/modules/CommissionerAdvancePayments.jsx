@@ -329,7 +329,7 @@ const CommissionerAdvancePayments = () => {
               </div>
             </div>
             <div className="mt-3 pt-3 border-t border-blue-700">
-              <h3 className="text-lg font-semibold tracking-wide">COMMISSIONER - ADVANCE PAYMENT MANAGEMENT</h3>
+              <h3 className="text-lg font-semibold tracking-wide">TRANSPORT COMMISSIONER - ADVANCE PAYMENT MANAGEMENT</h3>
             </div>
           </div>
         </div>

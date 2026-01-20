@@ -477,7 +477,7 @@ const BillSanction = () => {
             </div>
           </div>
           <div className="text-center border-t border-blue-700 pt-3">
-            <h3 className="text-lg font-semibold tracking-wide">COMMISSIONER - BILL SANCTION</h3>
+            <h3 className="text-lg font-semibold tracking-wide">TRANSPORT COMMISSIONER - BILL SANCTION</h3>
           </div>
         </div>
       </div>
@@ -526,7 +526,7 @@ const BillSanction = () => {
               <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
                 <CheckCircle className="w-5 h-5" />
               </div>
-              Commissioner Approved Utilizations
+             Transport Commissioner Approved Utilizations
             </h3>
           </div>
 

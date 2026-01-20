@@ -49,7 +49,7 @@ export default function CommissionerSidebar({ activePage, setActivePage }) {
           <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center mr-3">
             <span className="text-blue-900 font-bold text-sm">CM</span>
           </div>
-          <h1 className="text-xl font-bold">Commissioner</h1>
+          <h1 className="text-xl font-bold"> Transport Commissioner</h1>
         </div>
 
         <nav className="space-y-2">

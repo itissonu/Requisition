@@ -116,7 +116,7 @@ export default function CommissionerApproveUtilizations() {
               </div>
             </div>
             <div className="mt-3 pt-3 border-t border-blue-700">
-              <h3 className="text-lg font-semibold tracking-wide">COMMISSIONER - UTILIZATION APPROVAL</h3>
+              <h3 className="text-lg font-semibold tracking-wide">TRANSPORT COMMISSIONER - UTILIZATION APPROVAL</h3>
             </div>
           </div>
         </div>

@@ -141,11 +141,11 @@ const AllBills = () => {
                             </div>
                             <div>
                                 <h1 className="text-2xl font-bold">GOVERNMENT OF ODISHA</h1>
-                                <h2 className="text-lg opacity-90">Commerce & Transport (Transport) Department</h2>
+                                <h2 className="text-lg opacity-90">Commerce & Transport  Department</h2>
                             </div>
                         </div>
                         <div className="mt-3 pt-3 border-t border-blue-700">
-                            <h3 className="text-lg font-semibold tracking-wide">COMMISSIONER - ALL COMPLETED PAYMENTS</h3>
+                            <h3 className="text-lg font-semibold tracking-wide">TRANSPORT COMMISSIONER - ALL COMPLETED PAYMENTS</h3>
                         </div>
                     </div>
                 </div>
