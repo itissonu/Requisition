@@ -17,7 +17,7 @@ import {
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
-import { eventAPI } from "../../../apis/apiService";
+import { baseURL, eventAPI } from "../../../apis/apiService";
 import logo from '../../../assests/logo.png';
 
 export default function ShowAllEvents() {
@@ -184,7 +184,7 @@ export default function ShowAllEvents() {
   const handleViewPdf = async (event) => {
     try {
       setCurrentEventForPdf(event);
-      const pdfViewUrl = `http://localhost:8091/Requisition/api/events/${event.requestEventId}/pdf/view`;
+      const pdfViewUrl = `${baseURL}/api/events/${event.requestEventId}/pdf/view`;
       setPdfUrl(pdfViewUrl);
       setPdfModalOpen(true);
     } catch (error) {

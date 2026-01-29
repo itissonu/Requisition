@@ -246,7 +246,7 @@ const BillSanction = () => {
       setUtilizations(utilizationsResponse.data);
       setBills(billsResponse.data);
       setAdvanceRequests(advanceRequestsResponse.data);
-      console.log(billsResponse.data, "bills sanctionsss")
+      
     } catch (error) {
       console.error("Failed to fetch data:", error);
       alert("Failed to load data. Please try again.");

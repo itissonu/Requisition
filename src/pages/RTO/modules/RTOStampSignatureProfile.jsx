@@ -33,7 +33,7 @@ export default function RTOStampSignatureProfile() {
     try {
       setLoading(true);
       const response = await districtStampAPI.getCurrent();
-      // console.log("Profile data:", response.data);
+      
       setProfile(response.data);
       
       setCollectorInfo({
@@ -75,9 +75,9 @@ export default function RTOStampSignatureProfile() {
       setProcessingImage(true);
       setImageProcessingType('stamp');
 
-      console.log('Processing stamp image - removing background...');
+     
       const imageWithoutBackground = await removeBackground(file);
-      console.log('Background removed successfully');
+
 
       const processedFile = new File(
         [imageWithoutBackground],
@@ -126,14 +126,9 @@ export default function RTOStampSignatureProfile() {
       setSaving(true);
       setProcessingImage(true);
       setImageProcessingType('signature');
-
-      console.log('Processing signature image - removing background...');
-      
       // Remove background from signature image
       const imageWithoutBackground = await removeBackground(file);
       
-      console.log('Background removed successfully');
-
       // Create a new File object from the processed blob
       const processedFile = new File(
         [imageWithoutBackground],
@@ -162,6 +157,82 @@ export default function RTOStampSignatureProfile() {
       setImageProcessingType('');
     }
   };
+
+
+// const handleCollectorStampUpload = async (e) => {
+//   const file = e.target.files[0];
+//   if (!file) return;
+
+//   if (!file.type.startsWith("image/")) {
+//     alert("Please upload an image file");
+//     return;
+//   }
+
+//   if (file.size > 10 * 1024 * 1024) {
+//     alert("File size must be less than 10MB");
+//     return;
+//   }
+
+//   try {
+//     setSaving(true);
+
+//     // Directly upload original image (no background removal)
+//     const response = await districtStampAPI.uploadCollectorStamp(
+//       profile.districtName,
+//       file
+//     );
+
+//     setCollectorInfo({
+//       ...collectorInfo,
+//       stamp: `data:image/png;base64,${response.data.collectorStamp}`
+//     });
+
+//     alert("Collector stamp uploaded successfully!");
+//   } catch (error) {
+//     console.error("Failed to upload stamp:", error);
+//     alert("Failed to upload stamp. Please try again.");
+//   } finally {
+//     setSaving(false);
+//   }
+// };
+
+
+//   const handleCollectorSignatureUpload = async (e) => {
+//   const file = e.target.files[0];
+//   if (!file) return;
+
+//   if (!file.type.startsWith("image/")) {
+//     alert("Please upload an image file");
+//     return;
+//   }
+
+//   if (file.size > 10 * 1024 * 1024) {
+//     alert("File size must be less than 10MB");
+//     return;
+//   }
+
+//   try {
+//     setSaving(true);
+
+//     //  Directly upload the original image
+//     const response = await districtStampAPI.uploadCollectorSignature(
+//       profile.districtName,
+//       file
+//     );
+
+//     setCollectorInfo({
+//       ...collectorInfo,
+//       signature: `data:image/png;base64,${response.data.collectorSignature}`
+//     });
+
+//     alert("Collector signature uploaded successfully!");
+//   } catch (error) {
+//     console.error("Failed to upload signature:", error);
+//     alert("Failed to upload signature. Please try again.");
+//   } finally {
+//     setSaving(false);
+//   }
+// };
 
 
   const handleDeleteCollectorStamp = async () => {

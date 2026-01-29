@@ -1,364 +1,3 @@
-// import React, { useState } from "react";
-// import { useForm } from "react-hook-form";
-// import { zodResolver } from "@hookform/resolvers/zod";
-// import { z } from "zod";
-// import { Upload, FileText, CheckCircle } from "lucide-react";
-
-// // Demo collectors data
-// const demoCollectors = [
-//   { value: 1, label: "John Collector - Delhi District" },
-//   { value: 2, label: "Priya Collector - Mumbai District" },
-//   { value: 3, label: "Raj Collector - Bangalore District" },
-//   { value: 4, label: "Amit Collector - Chennai District" },
-// ];
-
-// // Simplified validation schema
-// const letterSchema = z.object({
-//   letterName: z.string().min(1, "Letter name is required").max(100, "Letter name must be less than 100 characters"),
-//   collectorId: z.number().min(1, "Please select a collector"),
-//   letterFile: z.any().refine((files) => files?.length === 1, "PDF file is required")
-//     .refine((files) => files?.[0]?.type === "application/pdf", "Only PDF files are allowed")
-//     .refine((files) => files?.[0]?.size <= 5000000, "File size must be less than 5MB"),
-// });
-
-// export default function UploadLetterToCollector() {
-//   const [loading, setLoading] = useState(false);
-//   const [uploadSuccess, setUploadSuccess] = useState(false);
-
-//   const {
-//     register,
-//     handleSubmit,
-//     formState: { errors },
-//     reset,
-//     watch
-//   } = useForm({
-//     resolver: zodResolver(letterSchema)
-//   });
-
-//   const selectedFile = watch("letterFile");
-
-//   const onSubmit = async (data) => {
-//     setLoading(true);
-//     console.log("Letter Upload Data:", data);
-
-//     // Simulate API call
-//     setTimeout(() => {
-//       setUploadSuccess(true);
-//       setLoading(false);
-//       reset();
-
-//       // Hide success message after 3 seconds
-//       setTimeout(() => setUploadSuccess(false), 3000);
-//     }, 2000);
-//   };
-
-//   return (
-//     <div className="bg-white p-6 rounded shadow max-w-2xl mx-auto">
-//       <h2 className="text-2xl font-semibold mb-6">Upload Letter to Collector</h2>
-
-//       {/* Success Message */}
-//       {uploadSuccess && (
-//         <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-md flex items-center gap-2">
-//           <CheckCircle className="w-5 h-5" />
-//           Letter uploaded successfully and sent to collector!
-//         </div>
-//       )}
-
-//       {/* Upload Form */}
-//       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-//         {/* Letter Name */}
-//         <div>
-//           <label className="block text-sm font-medium mb-2">Letter Name *</label>
-//           <input
-//             {...register("letterName")}
-//             className="w-full border border-gray-300 p-3 rounded-md focus:ring-2 focus:ring-blue-500"
-//             placeholder="Enter letter name"
-//           />
-//           {errors.letterName && <p className="text-red-500 text-sm mt-1">{errors.letterName.message}</p>}
-//         </div>
-
-//         {/* Collector Selection */}
-//         <div>
-//           <label className="block text-sm font-medium mb-2">Select Collector *</label>
-//           <select
-//             {...register("collectorId", { valueAsNumber: true })}
-//             className="w-full border border-gray-300 p-3 rounded-md focus:ring-2 focus:ring-blue-500"
-//           >
-//             <option value="">Select a collector</option>
-//             {demoCollectors.map((collector) => (
-//               <option key={collector.value} value={collector.value}>
-//                 {collector.label}
-//               </option>
-//             ))}
-//           </select>
-//           {errors.collectorId && <p className="text-red-500 text-sm mt-1">{errors.collectorId.message}</p>}
-//         </div>
-
-//         {/* File Upload */}
-//         <div>
-//           <label className="block text-sm font-medium mb-2">Upload PDF Letter *</label>
-//           <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
-//             <div className="text-center">
-//               <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-//               <div className="flex text-sm text-gray-600">
-//                 <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500">
-//                   <span>Upload a file</span>
-//                   <input
-//                     id="file-upload"
-//                     type="file"
-//                     accept=".pdf"
-//                     {...register("letterFile")}
-//                     className="sr-only"
-//                   />
-//                 </label>
-//                 <p className="pl-1">or drag and drop</p>
-//               </div>
-//               <p className="text-xs text-gray-500">PDF up to 5MB</p>
-
-//               {selectedFile && selectedFile[0] && (
-//                 <div className="mt-4 flex items-center justify-center gap-2 text-sm text-green-600">
-//                   <FileText className="w-4 h-4" />
-//                   {selectedFile[0].name}
-//                 </div>
-//               )}
-//             </div>
-//           </div>
-//           {errors.letterFile && <p className="text-red-500 text-sm mt-1">{errors.letterFile.message}</p>}
-//         </div>
-
-//         {/* Submit Button */}
-//         <div className="flex gap-4">
-//           <button
-//             type="submit"
-//             disabled={loading}
-//             className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
-//           >
-//             {loading ? (
-//               <>
-//                 <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-//                 Uploading...
-//               </>
-//             ) : (
-//               <>
-//                 <Upload className="w-4 h-4" />
-//                 Upload Letter
-//               </>
-//             )}
-//           </button>
-
-//           <button
-//             type="button"
-//             onClick={() => reset()}
-//             className="bg-gray-500 text-white px-6 py-3 rounded-md hover:bg-gray-600"
-//           >
-//             Reset
-//           </button>
-//         </div>
-//       </form>
-//     </div>
-//   );
-// }
-
-// import React, { useState } from "react";
-// import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
-// import { Download, Loader2, CheckCircle, AlertCircle } from "lucide-react";
-
-// function UploadLetterToCollector() {
-//   const [isProcessing, setIsProcessing] = useState(false);
-//   const [status, setStatus] = useState(null);
-
-//   const handleAddSignature = async () => {
-//     setIsProcessing(true);
-//     setStatus(null);
-
-//     try {
-//       // 1. Load your existing PDF
-//       const pdfUrl = "/vehicle.pdf"; 
-//       const existingPdfBytes = await fetch(pdfUrl).then(res => res.arrayBuffer());
-
-//       // 2. Load signature image
-//       const signatureUrl = "/signature.png";
-//       const signatureBytes = await fetch(signatureUrl).then(res => res.arrayBuffer());
-
-//       // 3. Create PDF document
-//       const pdfDoc = await PDFDocument.load(existingPdfBytes);
-//       const pngImage = await pdfDoc.embedPng(signatureBytes);
-//       const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-//       const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-
-//       const pages = pdfDoc.getPages();
-//       const lastPage = pages[pages.length - 1]; // Sign on last page
-//       const { width, height } = lastPage.getSize();
-
-//       // 4. Add signature image
-//       const signatureWidth = 150;
-//       const signatureHeight = 60;
-//       const xPos = width - 200;
-//       const yPos = 120;
-
-//       lastPage.drawImage(pngImage, {
-//         x: xPos,
-//         y: yPos,
-//         width: signatureWidth,
-//         height: signatureHeight,
-//       });
-
-//       // 5. Add signatory details below signature
-//       let textY = yPos - 10;
-
-//       // Add horizontal line
-//       lastPage.drawLine({
-//         start: { x: xPos, y: textY },
-//         end: { x: xPos + signatureWidth, y: textY },
-//         thickness: 1,
-//         color: rgb(0, 0, 0),
-//       });
-
-//       textY -= 15;
-
-//       // Add name
-//       lastPage.drawText("Collector", {
-//         x: xPos,
-//         y: textY,
-//         size: 11,
-//         font: boldFont,
-//         color: rgb(0, 0, 0),
-//       });
-
-//       textY -= 14;
-
-//       // Add designation
-//       lastPage.drawText("Regional Transport Officer", {
-//         x: xPos,
-//         y: textY,
-//         size: 9,
-//         font: font,
-//         color: rgb(0.2, 0.2, 0.2),
-//       });
-
-//       textY -= 12;
-
-//       // Add date
-//       const currentDate = new Date().toLocaleDateString('en-IN', {
-//         day: '2-digit',
-//         month: '2-digit',
-//         year: 'numeric'
-//       });
-//       lastPage.drawText(`Date: ${currentDate}`, {
-//         x: xPos,
-//         y: textY,
-//         size: 9,
-//         font: font,
-//         color: rgb(0.2, 0.2, 0.2),
-//       });
-
-//       // 6. Save and download
-//       const pdfBytes = await pdfDoc.save();
-//       const blob = new Blob([pdfBytes], { type: "application/pdf" });
-//       const link = document.createElement("a");
-//       link.href = URL.createObjectURL(blob);
-//       link.download = "signed_document.pdf";
-//       link.click();
-
-//       setStatus({ type: "success", message: "PDF signed and downloaded successfully!" });
-
-//     } catch (error) {
-//       console.error("Error processing PDF:", error);
-//       setStatus({ type: "error", message: "Failed to process PDF. Please try again." });
-//     } finally {
-//       setIsProcessing(false);
-//     }
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-6">
-//       <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
-//         <div className="text-center mb-8">
-//           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-//             Sign Document
-//           </h2>
-//           <p className="text-gray-600">
-//             Add digital signature to your PDF document
-//           </p>
-//         </div>
-
-//         {/* Status Message */}
-//         {status && (
-//           <div className={`rounded-lg p-4 mb-6 flex items-center space-x-3 ${
-//             status.type === "success" 
-//               ? "bg-green-50 border border-green-200" 
-//               : "bg-red-50 border border-red-200"
-//           }`}>
-//             {status.type === "success" ? (
-//               <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-//             ) : (
-//               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
-//             )}
-//             <p className={`text-sm font-medium ${
-//               status.type === "success" ? "text-green-800" : "text-red-800"
-//             }`}>
-//               {status.message}
-//             </p>
-//           </div>
-//         )}
-
-//         {/* Document Info */}
-//         {/* <div className="bg-gray-50 rounded-lg p-4 mb-6">
-//           <div className="space-y-2 text-sm">
-//             <div className="flex justify-between">
-//               <span className="text-gray-600">Document:</span>
-//               <span className="font-medium text-gray-900">vehicle.pdf</span>
-//             </div>
-//             <div className="flex justify-between">
-//               <span className="text-gray-600">Signatory:</span>
-//               <span className="font-medium text-gray-900">John Doe</span>
-//             </div>
-//             <div className="flex justify-between">
-//               <span className="text-gray-600">Designation:</span>
-//               <span className="font-medium text-gray-900">Regional Transport Officer</span>
-//             </div>
-//             <div className="flex justify-between">
-//               <span className="text-gray-600">Date:</span>
-//               <span className="font-medium text-gray-900">
-//                 {new Date().toLocaleDateString('en-IN')}
-//               </span>
-//             </div>
-//           </div>
-//         </div> */}
-
-//         {/* Download Button */}
-//         <button
-//           onClick={handleAddSignature}
-//           disabled={isProcessing}
-//           className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 
-//                    hover:to-indigo-700 disabled:from-gray-400 disabled:to-gray-500
-//                    text-white py-4 rounded-xl font-semibold text-lg shadow-lg 
-//                    hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] 
-//                    active:scale-95 disabled:cursor-not-allowed disabled:transform-none
-//                    flex items-center justify-center space-x-2"
-//         >
-//           {isProcessing ? (
-//             <>
-//               <Loader2 className="w-5 h-5 animate-spin" />
-//               <span>Processing...</span>
-//             </>
-//           ) : (
-//             <>
-//               <Download className="w-5 h-5" />
-//               <span>Sign & Download PDF</span>
-//             </>
-//           )}
-//         </button>
-
-//         <p className="text-center text-xs text-gray-500 mt-4">
-//           The signature will be added to the last page of the document
-//         </p>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default UploadLetterToCollector;
 
 import React, { useState, useEffect } from "react";
 import { FileText, Download, Eye, Calendar, Hash, User, CheckCircle, Clock, XCircle, Filter, Tag, Building, House, Landmark } from "lucide-react";
@@ -386,21 +25,28 @@ export default function ViewCollectorRequests() {
       setLoading(false);
     }
   };
-
+  const [pdfLoading, setPdfLoading] = useState(false);
   const handleViewPdf = async (id, letterName) => {
     try {
+      setPdfLoading(true);
+
       const response = await requestEventAPI.viewPdf(id);
       const blob = new Blob([response.data], { type: "application/pdf" });
       const url = window.URL.createObjectURL(blob);
+
       setViewingPdf({ url, name: letterName });
     } catch (error) {
       console.error("Failed to view PDF:", error);
       alert("Failed to view PDF. Please try again.");
+    } finally {
+      setPdfLoading(false);
     }
   };
 
+
   const handleDownloadPdf = async (id, letterName) => {
     try {
+      setPdfLoading(true);
       const response = await requestEventAPI.downloadPdf(id);
       const blob = new Blob([response.data], { type: "application/pdf" });
       const url = window.URL.createObjectURL(blob);
@@ -414,6 +60,9 @@ export default function ViewCollectorRequests() {
     } catch (error) {
       console.error("Failed to download PDF:", error);
       alert("Failed to download PDF. Please try again.");
+    }
+    finally {
+      setPdfLoading(false);
     }
   };
 
@@ -595,6 +244,7 @@ export default function ViewCollectorRequests() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleViewPdf(request.id, request.letterName)}
+                      disabled={pdfLoading}
                       className="flex-1 flex hover:cursor-pointer items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all"
                     >
                       <Eye className="w-4 h-4 " />
@@ -603,6 +253,7 @@ export default function ViewCollectorRequests() {
 
                     <button
                       onClick={() => handleDownloadPdf(request.id, request.letterName)}
+                      disabled={pdfLoading}
                       className="flex-1 hover:cursor-pointer flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium text-xs transition-all"
                     >
                       <Download className="w-4 h-4" />
@@ -654,7 +305,16 @@ export default function ViewCollectorRequests() {
           </div>
         </div>
       )}
-       {/* Footer */}
+
+      {pdfLoading && (
+      <div className="fixed inset-0 z-[60] bg-black/40 flex items-center justify-center">
+        <div className="bg-white rounded-xl p-6 flex flex-col items-center gap-4 shadow-xl">
+          <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-gray-700 font-medium">Processing PDF...</p>
+        </div>
+      </div>
+    )}
+      {/* Footer */}
       <div className="bg-gradient-to-r from-blue-900 gap-3 via-blue-800 to-blue-900 text-white p-4 text-center text-sm mt-8">
         <p className="mb-2">Vehicles Requisition System</p>
         <p>© Government of Odisha – Commerce & Transport Department </p>

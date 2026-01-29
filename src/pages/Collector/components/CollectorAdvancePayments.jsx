@@ -21,7 +21,6 @@ const CollectorAdvancePayments = () => {
   const [actionLoading, setActionLoading] = useState(false);
 
 
-  console.log(selectedRequest,"selelee")
   useEffect(() => {
     fetchData();
   }, []);

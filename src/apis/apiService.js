@@ -1,11 +1,14 @@
 import axios from "axios";
 import { API_ENDPOINTS } from "./endpoint.js";
 
+//export const baseURL = 'http://localhost:8091/VehicleRequisition';
+//export const baseURL = 'http://164.100.221.134/VehicleRequisition';
+export const baseURL= "https://vehicle-backend-d3l9.onrender.com/Requisition"
+
 const api = axios.create({
-//  baseURL: "https://vehicle-backend-d3l9.onrender.com/Requisition",
-baseURL: 'http://localhost:8091/Requisition',
+  baseURL: baseURL,
   withCredentials: true,
-   headers: {
+  headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json, text/plain, */*',
   },
@@ -31,13 +34,13 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-   
-    if (error.response && (error.response.status === 403 )) {
-     
+
+    if (error.response && (error.response.status === 403)) {
+
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       alert('Your session has expired. Please login again.');
-      window.location.href = '/login'; 
+      window.location.href = '/login';
     }
 
     return Promise.reject(error);
@@ -55,7 +58,7 @@ const getAuthHeader = () => {
 
 
 export const authAPI = {
-   requestOTP: (username) => api.post('/api/auth/otp', { username }, {
+  requestOTP: (username) => api.post('/api/auth/otp', { username }, {
     headers: {
       "Content-Type": "application/json"
     }
@@ -327,7 +330,7 @@ export const advancePaymentAPI = {
 
 
 export const districtStampAPI = {
-  
+
   getCurrent: () => api.get('/api/district-stamps/current', {
     headers: {
       "Content-Type": "application/json",
@@ -347,7 +350,7 @@ export const districtStampAPI = {
     });
   },
 
-  
+
   updateCollectorInfo: (districtName, data) => api.patch(
     `/api/district-stamps/${districtName}/collector-info`,
     data,

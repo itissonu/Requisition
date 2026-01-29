@@ -53,6 +53,8 @@ export const AuthProvider = ({ children }) => {
     // Clear localStorage
     localStorage.removeItem("user");
     localStorage.removeItem("token");
+
+     window.location.replace('/VRS/');
   };
 
   // Check authentication status on app load

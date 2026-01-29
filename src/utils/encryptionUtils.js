@@ -33,10 +33,7 @@ export const decryptOTP = (encryptedInput) => {
 
 export const compareOTP = (enteredOTP, encryptedOTPFromServer) => {
   try {
-    console.log("Entered OTP:", enteredOTP);
-    console.log("Encrypted OTP from server:", encryptedOTPFromServer);
     const decryptedOTP = decryptOTP(encryptedOTPFromServer);
-    console.log("Decrypted OTP:", decryptedOTP === enteredOTP);
     return decryptedOTP === enteredOTP;
   } catch (error) {
     console.error("OTP comparison error:", error);

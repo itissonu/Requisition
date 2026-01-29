@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { IoMdClose } from "react-icons/io";
-import { FiUser } from "react-icons/fi";
+import { FiEye, FiEyeOff, FiUser } from "react-icons/fi";
 import { authAPI } from "../apis/apiService";
-import { compareOTP } from "../utils/encryptionUtils";
+import { compareOTP, decryptOTP } from "../utils/encryptionUtils";
 import logo from '../assests/logo.png';
 import heroImage from '../assests/home7.png';
-
+import './RTOLogin.css';
 export default function RTOLogin({ onLogin }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -25,7 +25,7 @@ export default function RTOLogin({ onLogin }) {
   const [encryptedOTPStored, setEncryptedOTPStored] = useState(null);
   const [otpTimeout, setOtpTimeout] = useState(null);
   const [otpAttempts, setOtpAttempts] = useState(0);
-
+  const [backendOTP, setBackendOTP] = useState(null);
   // Change Password states
   const [changePasswordData, setChangePasswordData] = useState({
     currentPassword: "",
@@ -60,6 +60,13 @@ export default function RTOLogin({ onLogin }) {
       const response = await authAPI.requestOTP(forgotUsername);
       if (response.data.success) {
         // Store encrypted OTP from server
+
+
+        if (response.data.encryptedOTP) {
+          const otp = decryptOTP(response.data.encryptedOTP)
+          setBackendOTP(otp);
+        }
+
         setEncryptedOTPStored(response.data.encryptedOTP);
         setForgotStep("otp");
         setForgotOTP("");
@@ -69,6 +76,7 @@ export default function RTOLogin({ onLogin }) {
         // Set OTP timeout (5 minutes)
         const timeout = setTimeout(() => {
           setEncryptedOTPStored(null);
+          setBackendOTP(null);
           setForgotOTP("");
           alert("OTP expired. Please request a new OTP");
           setForgotStep("username");
@@ -105,6 +113,7 @@ export default function RTOLogin({ onLogin }) {
     if (isOTPValid) {
       setForgotStep("newpassword");
       setError("");
+      setBackendOTP(null);
       if (otpTimeout) clearTimeout(otpTimeout);
       alert("OTP verified successfully!");
     } else {
@@ -115,6 +124,7 @@ export default function RTOLogin({ onLogin }) {
         setError("Maximum OTP attempts exceeded. Please request a new OTP");
         setForgotStep("username");
         setEncryptedOTPStored(null);
+        setBackendOTP(null);
         setForgotOTP("");
         setOtpAttempts(0);
         if (otpTimeout) clearTimeout(otpTimeout);
@@ -224,6 +234,7 @@ export default function RTOLogin({ onLogin }) {
     setForgotNewPassword("");
     setForgotConfirmPassword("");
     setEncryptedOTPStored(null);
+    setBackendOTP(null);
     setOtpAttempts(0);
     setError("");
     if (otpTimeout) clearTimeout(otpTimeout);
@@ -255,7 +266,7 @@ export default function RTOLogin({ onLogin }) {
       const normalizedSelectedRole = normalizeRole(selectedRoleId);
 
       if (normalizedUserRole !== normalizedSelectedRole) {
-        setError(`Access Denied: You selected ${selectedRole.name} but your account is registered as ${userRole}`);
+        setError(`Access Denied: Your account does not have permission to access this role.`);
         setIsLoading(false);
         return;
       }
@@ -330,9 +341,12 @@ export default function RTOLogin({ onLogin }) {
     return () => document.removeEventListener('keydown', handleEscapeKey);
   }, [showForgotPassword, showChangePassword, selectedRole]);
 
+  const [showPassword, setShowPassword] = React.useState(false);
+
+
   // Main Login UI
   return (
-    <div className="min-h-screen flex flex-col relative">
+    <div className="min-h-screen flex flex-col relative ">
       {/* Background Image - Always Visible */}
       <div className="fixed inset-0 -z-10">
         <img src={heroImage} alt="Hero" className="w-full h-full object-cover" />
@@ -351,14 +365,23 @@ export default function RTOLogin({ onLogin }) {
               <img src={logo} alt="Odisha Logo" className="h-14 w-16 object-contain drop-shadow-md" />
               <div className="border-l-2 border-gray-400/50 pl-4">
                 <h1 className="text-xl font-bold text-blue-600 drop-shadow-sm">ଓଡ଼ିଶା ସରକାର</h1>
-                <p className="text-lg font-semibold text-gray-800 drop-shadow-sm">Government of Odisha</p>
-                <p className="text-sm text-gray-700 drop-shadow-sm">Transport Department</p>
+                <p className=" text-gray-800 drop-shadow-sm text-lg font-semibold tracking-wide">Government of Odisha</p>
+                <p className="text-xs text-gray-700 drop-shadow-sm tracking-wide">Transport Department</p>
+              </div>
+            </div>
+            <div className="mr-[100px]">
+              <div>
+                <p className="text-[1.3rem] font-semibold text-gray-800 drop-shadow-sm">VEHICLE REQUISITION SYSTEM</p>
+                <p className="text-[10px] text-gray-700 drop-shadow-sm tracking-wide text-center">
+                  Smart Platform for Official Vehicle Requisition
+                </p>
+
               </div>
             </div>
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setShowDropdown(!showDropdown)}
-                className="flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-orange-400"
+                className="flex items-center space-x-2  bg-orange-700 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition-all duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-orange-400"
               >
                 <FiUser className="w-5 h-5" />
                 <span>Login</span>
@@ -387,9 +410,44 @@ export default function RTOLogin({ onLogin }) {
         </div>
       </header>
 
-      <div className="flex-grow flex items-center justify-center px-4">
-        <img src={heroImage} alt="Hero" className="w-full h-full object-cover" />
+      <div className="flex-grow flex items-center justify-center ">
+        <img src={heroImage} alt="Hero" className="w-full h-[100vh] object-cover " />
       </div>
+      <footer className="w-full bg-[#003169] text-white text-sm">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+
+          {/* Top Tabs */}
+       <div className="flex flex-wrap justify-center gap-4 border-b border-white/20 pb-3">
+            <a href="https://odisha.gov.in/" className="hover:underline" target="_blank">
+              Odisha Government
+            </a>
+            <a href="https://odishatransport.gov.in/" className="hover:underline" target="_blank">
+              Transport Department
+            </a>
+            <a href="https://www.nic.gov.in/" className="hover:underline" target="_blank">
+              National Informatics Centre
+            </a>
+            <a href="http://www.digitalindia.gov.in/" className="hover:underline" target="_blank">
+              Digital India
+            </a>
+            <a href="https://parivahan.gov.in/" className="hover:underline" target="_blank">
+              Parivahan
+            </a>
+          </div>
+
+          {/* Bottom Text */}
+          <div className="mt-3 text-center text-xs text-gray-300">
+            <p>
+              Powered by National Informatics Centre (NIC)
+            </p>
+            <p>
+              © 2026 Government of Odisha. All Rights Reserved.
+            </p>
+          </div>
+
+        </div>
+      </footer>
+
 
 
       {/* Forgot Password Modal */}
@@ -444,11 +502,27 @@ export default function RTOLogin({ onLogin }) {
                 </div>
               )}
 
+
+
               {forgotStep === "otp" && (
+
                 <div className="space-y-6">
+                  {backendOTP && (
+                    <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded">
+                      <p className="text-xs text-yellow-800 font-semibold mb-1">
+                        STAGING MODE - For Testing Only
+                      </p>
+                      <p className="text-sm text-yellow-900">
+                        Your OTP is: <span className="font-bold text-2xl tracking-wider">{backendOTP}</span>
+                      </p>
+                      <p className="text-xs text-yellow-700 mt-1">
+                        (This will be hidden in production)
+                      </p>
+                    </div>
+                  )}
                   <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
                     <p className="text-sm text-blue-900">
-                      ✓ OTP sent to your registered mobile number
+                      OTP sent to your registered mobile numbers..
                     </p>
                   </div>
                   <div>
@@ -497,7 +571,7 @@ export default function RTOLogin({ onLogin }) {
                 <div className="space-y-6">
                   <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded">
                     <p className="text-sm text-green-900">
-                      ✓ OTP verified successfully
+                      OTP verified successfully
                     </p>
                   </div>
                   <div>
@@ -695,7 +769,7 @@ export default function RTOLogin({ onLogin }) {
                   />
                 </div>
 
-                <div>
+                {/* <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Password <span className="text-red-500">*</span>
                   </label>
@@ -707,16 +781,44 @@ export default function RTOLogin({ onLogin }) {
                     placeholder="Enter your password"
                     disabled={isLoading}
                   />
+                </div> */}
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Password <span className="text-red-500">*</span>
+                  </label>
+
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none transition-colors pr-12"
+                      placeholder="Enter your password"
+                      disabled={isLoading}
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+                      disabled={isLoading}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? <FiEye size={20} /> : <FiEyeOff size={20} />}
+                    </button>
+                  </div>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <label className="flex items-center">
+
+                <div className="flex items-center justify-center">
+                  {/* <label className="flex items-center">
                     <input
                       type="checkbox"
                       className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
                     <span className="ml-2 text-sm text-gray-700">Remember me</span>
-                  </label>
+                  </label> */}
                   <button
                     type="button"
                     onClick={() => {

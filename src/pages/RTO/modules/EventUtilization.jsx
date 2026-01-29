@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { FileText, Plus, Eye, Calendar, MapPin, User, Car } from "lucide-react";
-import { eventAPI, utilizationAPI } from "../../../apis/apiService";
+import { baseURL, eventAPI, utilizationAPI } from "../../../apis/apiService";
 import logo from '../../../assests/logo.png';
+import { useNavigate } from "react-router-dom";
 
 export default function EventUtilizationDashboard() {
   const [approvedEvents, setApprovedEvents] = useState([]);
@@ -43,16 +44,17 @@ export default function EventUtilizationDashboard() {
 
   const handleViewEventPdf = async (eventId) => {
     try {
-      const pdfUrl = `http://localhost:8091/Requisition/api/events/${eventId}/pdf/view`;
+      const pdfUrl = `${baseURL}/api/events/${eventId}/pdf/view`;
       window.open(pdfUrl, '_blank');
     } catch (error) {
       console.error('Error viewing PDF:', error);
       alert('Failed to open document.');
     }
   };
-
+const navigate = useNavigate();
   const handleCreateUtilization = (eventId) => {
-    window.location.href = `/utilization/${eventId}`;
+   // window.location.href = `/utilization/${eventId}`;
+    navigate(`/utilization/${eventId}`);
   };
 
   function formatDateTime(isoString) {

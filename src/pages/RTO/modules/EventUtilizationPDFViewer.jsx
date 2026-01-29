@@ -88,7 +88,7 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
     setError(null);
     try {
       const response = await eventAPI.details(eventId);
-      console.log("Fetched event data:", response.data);
+      
       setEventData(response?.data);
     } catch (error) {
       console.error("Error fetching event data:", error);
@@ -102,7 +102,7 @@ const EventUtilizationPDFViewer = ({ eventId, isOpen, onClose }) => {
   const fetchStampAndSignature = async () => {
     try {
       const response = await districtStampAPI.getCurrent();
-      console.log("Fetched stamp and signature:", response.data);
+     
       setStampData(response?.data);
       
    

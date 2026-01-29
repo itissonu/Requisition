@@ -46,7 +46,7 @@ export const API_ENDPOINTS = {
         list: () => `/api/events`,
         details: (id) => `/api/events/singleEvent/${id}`,
         update: (id) => `/api/events/${id}`,
-        viewPdf: (id) => `/api/events/${id}/pdf/view`,        // This should match your backend
+        viewPdf: (id) => `/api/events/${id}/pdf/view`,        
         downloadPdf: (id) => `/api/events/${id}/pdf`,
          delete: (id) => `/api/events/${id}`,
     },

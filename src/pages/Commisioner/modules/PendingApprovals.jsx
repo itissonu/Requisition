@@ -65,7 +65,7 @@ export default function CommissionerApproveUtilizations() {
     setSelected(util);
     setShowDetailsModal(true);
   };
-  console.log(utilizations,"utilizionss")
+
 
   // Calculate total vehicles across all sub-events
   const getTotalVehicles = (utilization) => {

@@ -108,7 +108,7 @@ export default function VehicleRequisitionForm() {
                 const logoImageBytes = await fetch(logo).then(res => res.arrayBuffer());
                 logoImage = await pdfDoc.embedPng(logoImageBytes);
             } catch (error) {
-                console.log("Logo not found, continuing without logo");
+                console.error("Logo not found, continuing without logo");
             }
 
             // Header - Left Side
