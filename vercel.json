@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "source": "/VRS((?!/assets|/.*\\..*).*)",
+      "destination": "/VRS/index.html"
     }
   ]
 }
